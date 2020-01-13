@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import itertools
 import json
 import os
@@ -129,7 +131,7 @@ class ExternalProgram(object):
         elif stream == "stderr":
             return [l.strip() for l in self.err.splitlines()]
         else:
-            raise InvalidStream
+            raise InvalidStream("Allowed streams are stdout and stderr")
 
     def _stdout_lines(self):
         return self._splitlines()
@@ -142,24 +144,20 @@ class ExternalProgram(object):
             raise ExternalProgramException(
                 "Run program to obtain results before requesting resulting data"
             )
-        lines = []
+        new_lines = []
         if stream == "stdout":
-            for l in self.out.split("\n"):
-                tokens = l.split()
-                if tokens:
-                    if strip_punct:
-                        tokens = tuple(stripper(tok, strip_chars) for tok in tokens)
-                    lines.append(tokens)
+            lines = self._stdout_lines()
         elif stream == "stderr":
-            for l in self.err.split("\n"):
-                tokens = l.split()
-                if tokens:
-                    if strip_punct:
-                        tokens = [stripper(tok, strip_chars) for tok in tokens]
-                    lines.append(tokens)
+            lines = self._stderr_lines()
         else:
-            raise InvalidStream
-        return lines
+            raise InvalidStream("Allowed streams are stdout and stderr")
+        for l in lines:
+            tokens = tuple(l.split())
+            if tokens:
+                if strip_punct:
+                    tokens = tuple(stripper(tok, strip_chars) for tok in tokens)
+                new_lines.append(tokens)
+        return new_lines
 
     def _trim_prefix(self, prefix, pattern=None, exclude=False, stream="stdout"):
         if stream == "stdout":
@@ -167,18 +165,21 @@ class ExternalProgram(object):
         elif stream == "stderr":
             lines = self._stderr_lines()
         else:
-            raise InvalidStream
+            raise InvalidStream("Allowed streams are stdout and stderr")
         if not pattern:
             unfiltered_lines = [l for l in lines]
             return [
-                l[len(prefix) :] if l.startswith(prefix) else l
+                l[len(prefix) :].strip() if l.startswith(prefix) else l
                 for l in unfiltered_lines
             ]
         if exclude:
             filtered_lines = [l for l in lines if not re.search(pattern, l)]
         else:
             filtered_lines = [l for l in lines if re.search(pattern, l)]
-        return [l[len(prefix) :] if l.startswith(prefix) else l for l in filtered_lines]
+        return [
+            l[len(prefix) :].strip() if l.startswith(prefix) else l
+            for l in filtered_lines
+        ]
 
     def _trim_suffix(self, suffix, pattern=None, exclude=False, stream="stdout"):
         if stream == "stdout":
@@ -186,17 +187,21 @@ class ExternalProgram(object):
         elif stream == "stderr":
             lines = self._stderr_lines()
         else:
-            raise InvalidStream
+            raise InvalidStream("Allowed streams are stdout and stderr")
         if not pattern:
             unfiltered_lines = [l for l in lines]
             return [
-                l[len(suffix) :] if l.endswith(suffix) else l for l in unfiltered_lines
+                l[: l.rindex(suffix)].strip() if l.endswith(suffix) else l
+                for l in unfiltered_lines
             ]
         if exclude:
             filtered_lines = [l for l in lines if not re.search(pattern, l)]
         else:
             filtered_lines = [l for l in lines if re.search(pattern, l)]
-        return [l[len(suffix) :] if l.endswith(suffix) else l for l in filtered_lines]
+        return [
+            l[: l.rindex(suffix)].strip() if l.endswith(suffix) else l
+            for l in filtered_lines
+        ]
 
     def _with_prefix(self, prefix, exclude=False, stream="stdout"):
         if stream == "stdout":
@@ -204,7 +209,7 @@ class ExternalProgram(object):
         elif stream == "stderr":
             lines = self._stderr_lines()
         else:
-            raise InvalidStream
+            raise InvalidStream("Allowed streams are stdout and stderr")
         if not prefix:
             return lines
         if exclude:
@@ -217,7 +222,7 @@ class ExternalProgram(object):
         elif stream == "stderr":
             lines = self._stderr_lines()
         else:
-            raise InvalidStream
+            raise InvalidStream("Allowed streams are stdout and stderr")
         if not suffix:
             return lines
         if exclude:
@@ -230,7 +235,7 @@ class ExternalProgram(object):
         elif stream == "stderr":
             lines = self._stderr_lines()
         else:
-            raise InvalidStream
+            raise InvalidStream("Allowed streams are stdout and stderr")
         if not substr:
             return lines
         if exclude:
@@ -243,7 +248,7 @@ class ExternalProgram(object):
         elif stream == "stderr":
             lines = self._stderr_lines()
         else:
-            raise InvalidStream
+            raise InvalidStream("Allowed streams are stdout and stderr")
         if not substr:
             return lines
         return [l for l in lines if l.count(substr) >= n]
@@ -254,7 +259,7 @@ class ExternalProgram(object):
         elif stream == "stderr":
             lines = self._stderr_lines()
         else:
-            raise InvalidStream
+            raise InvalidStream("Allowed streams are stdout and stderr")
         if not substr:
             return lines
         return [l for l in lines if l.count(substr) <= n]
@@ -267,7 +272,7 @@ class ExternalProgram(object):
         elif stream == "stderr":
             lines = self._stderr_lines()
         else:
-            raise InvalidStream
+            raise InvalidStream("Allowed streams are stdout and stderr")
         if n < 1:
             raise ValueError("Number of lines cannot be less than '1'")
         if first:
@@ -290,7 +295,7 @@ class ExternalProgram(object):
         elif stream == "stderr":
             lines = self._stderr_lines()
         else:
-            raise InvalidStream
+            raise InvalidStream("Allowed streams are stdout and stderr")
         if not pattern:
             return [col.split(sep)[0].strip() for col in lines]
         if exclude:
@@ -305,7 +310,7 @@ class ExternalProgram(object):
         elif stream == "stderr":
             lines = self._stderr_lines()
         else:
-            raise InvalidStream
+            raise InvalidStream("Allowed streams are stdout and stderr")
         if not pattern:
             return [tuple(col.split(sep)[1:]) for col in lines]
         if exclude:
@@ -313,6 +318,23 @@ class ExternalProgram(object):
         else:
             filtered_lines = [l for l in lines if re.search(pattern, l)]
         return [tuple(col.split(sep)[1:]) for col in filtered_lines]
+
+    def _columns(
+        self, sep=None, pattern=None, exclude=False, stream="stdout"
+    ):
+        if stream == "stdout":
+            lines = self._stdout_lines()
+        elif stream == "stderr":
+            lines = self._stderr_lines()
+        else:
+            raise InvalidStream("Allowed streams are stdout and stderr")
+        if not pattern:
+            return list(zip(*map(lambda x: map(lambda x: x.strip(), x.split()), lines)))
+        if exclude:
+            filtered_lines = [l for l in lines if not re.search(pattern, l)]
+        else:
+            filtered_lines = [l for l in lines if re.search(pattern, l)]
+        return list(zip(*map(lambda x: map(lambda x: x.strip(), x.split()), filtered_lines)))
 
     def _take_column(
         self, sep=None, column=0, pattern=None, exclude=False, stream="stdout"
@@ -322,7 +344,7 @@ class ExternalProgram(object):
         elif stream == "stderr":
             lines = self._stderr_lines()
         else:
-            raise InvalidStream
+            raise InvalidStream("Allowed streams are stdout and stderr")
         if not pattern:
             return [col.split(sep)[column].strip() for col in lines]
         if exclude:
@@ -339,7 +361,7 @@ class ExternalProgram(object):
         elif stream == "stderr":
             lines = self._stderr_lines()
         else:
-            raise InvalidStream
+            raise InvalidStream("Allowed streams are stdout and stderr")
         if not pattern:
             return [
                 tuple(itertools.compress(col.split(sep), selectors)) for col in lines
@@ -366,7 +388,7 @@ class ExternalProgram(object):
         elif stream == "stderr":
             lines = self._stderr_lines()
         else:
-            raise InvalidStream
+            raise InvalidStream("Allowed streams are stdout and stderr")
         slc_obj = slice(*slc_range)
         if not pattern:
             return [col.split(sep)[slc_obj] for col in lines]
@@ -376,7 +398,7 @@ class ExternalProgram(object):
             filtered_lines = [l for l in lines if re.search(pattern, l)]
         return [col.split(sep)[slc_obj] for col in filtered_lines]
 
-    def _dict_transform_func(
+    def _to_dict_map_func(
         self, func, sep=None, pattern=None, exclude=False, stream="stdout",
     ):
         if stream == "stdout":
@@ -384,7 +406,7 @@ class ExternalProgram(object):
         elif stream == "stderr":
             lines = self._stderr_lines()
         else:
-            raise InvalidStream
+            raise InvalidStream("Allowed streams are stdout and stderr")
         if not pattern:
             return dict(func(line) for line in lines)
         if exclude:
@@ -393,13 +415,31 @@ class ExternalProgram(object):
             filtered_lines = [l for l in lines if re.search(pattern, l)]
         return dict(func(line) for line in filtered_lines)
 
+    def _tuple_transform_func(
+        self, func, sep=None, pattern=None, exclude=False, stream="stdout",
+    ):
+        if stream == "stdout":
+            lines = self._stdout_lines()
+        elif stream == "stderr":
+            lines = self._stderr_lines()
+        else:
+            raise InvalidStream("Allowed streams are stdout and stderr")
+        if not pattern:
+            return [func(line) for line in lines]
+        if exclude:
+            filtered_lines = [l for l in lines if not re.search(pattern, l)]
+        else:
+            filtered_lines = [l for l in lines if re.search(pattern, l)]
+        return [func(line) for line in filtered_lines]
+
+
     def _filter_func(self, func, stream="stdout"):
         if stream == "stdout":
             lines = self._stdout_lines()
         elif stream == "stderr":
             lines = self._stderr_lines()
         else:
-            raise InvalidStream
+            raise InvalidStream("Allowed streams are stdout and stderr")
         return [line for line in lines if func(line)]
 
     def _map_func(self, func, stream="stdout"):
@@ -408,7 +448,7 @@ class ExternalProgram(object):
         elif stream == "stderr":
             lines = self._stderr_lines()
         else:
-            raise InvalidStream
+            raise InvalidStream("Allowed streams are stdout and stderr")
         return [func(line) for line in lines]
 
     def _json_loads(self, stream="stdout"):
@@ -417,7 +457,7 @@ class ExternalProgram(object):
         elif stream == "stderr":
             json_string = self.err
         else:
-            raise InvalidStream
+            raise InvalidStream("Allowed streams are stdout and stderr")
         if not json_string:
             return None
         d = {}
@@ -435,7 +475,7 @@ class ExternalProgram(object):
         elif stream == "stderr":
             lines = self._stderr_lines()
         else:
-            raise InvalidStream
+            raise InvalidStream("Allowed streams are stdout and stderr")
         if not pattern:
             return [
                 dict(
@@ -488,57 +528,324 @@ class ExternalProgram(object):
             return [l for l in lines if not re.search(pattern, l)].__len__()
         return [l for l in lines if re.search(pattern, l)].__len__()
 
-    def stdout_lines(self, pattern=None, exclude=False):
+    def stdout_lines(self, skip_head=0, skip_tail=0, pattern=None, exclude=False):
+        """
+        Stdout text produced by the program.
+
+        Args:
+            skip_head (int, optional): Number of lines to skip relative to beginning of data. Defaults to 0.
+            skip_tail (int, optional): Number of lines to skip relative to the end of the data. Defaults to 0.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            list: List of lines written to stdout.
+        """
+        if skip_head < 0:
+            raise ValueError("skip_head cannot be less than 0")
+        if skip_tail < 0:
+            raise ValueError("skip_tail cannot be less than 0")
         lines = self._stdout_lines()
+        lines = lines[skip_head:len(lines)-skip_tail]
         if not pattern:
             return lines
         if exclude:
             return [l for l in lines if not re.search(pattern, l)]
         return [l for l in lines if re.search(pattern, l)]
 
-    def stderr_lines(self, pattern=None, exclude=False):
+    def stderr_lines(self, skip_head=0, skip_tail=0, pattern=None, exclude=False):
+        """
+        Stderr text produced by the program.
+
+        Args:
+            skip_head (int, optional): Number of lines to skip relative to beginning of data. Defaults to 0.
+            skip_tail (int, optional): Number of lines to skip relative to the end of the data. Defaults to 0.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            list: List of lines written to stderr.
+        """
+        if skip_head < 0:
+            raise ValueError("skip_head cannot be less than 0")
+        if skip_tail < 0:
+            raise ValueError("skip_tail cannot be less than 0")
         lines = self._stderr_lines()
+        lines = lines[skip_head:len(lines)-skip_tail]
         if not pattern:
             return lines
         if exclude:
             return [l for l in lines if not re.search(pattern, l)]
         return [l for l in lines if re.search(pattern, l)]
 
-    def stdout_dict_transform_func(self, func, sep=None, pattern=None, exclude=False):
-        return self._dict_transform_func(func, sep, pattern, exclude)
+    def stdout_tuple_transform_func(self, tuple_func, sep=None, pattern=None, exclude=False):
+        """
+        Applies 'tuple_func' over each line, adding resulting tuple to list.
 
-    def stderr_dict_transform_func(self, func, sep=None, pattern=None, exclude=False):
-        return self._dict_transform_func(func, sep, pattern, exclude, stream="stderr")
+        Args:
+            tuple_func (str): Conversion function from string to two-element tuple.
+            sep (str, optional): Separator character. Defaults to None.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            list(tuple): List of tuples for each line over which 'tuple_func'
+            was applied.
+        """
+        return self._tuple_transform_func(tuple_func, sep, pattern, exclude)
+
+    def stderr_tuple_transform_func(self, tuple_func, sep=None, pattern=None, exclude=False):
+        """
+        Applies 'tuple_func' over each line, adding resulting tuple to list.
+        It is expected that result from 'tuple_func' is a single tuple object.
+
+        Args:
+            tuple_func (str): Conversion function from string to two-element tuple.
+            sep (str, optional): Separator character. Defaults to None.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            list(tuple): List of tuples for each line over which 'tuple_func' was applied.
+        """
+        return self._tuple_transform_func(tuple_func, sep, pattern, exclude, stream="stderr")
+
+    def stdout_to_dict_map_func(self, tuple_func, sep=None, pattern=None, exclude=False):
+        """
+        Applies 'tuple_func' to each line from stdout, adding resulting tuple
+        to dict. It is expected that result from 'tuple_func' is a single
+        two-element tuple object, where first element becomes dict key and
+        second value for given key.
+
+        Args:
+            tuple_func (str): Conversion function from string to two-element tuple.
+            sep (str, optional): Separator character. Defaults to None.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            dict: Dict made from tuples for each line over which 'tuple_func'
+            was applied.
+        """
+        return self._to_dict_map_func(tuple_func, sep, pattern, exclude)
+
+    def stderr_to_dict_map_func(self, tuple_func, sep=None, pattern=None, exclude=False):
+        """
+        Applies 'tuple_func' to each line from stdout, adding resulting tuple
+        to dict. It is expected that result from 'tuple_func' is a single
+        two-element tuple object, where first element becomes dict key and
+        second value for given key.
+
+        Args:
+            tuple_func (str): Conversion function from string to two-element tuple.
+            sep (str, optional): Separator character. Defaults to None.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            dict: Dict made from tuples for each line over which 'tuple_func'
+            was applied.
+        """
+        return self._to_dict_map_func(tuple_func, sep, pattern, exclude, stream="stderr")
 
     def stdout_dict_from_line(self, keys=None, sep=None, pattern=None, exclude=False):
+        """
+        Converts stdout lines into dicts, where 'keys' is a list of keys which 
+        should be zip(able) with contents of split line. This means that the
+        following expression should be true: len(keys) == len(line.split(sep))
+        for each line. If len(line) > len(keys), only len(keys) elements are
+        taken from each split line. Reverse of this is true also. This is done
+        so that equal number of key=value pairs was available for establishing
+        a mapping.
+        If keys == None, then after a line is split, it is zipped with a range
+        object generated from length of split line. In other words, if
+        len(line) == 3, resulting dict is {0: line[0], 1: line[1], 2: line[2]}.
+
+        Args:
+            keys (hashable, optional): A list of keys to build a dict from line. Defaults to None.
+            sep (str, optional): Separator character. Defaults to None.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            list: List of dictionaries generated from lines.
+        """
         return self._dict_from_line(keys, sep, pattern, exclude)
 
     def stderr_dict_from_line(self, keys=None, sep=None, pattern=None, exclude=False):
+        """
+        Converts stderr lines into dicts, where 'keys' is a list of keys which 
+        should be zip(able) with contents of split line. This means that the
+        following expression should be true: len(keys) == len(line.split(sep))
+        for each line. If len(line) > len(keys), only len(keys) elements are
+        taken from each split line. Reverse of this is true also. This is done
+        so that equal number of key=value pairs was available for establishing
+        a mapping.
+        If keys == None, then after a line is split, it is zipped with a range
+        object generated from length of split line. In other words, if
+        len(line) == 3, resulting dict is {0: line[0], 1: line[1], 2: line[2]}.
+
+        Args:
+            keys (hashable, optional): A list of keys to build a dict from line. Defaults to None.
+            sep (str, optional): Separator character. Defaults to None.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            list: List of dictionaries generated from lines.
+        """
         return self._dict_from_line(keys, sep, pattern, exclude, stream="stderr")
 
     def stdout_firstn(self, n=1, pattern=None, exclude=None):
+        """
+        Select first n lines from stdout.
+
+        Args:
+            n (int, optional): Number of lines to select. Defaults to 1.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            list: List of lines 0 through n, from stdout.
+        """
         return self._first_last_n(n, pattern, exclude)
 
     def stderr_firstn(self, n=1, pattern=None, exclude=None):
+        """
+        Select first n lines from stderr.
+
+        Args:
+            n (int, optional): Number of lines to select. Defaults to 1.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            list: List of lines 0 through n, from stderr.
+        """
         return self._first_last_n(n, pattern, exclude, stream="stderr")
 
     def stdout_lastn(self, n=1, pattern=None, exclude=None):
+        """
+        Select last n lines from stdout.
+
+        Args:
+            n (int, optional): Number of lines to select. Defaults to 1.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            list: List of lines len(lines) - n through len(lines), from stdout.
+        """
         return self._first_last_n(n, pattern, exclude, first=False)
 
     def stderr_lastn(self, n=1, pattern=None, exclude=None):
+        """
+        Select last n lines from stderr.
+
+        Args:
+            n (int, optional): Number of lines to select. Defaults to 1.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            list: List of lines len(lines) - n through len(lines), from stderr.
+        """
         return self._first_last_n(n, pattern, exclude, first=False, stream="stderr")
 
     def stdout_head(self, sep=None, pattern=None, exclude=False):
+        """
+        Select first column of each line from stdout, after splitting on 'sep'.
+
+        Args:
+            sep (str, optional): Separator character. Defaults to None.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            list: List of first element of each split line from stdout.
+        """
         return self._head(sep, pattern, exclude)
 
     def stderr_head(self, sep=None, pattern=None, exclude=False):
+        """
+        Select first column of each line from stderr, after splitting on 'sep'.
+
+        Args:
+            sep (str, optional): Separator character. Defaults to None.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            list: List of first element of each split line from stderr.
+        """
         return self._head(sep, pattern, exclude, stream="stderr")
 
     def stdout_tail(self, sep=None, pattern=None, exclude=False):
+        """
+        Select all but first column of each line from stdout, after splitting on 'sep'.
+
+        Args:
+            sep (str, optional): Separator character. Defaults to None.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            list: List of tuples with all but first element of each split line from stdout.
+        """
         return self._tail(sep, pattern, exclude)
 
     def stderr_tail(self, sep=None, pattern=None, exclude=False):
+        """
+        Select all but first column of each line from stderr, after splitting on 'sep'.
+
+        Args:
+            sep (str, optional): Separator character. Defaults to None.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            list: List of tuples with all but first element of each split line from stderr.
+        """
         return self._tail(sep, pattern, exclude, stream="stderr")
+
+    def stdout_columns(self, sep=None, pattern=None, exclude=False):
+        """
+        Split each line from stdout into columns and join each column into a
+        tuple. This is meant to be used with text where multiple lines contain
+        same number of fields (columns), and result of this is a list of tuples
+        where each tuple contains elements from a given position across all
+        lines. Given a string: 'alpha beta gamma\\ndelta epsilon zeta\\n', this
+        produces: [('alpha', 'delta'), ('beta', 'epsilon'), ('gamma', 'zeta')].
+        
+        Args:
+            sep (str, optional): Separator character. Defaults to None.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            list: List of tuples from each split line from stdout.
+        """
+        return self._columns(sep, pattern, exclude)
+
+    def stderr_columns(self, sep=None, pattern=None, exclude=False):
+        """
+        Split each line from stderr into columns and join each column into a
+        tuple. This is meant to be used with text where multiple lines contain
+        same number of fields (columns), and result of this is a list of tuples
+        where each tuple contains elements from a given position across all
+        lines. Given a string: 'alpha beta gamma\\ndelta epsilon zeta\\n', this
+        produces: [('alpha', 'delta'), ('beta', 'epsilon'), ('gamma', 'zeta')].
+
+        Args:
+            sep (str, optional): Separator character. Defaults to None.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            list: List of tuples from each split line from stderr.
+        """
+        return self._columns(sep, pattern, exclude, stream="stderr")
+
 
     def stdout_take_column(self, sep=None, column=0, pattern=None, exclude=False):
         return self._take_column(sep, column, pattern, exclude)
@@ -590,7 +897,11 @@ class ExternalProgram(object):
     def stderr_trim_prefix(self, prefix, pattern=None, exclude=False):
         return self._trim_prefix(prefix, pattern, exclude, stream="stderr")
 
-    # FIXME: Add trim_suffix
+    def stdout_trim_suffix(self, suffix, pattern=None, exclude=False):
+        return self._trim_suffix(suffix, pattern, exclude)
+
+    def stderr_trim_suffix(self, suffix, pattern=None, exclude=False):
+        return self._trim_suffix(suffix, pattern, exclude, stream="stderr")
 
     def stdout_with_prefix(self, prefix, exclude=False):
         return self._with_prefix(prefix, exclude)

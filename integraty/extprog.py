@@ -447,14 +447,18 @@ class ExternalProgram(object):
             filtered_lines = [l for l in lines if re.search(pattern, l)]
         return [func(line) for line in filtered_lines]
 
-    def _filter_func(self, func, stream="stdout"):
+    def _filter_func(self, func, exclude=False, stream="stdout"):
         if stream == "stdout":
             lines = self._stdout_lines()
         elif stream == "stderr":
             lines = self._stderr_lines()
         else:
             raise InvalidStream("Allowed streams are stdout and stderr")
-        return [line for line in lines if func(line)]
+        if exclude:
+            filtered_lines = [line for line in lines if not func(line)]
+        else:
+            filtered_lines = [line for line in lines if func(line)]
+        return filtered_lines
 
     def _map_func(self, func, stream="stdout"):
         if stream == "stdout":
@@ -1170,17 +1174,69 @@ class ExternalProgram(object):
     def stderr_at_most_n_substr(self, substr=None, n=0):
         return self._at_most_n_substr(substr, n, stream="stderr")
 
-    def stdout_filter_func(self, func):
-        return self._filter_func(func)
+    def stdout_filter_func(self, func, exclude=False):
+        """
+        Filters lines written to stdout with a filtering function in
+        'func' argument. This function should expect a single argument
+        which will be a line that either should evaluate to a `True` or
+        `False` result. Any lines that cause this function to return `True`
+        will be included in the resulting list, and those that result in
+        `False` will be excluded, unless 'exclude' is `True`, which inverts
+        this logic.
 
-    def stderr_filter_func(self, func):
-        return self._filter_func(func)
+        Args:
+            func ((s: str) -> bool): Filtering function emitting a boolean.
+            exclude (bool, optional): Invert filtering logic. Defaults to False.
+        Returns:
+            list: List of lines after filtering function is applied.
+        """
+        return self._filter_func(func, exclude)
+
+    def stderr_filter_func(self, func, exclude=False):
+        """
+        Filters lines written to stderr with a filtering function in
+        'func' argument. This function should expect a single argument
+        which will be a line that either should evaluate to a `True` or
+        `False` result. Any lines that cause this function to return `True`
+        will be included in the resulting list, and those that result in
+        `False` will be excluded, unless 'exclude' is `True`, which inverts
+        this logic.
+
+        Args:
+            func ((s: str) -> bool): Filtering function receiving a string and emitting a boolean.
+            exclude (bool, optional): Invert filtering logic. Defaults to False.
+        Returns:
+            list: List of lines after filtering function is applied.
+        """
+        return self._filter_func(func, exclude, stream="stderr")
 
     def stdout_map_func(self, func):
+        """
+        Applies function in 'func' to each line written to stdout.
+        Transformations from these map operations will be included in
+        the resulting list. Result of calling 'func' should not be None.
+
+        Args:
+            func ((s: str) -> Any): Mapping function receiving a string and emitting Any other type.
+
+        Returns:
+            list: List of results from application of mapping function.
+        """
         return self._map_func(func)
 
     def stderr_map_func(self, func):
-        return self._map_func(func)
+        """
+        Applies function in 'func' to each line written to stderr.
+        Transformations from these map operations will be included in
+        the resulting list. Result of calling 'func' should not be None.
+
+        Args:
+            func ((s: str) -> Any): Mapping function receiving a string and emitting Any other type.
+
+        Returns:
+            list: List of results from application of mapping function.
+        """
+        return self._map_func(func, stream="stderr")
 
     ### End String Processing Public Methods ###
 

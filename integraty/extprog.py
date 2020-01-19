@@ -11,6 +11,9 @@ import sys
 import locale
 import errno
 
+from functools import reduce
+from typing import TypeVar, Callable, Sequence
+
 from pexpect.popen_spawn import PopenSpawn
 import pexpect
 
@@ -84,7 +87,9 @@ class ExternalProgram(object):
         self.__err = None
 
     def __repr__(self):
-        return "ExternalProgram({!r}, timeout={})".format(self.cmd, self.timeout)
+        return "ExternalProgram({!r}, timeout={})".format(
+            self.cmd, self.timeout
+        )
 
     @property
     def _popen_args(self):
@@ -109,7 +114,11 @@ class ExternalProgram(object):
             default_encoding = locale.getdefaultlocale()[1]
             if default_encoding is not None:
                 encoding = default_encoding
-        return {"env": os.environ.copy(), "encoding": encoding, "timeout": self.timeout}
+        return {
+            "env": os.environ.copy(),
+            "encoding": encoding,
+            "timeout": self.timeout,
+        }
 
     @property
     def _uses_subprocess(self):
@@ -120,6 +129,14 @@ class ExternalProgram(object):
         return isinstance(self.subprocess, PopenSpawn)
 
     ### String Processing Private Methods Below ###
+
+    def _lines_from_impl(self, stream=None):
+        if stream == "stdout":
+            return self._stdout_lines()
+        elif stream == "stderr":
+            return self._stderr_lines()
+        else:
+            raise InvalidStream("Allowed streams are stdout and stderr")
 
     def _splitlines(self, stream="stdout"):
         if not self.was_run:
@@ -154,12 +171,7 @@ class ExternalProgram(object):
             )
         new_lines = []
         filtered_lines = None
-        if stream == "stdout":
-            lines = self._stdout_lines()
-        elif stream == "stderr":
-            lines = self._stderr_lines()
-        else:
-            raise InvalidStream("Allowed streams are stdout and stderr")
+        lines = self._lines_from_impl(stream)
 
         if pattern and exclude:
             filtered_lines = [l for l in lines if not re.search(pattern, l)]
@@ -170,17 +182,16 @@ class ExternalProgram(object):
             tokens = tuple(l.split(sep))
             if tokens:
                 if strip_punct:
-                    tokens = tuple(stripper(tok, strip_chars) for tok in tokens)
+                    tokens = tuple(
+                        stripper(tok, strip_chars) for tok in tokens
+                    )
                 new_lines.append(tokens)
         return new_lines
 
-    def _trim_prefix(self, prefix, pattern=None, exclude=False, stream="stdout"):
-        if stream == "stdout":
-            lines = self._stdout_lines()
-        elif stream == "stderr":
-            lines = self._stderr_lines()
-        else:
-            raise InvalidStream("Allowed streams are stdout and stderr")
+    def _trim_prefix(
+        self, prefix, pattern=None, exclude=False, stream="stdout"
+    ):
+        lines = self._lines_from_impl(stream)
         if not pattern:
             unfiltered_lines = [l for l in lines]
             return [
@@ -196,13 +207,10 @@ class ExternalProgram(object):
             for l in filtered_lines
         ]
 
-    def _trim_suffix(self, suffix, pattern=None, exclude=False, stream="stdout"):
-        if stream == "stdout":
-            lines = self._stdout_lines()
-        elif stream == "stderr":
-            lines = self._stderr_lines()
-        else:
-            raise InvalidStream("Allowed streams are stdout and stderr")
+    def _trim_suffix(
+        self, suffix, pattern=None, exclude=False, stream="stdout"
+    ):
+        lines = self._lines_from_impl(stream)
         if not pattern:
             unfiltered_lines = [l for l in lines]
             return [
@@ -219,12 +227,7 @@ class ExternalProgram(object):
         ]
 
     def _with_prefix(self, prefix, exclude=False, stream="stdout"):
-        if stream == "stdout":
-            lines = self._stdout_lines()
-        elif stream == "stderr":
-            lines = self._stderr_lines()
-        else:
-            raise InvalidStream("Allowed streams are stdout and stderr")
+        lines = self._lines_from_impl(stream)
         if not prefix:
             return lines
         if exclude:
@@ -232,12 +235,7 @@ class ExternalProgram(object):
         return [l for l in lines if l.startswith(prefix)]
 
     def _with_suffix(self, suffix=None, exclude=False, stream="stdout"):
-        if stream == "stdout":
-            lines = self._stdout_lines()
-        elif stream == "stderr":
-            lines = self._stderr_lines()
-        else:
-            raise InvalidStream("Allowed streams are stdout and stderr")
+        lines = self._lines_from_impl(stream)
         if not suffix:
             return lines
         if exclude:
@@ -245,12 +243,7 @@ class ExternalProgram(object):
         return [l for l in lines if l.endswith(suffix)]
 
     def _with_substr(self, substr=None, exclude=False, stream="stdout"):
-        if stream == "stdout":
-            lines = self._stdout_lines()
-        elif stream == "stderr":
-            lines = self._stderr_lines()
-        else:
-            raise InvalidStream("Allowed streams are stdout and stderr")
+        lines = self._lines_from_impl(stream)
         if not substr:
             return lines
         if exclude:
@@ -258,23 +251,13 @@ class ExternalProgram(object):
         return [l for l in lines if l.find(substr) >= 0]
 
     def _at_least_n_substr(self, substr=None, n=0, stream="stdout"):
-        if stream == "stdout":
-            lines = self._stdout_lines()
-        elif stream == "stderr":
-            lines = self._stderr_lines()
-        else:
-            raise InvalidStream("Allowed streams are stdout and stderr")
+        lines = self._lines_from_impl(stream)
         if not substr:
             return lines
         return [l for l in lines if l.count(substr) >= n]
 
     def _at_most_n_substr(self, substr=None, n=0, stream="stdout"):
-        if stream == "stdout":
-            lines = self._stdout_lines()
-        elif stream == "stderr":
-            lines = self._stderr_lines()
-        else:
-            raise InvalidStream("Allowed streams are stdout and stderr")
+        lines = self._lines_from_impl(stream)
         if not substr:
             return lines
         return [l for l in lines if l.count(substr) <= n]
@@ -282,12 +265,7 @@ class ExternalProgram(object):
     def _first_last_n(
         self, n=1, pattern=None, exclude=False, first=True, stream="stdout"
     ):
-        if stream == "stdout":
-            lines = self._stdout_lines()
-        elif stream == "stderr":
-            lines = self._stderr_lines()
-        else:
-            raise InvalidStream("Allowed streams are stdout and stderr")
+        lines = self._lines_from_impl(stream)
         if n < 1:
             raise ValueError("Number of lines cannot be less than '1'")
         if first:
@@ -305,12 +283,7 @@ class ExternalProgram(object):
         return filtered_lines[slc_obj]
 
     def _head(self, sep=None, pattern=None, exclude=False, stream="stdout"):
-        if stream == "stdout":
-            lines = self._stdout_lines()
-        elif stream == "stderr":
-            lines = self._stderr_lines()
-        else:
-            raise InvalidStream("Allowed streams are stdout and stderr")
+        lines = self._lines_from_impl(stream)
         if not pattern:
             return [col.split(sep)[0].strip() for col in lines]
         if exclude:
@@ -320,12 +293,7 @@ class ExternalProgram(object):
         return [col.split(sep)[0].strip() for col in filtered_lines]
 
     def _tail(self, sep=None, pattern=None, exclude=False, stream="stdout"):
-        if stream == "stdout":
-            lines = self._stdout_lines()
-        elif stream == "stderr":
-            lines = self._stderr_lines()
-        else:
-            raise InvalidStream("Allowed streams are stdout and stderr")
+        lines = self._lines_from_impl(stream)
         if not pattern:
             return [tuple(col.split(sep)[1:]) for col in lines]
         if exclude:
@@ -335,31 +303,28 @@ class ExternalProgram(object):
         return [tuple(col.split(sep)[1:]) for col in filtered_lines]
 
     def _columns(self, sep=None, pattern=None, exclude=False, stream="stdout"):
-        if stream == "stdout":
-            lines = self._stdout_lines()
-        elif stream == "stderr":
-            lines = self._stderr_lines()
-        else:
-            raise InvalidStream("Allowed streams are stdout and stderr")
+        lines = self._lines_from_impl(stream)
         if not pattern:
-            return list(zip(*map(lambda x: map(lambda x: x.strip(), x.split()), lines)))
+            return list(
+                zip(*map(lambda x: map(lambda x: x.strip(), x.split()), lines))
+            )
         if exclude:
             filtered_lines = [l for l in lines if not re.search(pattern, l)]
         else:
             filtered_lines = [l for l in lines if re.search(pattern, l)]
         return list(
-            zip(*map(lambda x: map(lambda x: x.strip(), x.split()), filtered_lines))
+            zip(
+                *map(
+                    lambda x: map(lambda x: x.strip(), x.split()),
+                    filtered_lines,
+                )
+            )
         )
 
     def _take_column(
         self, sep=None, column=0, pattern=None, exclude=False, stream="stdout"
     ):
-        if stream == "stdout":
-            lines = self._stdout_lines()
-        elif stream == "stderr":
-            lines = self._stderr_lines()
-        else:
-            raise InvalidStream("Allowed streams are stdout and stderr")
+        lines = self._lines_from_impl(stream)
         if not pattern:
             return [col.split(sep)[column].strip() for col in lines]
         if exclude:
@@ -369,17 +334,18 @@ class ExternalProgram(object):
         return [col.split(sep)[column].strip() for col in filtered_lines]
 
     def _take_some_columns(
-        self, sep=None, selectors=(), pattern=None, exclude=False, stream="stdout",
+        self,
+        sep=None,
+        selectors=(),
+        pattern=None,
+        exclude=False,
+        stream="stdout",
     ):
-        if stream == "stdout":
-            lines = self._stdout_lines()
-        elif stream == "stderr":
-            lines = self._stderr_lines()
-        else:
-            raise InvalidStream("Allowed streams are stdout and stderr")
+        lines = self._lines_from_impl(stream)
         if not pattern:
             return [
-                tuple(itertools.compress(col.split(sep), selectors)) for col in lines
+                tuple(itertools.compress(col.split(sep), selectors))
+                for col in lines
             ]
         if exclude:
             filtered_lines = [l for l in lines if not re.search(pattern, l)]
@@ -398,12 +364,7 @@ class ExternalProgram(object):
         exclude=False,
         stream="stdout",
     ):
-        if stream == "stdout":
-            lines = self._stdout_lines()
-        elif stream == "stderr":
-            lines = self._stderr_lines()
-        else:
-            raise InvalidStream("Allowed streams are stdout and stderr")
+        lines = self._lines_from_impl(stream)
         slc_obj = slice(*slc_range)
         if not pattern:
             return [col.split(sep)[slc_obj] for col in lines]
@@ -416,12 +377,7 @@ class ExternalProgram(object):
     def _to_dict_map_func(
         self, func, sep=None, pattern=None, exclude=False, stream="stdout",
     ):
-        if stream == "stdout":
-            lines = self._stdout_lines()
-        elif stream == "stderr":
-            lines = self._stderr_lines()
-        else:
-            raise InvalidStream("Allowed streams are stdout and stderr")
+        lines = self._lines_from_impl(stream)
         if not pattern:
             return dict(func(line) for line in lines)
         if exclude:
@@ -433,12 +389,7 @@ class ExternalProgram(object):
     def _tuple_transform_func(
         self, func, sep=None, pattern=None, exclude=False, stream="stdout",
     ):
-        if stream == "stdout":
-            lines = self._stdout_lines()
-        elif stream == "stderr":
-            lines = self._stderr_lines()
-        else:
-            raise InvalidStream("Allowed streams are stdout and stderr")
+        lines = self._lines_from_impl(stream)
         if not pattern:
             return [func(line) for line in lines]
         if exclude:
@@ -448,12 +399,7 @@ class ExternalProgram(object):
         return [func(line) for line in filtered_lines]
 
     def _filter_func(self, func, exclude=False, stream="stdout"):
-        if stream == "stdout":
-            lines = self._stdout_lines()
-        elif stream == "stderr":
-            lines = self._stderr_lines()
-        else:
-            raise InvalidStream("Allowed streams are stdout and stderr")
+        lines = self._lines_from_impl(stream)
         if exclude:
             filtered_lines = [line for line in lines if not func(line)]
         else:
@@ -461,12 +407,7 @@ class ExternalProgram(object):
         return filtered_lines
 
     def _map_func(self, func, stream="stdout"):
-        if stream == "stdout":
-            lines = self._stdout_lines()
-        elif stream == "stderr":
-            lines = self._stderr_lines()
-        else:
-            raise InvalidStream("Allowed streams are stdout and stderr")
+        lines = self._lines_from_impl(stream)
         return [func(line) for line in lines]
 
     def _json_loads(self, stream="stdout"):
@@ -488,17 +429,14 @@ class ExternalProgram(object):
     def _dict_from_line(
         self, keys=None, sep=None, pattern=None, exclude=False, stream="stdout"
     ):
-        if stream == "stdout":
-            lines = self._stdout_lines()
-        elif stream == "stderr":
-            lines = self._stderr_lines()
-        else:
-            raise InvalidStream("Allowed streams are stdout and stderr")
+        lines = self._lines_from_impl(stream)
         if not pattern:
             return [
                 dict(
                     zip(
-                        keys if keys else [i for i in range(0, len(col.split(sep)))],
+                        keys
+                        if keys
+                        else [i for i in range(0, len(col.split(sep)))],
                         col.split(sep),
                     )
                 )
@@ -511,12 +449,25 @@ class ExternalProgram(object):
         return [
             dict(
                 zip(
-                    keys if keys else [i for i in range(0, len(col.split(sep)))],
+                    keys
+                    if keys
+                    else [i for i in range(0, len(col.split(sep)))],
                     col.split(sep),
                 )
             )
             for col in filtered_lines
         ]
+
+    def _funcs_pipeline(self, *funcs, stream="stdout"):
+        lines = self._lines_from_impl(stream)
+        T = TypeVar("T")
+
+        def pipeline(value: T, funcs: Sequence[Callable[[T], T]],) -> T:
+            return reduce(lambda v, f: f(v), funcs, value)
+
+        return [
+            pipeline(line, *funcs) for line in lines
+        ]  # pylint: disable=no-value-for-parameter
 
     ### End String Processing Private Methods ###
 
@@ -714,7 +665,9 @@ class ExternalProgram(object):
             tuple_func, sep, pattern, exclude, stream="stderr"
         )
 
-    def stdout_dict_from_line(self, keys=None, sep=None, pattern=None, exclude=False):
+    def stdout_dict_from_line(
+        self, keys=None, sep=None, pattern=None, exclude=False
+    ):
         """
         Converts stdout lines into dicts, where 'keys' is a list of keys which 
         should be zip(able) with contents of split line. This means that the
@@ -738,7 +691,9 @@ class ExternalProgram(object):
         """
         return self._dict_from_line(keys, sep, pattern, exclude)
 
-    def stderr_dict_from_line(self, keys=None, sep=None, pattern=None, exclude=False):
+    def stderr_dict_from_line(
+        self, keys=None, sep=None, pattern=None, exclude=False
+    ):
         """
         Converts stderr lines into dicts, where 'keys' is a list of keys which 
         should be zip(able) with contents of split line. This means that the
@@ -760,7 +715,9 @@ class ExternalProgram(object):
         Returns:
             list: List of dictionaries generated from lines.
         """
-        return self._dict_from_line(keys, sep, pattern, exclude, stream="stderr")
+        return self._dict_from_line(
+            keys, sep, pattern, exclude, stream="stderr"
+        )
 
     def stdout_firstn(self, n=1, pattern=None, exclude=None):
         """
@@ -816,7 +773,9 @@ class ExternalProgram(object):
         Returns:
             list: List of lines len(lines) - n through len(lines).
         """
-        return self._first_last_n(n, pattern, exclude, first=False, stream="stderr")
+        return self._first_last_n(
+            n, pattern, exclude, first=False, stream="stderr"
+        )
 
     def stdout_head(self, sep=None, pattern=None, exclude=False):
         """
@@ -882,7 +841,7 @@ class ExternalProgram(object):
         where each tuple contains elements from a given position across all
         lines. Given a string: 'alpha beta gamma\\ndelta epsilon zeta\\n', this
         produces: [('alpha', 'delta'), ('beta', 'epsilon'), ('gamma', 'zeta')].
-        
+
         Args:
             sep (str, optional): Separator character. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
@@ -912,7 +871,9 @@ class ExternalProgram(object):
         """
         return self._columns(sep, pattern, exclude, stream="stderr")
 
-    def stdout_take_column(self, sep=None, column=0, pattern=None, exclude=False):
+    def stdout_take_column(
+        self, sep=None, column=0, pattern=None, exclude=False
+    ):
         """
         Select a single column of each line from stdout, after splitting the
         line on 'sep'.
@@ -922,13 +883,15 @@ class ExternalProgram(object):
             column (int, optional): Select column matching this index. Defaults to 0.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
-        
+
         Returns:
             list: List of elements extracted from each split line.
         """
         return self._take_column(sep, column, pattern, exclude)
 
-    def stderr_take_column(self, sep=None, column=0, pattern=None, exclude=False):
+    def stderr_take_column(
+        self, sep=None, column=0, pattern=None, exclude=False
+    ):
         """
         Select a single column from each line from stderr, after splitting the
         line on 'sep'.
@@ -942,7 +905,9 @@ class ExternalProgram(object):
         Returns:
             list: List of elements extracted, one from each split line.
         """
-        return self._take_column(sep, column, pattern, exclude, stream="stderr")
+        return self._take_column(
+            sep, column, pattern, exclude, stream="stderr"
+        )
 
     def stdout_take_some_columns(
         self, sep=None, selectors=(), pattern=None, exclude=False
@@ -1042,7 +1007,9 @@ class ExternalProgram(object):
         Returns:
             list: List of tuples, where each tuple contains columns from each split line.
         """
-        return self._line_tuples(sep, pattern, exclude, strip_punct, strip_chars)
+        return self._line_tuples(
+            sep, pattern, exclude, strip_punct, strip_chars
+        )
 
     def stderr_line_tuples(
         self,
@@ -1074,7 +1041,7 @@ class ExternalProgram(object):
     def stdout_lines(self):
         """
         Unfiltered lines written to stdout.
-        
+
         Returns:
             list: List of lines.
         """
@@ -1084,7 +1051,7 @@ class ExternalProgram(object):
     def stderr_lines(self):
         """
         Unfiltered lines written to stderr.
-        
+
         Returns:
             list: List of lines.
         """
@@ -1238,6 +1205,60 @@ class ExternalProgram(object):
         """
         return self._map_func(func, stream="stderr")
 
+    def stdout_funcs_pipeline(self, *funcs):
+        """
+        Applies functions in a given order over each line written to stdout.
+        This function is meant to emulate a unix pipeline, where information
+        is piped through multiple programs and possibly mutated throughout the
+        pipeline. Each function passed in is assumed to have a single argument
+        which will be a single line. Each function is also expected to return
+        a string, which may or may not be a mutated version of information
+        passed into the function, and the result from the function call is
+        passed into next function in the sequence until there are no more
+        functions to apply over the data.
+
+        Sementically, this is similar to doing the following for each line:
+        x = "some value"
+        x = func_a(x)
+        x = func_b(x)
+        x = func_c(x)
+        ... where 'x' is one line in input.
+
+        Args:
+            Sequence[Callable[(s: str) -> string]]: A sequence of functions, each receiving a string and emitting a string.
+
+        Returns:
+            list: List of results from application of sequence of callables.
+        """
+        return self._funcs_pipeline(funcs)
+
+    def stderr_funcs_pipeline(self, *funcs):
+        """
+        Applies functions in a given order over each line written to stderr.
+        This function is meant to emulate a unix pipeline, where information
+        is piped through multiple programs and possibly mutated throughout the
+        pipeline. Each function passed in is assumed to have a single argument
+        which will be a single line. Each function is also expected to return
+        a string, which may or may not be a mutated version of information
+        passed into the function, and the result from the function call is
+        passed into next function in the sequence until there are no more
+        functions to apply over the data.
+
+        Sementically, this is similar to doing the following for each line:
+        x = "some value"
+        x = func_a(x)
+        x = func_b(x)
+        x = func_c(x)
+        ... where 'x' is one line in input.
+
+        Args:
+            Sequence[Callable[(s: str) -> string]]: A sequence of functions, each receiving a string and emitting a string.
+
+        Returns:
+            list: List of results from application of sequence of callables.
+        """
+        return self._funcs_pipeline(funcs, stream="stderr")
+
     ### End String Processing Public Methods ###
 
     @property
@@ -1355,7 +1376,7 @@ class ExternalProgram(object):
         self.subprocess = s
         self.was_run = True
 
-    def run_wait(self, env=None, shell=True):
+    def do_shell(self, env=None, shell=True):
         """ Runs the command and blocks (waits) until the command is complete. """
         if not shell and not isinstance(self._popen_args, list):
             raise ExternalProgramException(
@@ -1368,7 +1389,9 @@ class ExternalProgram(object):
         """Waits on the given pattern to appear in std_out"""
 
         if self.blocking:
-            raise RuntimeError("expect can only be used on non-blocking commands.")
+            raise RuntimeError(
+                "expect can only be used on non-blocking commands."
+            )
 
         try:
             self.subprocess.expect(pattern=pattern, timeout=timeout)
@@ -1379,7 +1402,9 @@ class ExternalProgram(object):
         """Sends the given string or signal to std_in."""
 
         if self.blocking:
-            raise RuntimeError("send can only be used on non-blocking commands.")
+            raise RuntimeError(
+                "send can only be used on non-blocking commands."
+            )
 
         if not signal:
             if self._uses_subprocess:

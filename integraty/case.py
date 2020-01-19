@@ -36,7 +36,9 @@ class IntegraTestCase(TestCase):
         self.log = logger
         super(IntegraTestCase, self).__init__(methodName)
 
-    def assertCommandSucceeded(self, extprog: ExternalProgram = None, msg=None):
+    def assertCommandSucceeded(
+        self, extprog: ExternalProgram = None, msg=None
+    ):
         """Assert that the executed command ran successfully."""
         msg = self._formatMessage(
             msg,
@@ -72,11 +74,15 @@ class IntegraTestCase(TestCase):
         else:
             raise NoCommandException("ExternalProgram cannot be None")
 
-    def assertStdOutEqual(self, extprog: ExternalProgram = None, second=None, msg=None):
+    def assertStdOutEqual(
+        self, extprog: ExternalProgram = None, second=None, msg=None
+    ):
         """Assert that stdout from command and 'second' are equal."""
         return self.assertMultiLineEqual(extprog.out, second)
 
-    def assertStdErrEqual(self, extprog: ExternalProgram = None, second=None, msg=None):
+    def assertStdErrEqual(
+        self, extprog: ExternalProgram = None, second=None, msg=None
+    ):
         """Assert that stderr from command and 'second' are equal."""
         return self.assertMultiLineEqual(extprog.err, second)
 
@@ -84,7 +90,9 @@ class IntegraTestCase(TestCase):
         self, extprog: ExternalProgram = None, substr=None, msg=None
     ):
         """Assert that stdout from command contains a given substring"""
-        self.assertIsInstance(substr, str, "Parameter 'substr' is not a string")
+        self.assertIsInstance(
+            substr, str, "Parameter 'substr' is not a string"
+        )
 
         if extprog:
             if not re.search(substr, extprog.out):
@@ -100,7 +108,9 @@ class IntegraTestCase(TestCase):
         self, extprog: ExternalProgram = None, substr=None, msg=None
     ):
         """Assert that stderr from command contains a given substring"""
-        self.assertIsInstance(substr, str, "Parameter 'substr' is not a string")
+        self.assertIsInstance(
+            substr, str, "Parameter 'substr' is not a string"
+        )
 
         if extprog:
             if not re.search(substr, extprog.err):
@@ -112,7 +122,9 @@ class IntegraTestCase(TestCase):
         else:
             raise NoCommandException("ExternalProgram cannot be None")
 
-    def assertStdoutIsJSONArray(self, extprog: ExternalProgram = None, msg=None):
+    def assertStdoutIsJSONArray(
+        self, extprog: ExternalProgram = None, msg=None
+    ):
         """Assert that stdout from command contains JSON Array"""
         if extprog:
             data = None
@@ -159,10 +171,14 @@ class IntegraTestCase(TestCase):
         if os.path.exists(path):
             s = os.stat(path)
             if not stat.S_ISDIR(s.st_mode):
-                msg = self._formatMessage(msg, f"Expected '{path}' to be a directory",)
+                msg = self._formatMessage(
+                    msg, f"Expected '{path}' to be a directory",
+                )
                 raise self.failureException(msg)
         else:
-            msg = self._formatMessage(msg, f"Directory '{path}' does not exist",)
+            msg = self._formatMessage(
+                msg, f"Directory '{path}' does not exist",
+            )
             raise self.failureException(msg)
 
     def assertFileModifiedAfter(self, path, timestamp: float, msg=None):

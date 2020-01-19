@@ -60,7 +60,9 @@ class ChecksumBytesIO:
 
     @property
     def sha256(self):
-        digest = hashlib.sha256(self._stream.read(READ_LIMIT_BYTES)).hexdigest()
+        digest = hashlib.sha256(
+            self._stream.read(READ_LIMIT_BYTES)
+        ).hexdigest()
         self._stream.seek(0)  # reset to beginning for next operation
         return digest
 
@@ -94,7 +96,9 @@ class ChecksumStream:
                 self._stream.read(READ_LIMIT_BYTES).encode("utf-8")
             ).hexdigest()
         else:
-            digest = hashlib.sha1(self._stream.read(READ_LIMIT_BYTES)).hexdigest()
+            digest = hashlib.sha1(
+                self._stream.read(READ_LIMIT_BYTES)
+            ).hexdigest()
         self._stream.seek(0)  # reset to beginning for next operation
         return digest
 
@@ -113,7 +117,9 @@ class ChecksumStream:
                 self._stream.read(READ_LIMIT_BYTES).encode("utf-8")
             ).hexdigest()
         else:
-            digest = hashlib.sha256(self._stream.read(READ_LIMIT_BYTES)).hexdigest()
+            digest = hashlib.sha256(
+                self._stream.read(READ_LIMIT_BYTES)
+            ).hexdigest()
         self._stream.seek(0)  # reset to beginning for next operation
         return digest
 
@@ -132,7 +138,9 @@ class ChecksumStream:
                 self._stream.read(READ_LIMIT_BYTES).encode("utf-8")
             ).hexdigest()
         else:
-            digest = hashlib.md5(self._stream.read(READ_LIMIT_BYTES)).hexdigest()
+            digest = hashlib.md5(
+                self._stream.read(READ_LIMIT_BYTES)
+            ).hexdigest()
         self._stream.seek(0)  # reset to beginning for next operation
         return digest
 
@@ -147,7 +155,9 @@ class ChecksumStream:
         offset = self._stream.tell()
         encoded: bytes = None
         if isinstance(self._stream, io.TextIOBase):
-            encoded = base64.b64encode(bytes(self._stream.read().encode("utf-8")))
+            encoded = base64.b64encode(
+                bytes(self._stream.read().encode("utf-8"))
+            )
         else:
             encoded = base64.b64encode(bytes(self._stream.read()))
         self._stream.seek(offset)
@@ -197,7 +207,9 @@ class TemporaryFile:
         delete=True,
     ):
         if virtual:
-            self._f = tempfile.TemporaryFile(suffix=suffix, prefix=prefix, dir=dir)
+            self._f = tempfile.TemporaryFile(
+                suffix=suffix, prefix=prefix, dir=dir
+            )
         else:
             self._f = tempfile.NamedTemporaryFile(
                 suffix=suffix, prefix=prefix, dir=dir, delete=delete

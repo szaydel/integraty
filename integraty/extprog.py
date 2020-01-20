@@ -91,6 +91,16 @@ class ExternalProgram(object):
             self.cmd, self.timeout
         )
 
+    def __enter__(self):
+        return self
+
+    # FIXME: Do something useful with exc_* args.
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        if not self.std_out.closed:
+            self.std_out.close()
+        if not self.std_err.closed:
+            self.std_err.close()
+
     @property
     def _popen_args(self):
         return self.cmd

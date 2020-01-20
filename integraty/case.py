@@ -35,6 +35,19 @@ class IntegraTestCase(TestCase):
         logger.addHandler(hndlr)
         self.log = logger
         super(IntegraTestCase, self).__init__(methodName)
+    
+    def get_class_var(self, name):
+        """
+        Access class variables by their name without explicitly referring to
+        name of class. This is really just a convenience method.
+        
+        Args:
+            name (str): Name of class variable to lookup.
+        
+        Returns:
+            any: Value of the class variable.
+        """
+        return self.__class__.__getattribute__(self, name)
 
     def assertCommandSucceeded(
         self, extprog: ExternalProgram = None, msg=None

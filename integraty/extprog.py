@@ -76,6 +76,39 @@ def pid_exists(pid):
 
 
 class ExternalProgram(object):
+    """
+    ExternalProgram is an abstraction over the subprocess module with
+    convenience methods for running processes or pipelines and fetching
+    results from executed programs as well as collecting their stdout
+    and stderr. Optionally, there is also expect functionality to interact
+    with programs which require some level of interaction from user.
+
+    You may use this class as a context manager, since ExternalProgram
+    implements this functionality. It may be more convenient depending upon
+    how the results are going to be used.
+    
+    Because this is really meant to be used as part of a testing framework
+    primary focus is on usability and minimal boilerplate, while having
+    as much expressiveness as possible. Context managers positively contribute
+    to this goal. Here are some examples to make this a little more concrete:
+
+    >>> from integraty import extprog
+    >>> from pprint import pprint
+    >>> with extprog.ExternalProgram('dig microsoft.com') as c:
+    ...     c.do_shell()
+    ...     res = c.stdout_map_func(lambda l: dict(zip(('name', 'ttl', 'class','q_type', 'address'), l.split())), pattern='^microsoft.com')
+    ...     pprint([n['name'] == 'microsoft.com.' for n in res])
+    ...     pprint(sorted([n['address'] for n in res]))
+    [True, True, True, True, True]
+    ['104.215.148.63',
+     '13.77.161.179',
+     '40.112.72.205',
+     '40.113.200.201',
+     '40.76.4.15']
+
+    Try this out with `python3 -m doctest integraty/extprog.py` if you have
+    sources checked out in a convenient place.
+    """
     def __init__(self, cmd, timeout=None):
         super(ExternalProgram, self).__init__()
         self.cmd = cmd

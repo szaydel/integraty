@@ -10,8 +10,8 @@ import sys
 from unittest import TestCase
 from unittest import main as run_integra_tests
 
-from extprog import ExternalProgram
-from productivity import ChecksumFile
+from integraty.extprog import ExternalProgram
+from integraty.productivity import ChecksumFile
 
 
 class NoCommandException(Exception):

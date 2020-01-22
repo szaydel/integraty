@@ -109,6 +109,7 @@ class ExternalProgram(object):
     Try this out with `python3 -m doctest integraty/extprog.py` if you have
     sources checked out in a convenient place.
     """
+
     def __init__(self, cmd, timeout=None):
         super(ExternalProgram, self).__init__()
         self.cmd = cmd
@@ -243,7 +244,7 @@ class ExternalProgram(object):
         )
 
         return [
-            l[len(prefix):].strip() if l.startswith(prefix) else l
+            l[len(prefix) :].strip() if l.startswith(prefix) else l
             for l in lines
         ]
 
@@ -464,16 +465,19 @@ class ExternalProgram(object):
             for col in filtered_lines
         ]
 
-    def _funcs_pipeline(self, *funcs, stream="stdout"):
-        lines = self._lines_from_impl(stream=stream)
-        T = TypeVar("T")
+    def _fold_funcs(self, funcs, pattern=None, exclude=False, stream="stdout"):
+        lines = self._lines_from_impl(
+            pattern=pattern, exclude=exclude, stream=stream
+        )
 
-        def pipeline(value: T, funcs: Sequence[Callable[[T], T]],) -> T:
-            return reduce(lambda v, f: f(v), funcs, value)
+        def compose(*functions):
+            def compose2(f, g):
+                return lambda x: f(g(x))
 
-        return [
-            pipeline(line, *funcs) for line in lines
-        ]  # pylint: disable=no-value-for-parameter
+            return reduce(compose2, functions, lambda x: x)
+
+        composed = compose(*funcs[::-1])
+        return [composed(line) for line in lines]
 
     ### End String Processing Private Methods ###
 
@@ -550,7 +554,7 @@ class ExternalProgram(object):
         if skip_tail < 0:
             raise ValueError("skip_tail cannot be less than 0")
         lines = self._stdout_lines(pattern=pattern, exclude=exclude)
-        return lines[skip_head: len(lines) - skip_tail]
+        return lines[skip_head : len(lines) - skip_tail]
 
     def stderr_skip_lines(
         self, skip_head=0, skip_tail=0, pattern=None, exclude=False
@@ -577,7 +581,7 @@ class ExternalProgram(object):
         if skip_tail < 0:
             raise ValueError("skip_tail cannot be less than 0")
         lines = self._stderr_lines(pattern=pattern, exclude=exclude)
-        return lines[skip_head: len(lines) - skip_tail]
+        return lines[skip_head : len(lines) - skip_tail]
 
     def stdout_to_tuple_func(self, tuple_func, pattern=None, exclude=False):
         """
@@ -1260,24 +1264,57 @@ class ExternalProgram(object):
             func, pattern=pattern, exclude=exclude, stream="stderr"
         )
 
-    def stdout_funcs_pipeline(self, *funcs):
+    def stdout_fold_funcs(self, *funcs, pattern=None, exclude=None):
         """
-        Applies functions in a given order over each line written to stdout.
-        This function is meant to emulate a unix pipeline, where information
+        Higher-order function taking one or more functions composing them
+        together, then applying the composed function over each line from
+        stdout.
+        This method is meant to emulate a unix pipeline, where information
         is piped through multiple programs and possibly mutated throughout the
-        pipeline. Each function passed in is assumed to have a single argument
-        which will be a single line. Each function is also expected to return
-        a string, which may or may not be a mutated version of information
-        passed into the function, and the result from the function call is
-        passed into next function in the sequence until there are no more
-        functions to apply over the data.
+        pipeline. Each function passed in is assumed to have a single argument.
+        First function in the chain will receive a single complete line, but
+        every other function will receive output of previous function.
 
-        Sementically, this is similar to doing the following for each line:
-        x = "some value"
-        x = func_a(x)
-        x = func_b(x)
-        x = func_c(x)
-        ... where 'x' is one line in input.
+        Assuming there are three functions that must be applied to each line
+        and these functions are called `a`, `b`, and `c`, where `a` is the
+        first function, `b` second, and `c` last, the sequence as a pipeline
+        looks like this: `line |> a |> b |> c`, or in mathematical terms it
+        looks like this:
+        ```
+        a(line)
+        b(a(line))
+        c(b(a(line)))
+        ```
+
+        Args:
+            *funcs (Sequence[Callable[(s: str) -> string]]): A sequence of functions, each with a single argument, returning a single value.
+
+        Returns:
+            list: List of results from application of sequence of callables.
+        """
+        return self._fold_funcs(funcs, pattern=pattern, exclude=exclude)
+
+    def stderr_fold_funcs(self, *funcs, pattern=None, exclude=None):
+        """
+        Higher-order function taking one or more functions composing them
+        together, then applying the composed function over each line from
+        stderr.
+        This method is meant to emulate a unix pipeline, where information
+        is piped through multiple programs and possibly mutated throughout the
+        pipeline. Each function passed in is assumed to have a single argument.
+        First function in the chain will receive a single complete line, but
+        every other function will receive output of previous function.
+
+        Assuming there are three functions that must be applied to each line
+        and these functions are called `a`, `b`, and `c`, where `a` is the
+        first function, `b` second, and `c` last, the sequence as a pipeline
+        looks like this: `line |> a |> b |> c`, or in mathematical terms it
+        looks like this:
+        ```
+        a(line)
+        b(a(line))
+        c(b(a(line)))
+        ```
 
         Args:
             *funcs (Sequence[Callable[(s: str) -> string]]): A sequence of functions, each receiving a string and emitting a string.
@@ -1285,34 +1322,9 @@ class ExternalProgram(object):
         Returns:
             list: List of results from application of sequence of callables.
         """
-        return self._funcs_pipeline(funcs)
-
-    def stderr_funcs_pipeline(self, *funcs):
-        """
-        Applies functions in a given order over each line written to stderr.
-        This function is meant to emulate a unix pipeline, where information
-        is piped through multiple programs and possibly mutated throughout the
-        pipeline. Each function passed in is assumed to have a single argument
-        which will be a single line. Each function is also expected to return
-        a string, which may or may not be a mutated version of information
-        passed into the function, and the result from the function call is
-        passed into next function in the sequence until there are no more
-        functions to apply over the data.
-
-        Sementically, this is similar to doing the following for each line:
-        x = "some value"
-        x = func_a(x)
-        x = func_b(x)
-        x = func_c(x)
-        ... where 'x' is one line in input.
-
-        Args:
-            *funcs (Sequence[Callable[(s: str) -> string]]): A sequence of functions, each receiving a string and emitting a string.
-
-        Returns:
-            list: List of results from application of sequence of callables.
-        """
-        return self._funcs_pipeline(funcs, stream="stderr")
+        return self._fold_funcs(
+            funcs, pattern=pattern, exclude=exclude, stream="stderr"
+        )
 
     ### End String Processing Public Methods ###
 
@@ -1407,26 +1419,26 @@ class ExternalProgram(object):
         # Use subprocess.
         if self.blocking:
             popen_kwargs = self._default_popen_kwargs.copy()
-            del popen_kwargs['stdin']
-            popen_kwargs['universal_newlines'] = not binary
+            del popen_kwargs["stdin"]
+            popen_kwargs["universal_newlines"] = not binary
             if cwd:
-                popen_kwargs['cwd'] = cwd
+                popen_kwargs["cwd"] = cwd
             if env:
-                popen_kwargs['env'].update(env)
+                popen_kwargs["env"].update(env)
             if not shell:
-                popen_kwargs['shell'] = False
+                popen_kwargs["shell"] = False
             s = subprocess.Popen(self._popen_args, **popen_kwargs)
         # Otherwise, use pexpect.
         else:
             pexpect_kwargs = self._default_pexpect_kwargs.copy()
             if binary:
-                pexpect_kwargs['encoding'] = None
+                pexpect_kwargs["encoding"] = None
             if cwd:
-                pexpect_kwargs['cwd'] = cwd
+                pexpect_kwargs["cwd"] = cwd
             if env:
-                pexpect_kwargs['env'].update(env)
+                pexpect_kwargs["env"].update(env)
             # Enable Python subprocesses to work with expect functionality.
-            pexpect_kwargs['env']['PYTHONUNBUFFERED'] = "1"
+            pexpect_kwargs["env"]["PYTHONUNBUFFERED"] = "1"
             s = PopenSpawn(self._popen_args, **pexpect_kwargs)
         self.subprocess = s
         self.was_run = True

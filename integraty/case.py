@@ -35,7 +35,7 @@ class IntegraTestCase(TestCase):
         logger.addHandler(hndlr)
         self.log = logger
         super(IntegraTestCase, self).__init__(methodName)
-    
+
     def get_class_var(self, name):
         """
         Access class variables by their name without explicitly referring to

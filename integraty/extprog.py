@@ -336,7 +336,7 @@ class ExternalProgram(object):
 
         return [tuple(col.split(sep)[1:]) for col in lines]
 
-    def _columns(self, sep=None, pattern=None, exclude=False, stream="stdout"):
+    def _fields(self, sep=None, pattern=None, exclude=False, stream="stdout"):
         lines = self._lines_from_impl(
             pattern=pattern, exclude=exclude, stream=stream
         )
@@ -353,10 +353,10 @@ class ExternalProgram(object):
         )
         return [col.split(sep)[column].strip() for col in lines]
 
-    def _take_some_columns(
+    def _compress(
         self,
         sep=None,
-        selectors=(),
+        indexes=(),
         pattern=None,
         exclude=False,
         stream="stdout",
@@ -365,12 +365,15 @@ class ExternalProgram(object):
             pattern=pattern, exclude=exclude, stream=stream
         )
 
+        selectors = tuple(
+            True if i in indexes else False for i in range(0, max(indexes) + 1)
+        )
         return [
             tuple(itertools.compress(col.split(sep), selectors))
             for col in lines
         ]
 
-    def _take_range_columns(
+    def _take_range_fields(
         self,
         sep=None,
         slc_range=(0, 1, 1),
@@ -393,15 +396,6 @@ class ExternalProgram(object):
         )
 
         return dict(func(line) for line in lines)
-
-    def _to_tuple_func(
-        self, func, pattern=None, exclude=False, stream="stdout",
-    ):
-        lines = self._lines_from_impl(
-            pattern=pattern, exclude=exclude, stream=stream
-        )
-
-        return [func(line) for line in lines]
 
     def _filter_func(self, func, exclude=False, stream="stdout"):
         lines = self._lines_from_impl(stream=stream)
@@ -478,6 +472,28 @@ class ExternalProgram(object):
 
         composed = compose(*funcs[::-1])
         return [composed(line) for line in lines]
+
+    def _pairs(
+        self,
+        as_dict=False,
+        sep=None,
+        pattern=None,
+        exclude=False,
+        stream="stdout",
+    ):
+        lines = self._lines_from_impl(
+            pattern=pattern, exclude=exclude, stream=stream
+        )
+        if as_dict:
+            return [
+                dict(zip(line.split(sep)[::2], line.split(sep)[1::2]))
+                for line in lines
+            ]
+        else:
+            return [
+                tuple(zip(line.split(sep)[::2], line.split(sep)[1::2]))
+                for line in lines
+            ]
 
     ### End String Processing Private Methods ###
 
@@ -582,41 +598,6 @@ class ExternalProgram(object):
             raise ValueError("skip_tail cannot be less than 0")
         lines = self._stderr_lines(pattern=pattern, exclude=exclude)
         return lines[skip_head : len(lines) - skip_tail]
-
-    def stdout_to_tuple_func(self, tuple_func, pattern=None, exclude=False):
-        """
-        Applies 'tuple_func' to each line from stdout, adding resulting tuple
-        to list. It is expected that result from 'tuple_func' is a single tuple
-        object.
-
-        Args:
-            tuple_func (str): Conversion function from string to N-element tuple.
-            pattern (str, optional): Select lines matching pattern. Defaults to None.
-            exclude (bool, optional): Invert pattern matching. Defaults to False.
-
-        Returns:
-            list(tuple): List of tuples for each line over which 'tuple_func'
-            was applied.
-        """
-        return self._to_tuple_func(tuple_func, pattern, exclude)
-
-    def stderr_to_tuple_func(self, tuple_func, pattern=None, exclude=False):
-        """
-        Applies 'tuple_func' to each line from stderr, adding resulting tuple
-        to list. It is expected that result from 'tuple_func' is a single tuple
-        object.
-
-        Args:
-            tuple_func (str): Conversion function from string to N-element tuple.
-            pattern (str, optional): Select lines matching pattern. Defaults to None.
-            exclude (bool, optional): Invert pattern matching. Defaults to False.
-
-        Returns:
-            list(tuple): List of tuples for each line over which 'tuple_func' was applied.
-        """
-        return self._to_tuple_func(
-            tuple_func, pattern, exclude, stream="stderr"
-        )
 
     def stdout_to_dict_func(self, tuple_func, pattern=None, exclude=False):
         """
@@ -824,14 +805,16 @@ class ExternalProgram(object):
         """
         return self._tail(sep, pattern, exclude, stream="stderr")
 
-    def stdout_columns(self, sep=None, pattern=None, exclude=False):
+    def stdout_fields(self, sep=None, pattern=None, exclude=False):
         """
-        Split each line from stdout into columns and join each column into a
+        Split each line from stdout into fields and join each column into a
         tuple. This is meant to be used with text where multiple lines contain
-        same number of fields (columns), and result of this is a list of tuples
-        where each tuple contains elements from a given position across all
-        lines. Given a string: 'alpha beta gamma\\ndelta epsilon zeta\\n', this
-        produces: [('alpha', 'delta'), ('beta', 'epsilon'), ('gamma', 'zeta')].
+        same number of fields (sub-strings), and result of this is a list of
+        tuples where each tuple contains elements from a given position across
+        all lines.
+        Given a string: 'alpha beta gamma\\ndelta epsilon zeta\\n',
+        this produces: [('alpha', 'delta'), ('beta', 'epsilon'), ('gamma', 
+        'zeta')].
 
         Args:
             sep (str, optional): Separator character. Defaults to None.
@@ -841,16 +824,18 @@ class ExternalProgram(object):
         Returns:
             list: List of tuples from each split line.
         """
-        return self._columns(sep, pattern, exclude)
+        return self._fields(sep, pattern, exclude)
 
-    def stderr_columns(self, sep=None, pattern=None, exclude=False):
+    def stderr_fields(self, sep=None, pattern=None, exclude=False):
         """
-        Split each line from stderr into columns and join each column into a
+        Split each line from stderr into fields and join each column into a
         tuple. This is meant to be used with text where multiple lines contain
-        same number of fields (columns), and result of this is a list of tuples
-        where each tuple contains elements from a given position across all
-        lines. Given a string: 'alpha beta gamma\\ndelta epsilon zeta\\n', this
-        produces: [('alpha', 'delta'), ('beta', 'epsilon'), ('gamma', 'zeta')].
+        same number of fields (sub-strings), and result of this is a list of
+        tuples where each tuple contains elements from a given position across
+        all lines.
+        Given a string: 'alpha beta gamma\\ndelta epsilon zeta\\n',
+        this produces: [('alpha', 'delta'), ('beta', 'epsilon'), ('gamma', 
+        'zeta')].
 
         Args:
             sep (str, optional): Separator character. Defaults to None.
@@ -860,7 +845,7 @@ class ExternalProgram(object):
         Returns:
             list: List of tuples from each split line.
         """
-        return self._columns(sep, pattern, exclude, stream="stderr")
+        return self._fields(sep, pattern, exclude, stream="stderr")
 
     def stdout_take_column(
         self, sep=None, column=0, pattern=None, exclude=False
@@ -900,49 +885,69 @@ class ExternalProgram(object):
             sep, column, pattern, exclude, stream="stderr"
         )
 
-    def stdout_take_some_columns(
-        self, sep=None, selectors=(), pattern=None, exclude=False
+    def stdout_compress(
+        self, sep=None, indexes=(), pattern=None, exclude=False
     ):
         """
-        Select multiple columns from each line from stdout, after splitting the
-        line on 'sep'.
+        Select one or more fields from each line from stdout, after splitting
+        the line on 'sep'.
+        To make this more concrete let's take this example.
+        Given the line: `The quick brown fox jumps over the lazy dog`
+        to select words _quick_, _jumps_, _lazy_ and _dog_, indexes field
+        would be set to (1, 4, 7, 8).
+
+        Each line of text consists of zero or more substrings. An empty line
+        consists of zero substrings and cannot be indexed into. Any line with
+        one or more substrings, once split on `sep` is going to have 
+        `len(line)-1` positions or indexes if you think of this line as a list
+        of tokens. By specifying only certain indexes one can extract
+        substrings of interest.
 
         Args:
             sep (str, optional): Separator character. Defaults to None.
-            selectors (tuple, optional): Sequence of column indexes. Defaults to ().
+            indexes (tuple, optional): Sequence of column indexes. Defaults to ().
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
-            list: List of tuples, where each tuple contains one or more columns from each split line.
+            list: List of tuples, where each tuple contains one or more fields from each split line.
         """
-        return self._take_some_columns(sep, selectors, pattern, exclude)
+        return self._compress(sep, indexes, pattern, exclude)
 
-    def stderr_take_some_columns(
-        self, sep=None, selectors=(), pattern=None, exclude=False
+    def stderr_compress(
+        self, sep=None, indexes=(), pattern=None, exclude=False
     ):
         """
-        Select multiple columns from each line from stderr, after splitting the
-        line on 'sep'.
+        Select one or more fields from each line from stderr, after splitting
+        the line on 'sep'.
+        To make this more concrete let's take this example.
+        Given the line: `The quick brown fox jumps over the lazy dog`
+        to select words _quick_, _jumps_, _lazy_ and _dog_, indexes field
+        would be set to (1, 4, 7, 8).
+
+        Each line of text consists of zero or more substrings. An empty line
+        consists of zero substrings and cannot be indexed into. Any line with
+        one or more substrings, once split on `sep` is going to have 
+        `len(line)-1` positions or indexes if you think of this line as a list
+        of tokens. By specifying only certain indexes one can extract
+        substrings of interest.
 
         Args:
             sep (str, optional): Separator character. Defaults to None.
-            selectors (tuple, optional): Sequence of column indexes. Defaults to ().
+            indexes (tuple, optional): Sequence of column indexes. Defaults to ().
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
-            list: List of tuples, where each tuple contains one or more columns from each split line.
+            list: List of tuples, where each tuple contains one or more fields from each split line.
         """
-        return self._take_some_columns(
-            sep, selectors, pattern, exclude, stream="stderr"
-        )
+        return self._compress(sep, indexes, pattern, exclude, stream="stderr")
 
-    def stdout_take_range_columns(
+    def stdout_take_range_fields(
         self, sep=None, slc_range=(0, 1, 1), pattern=None, exclude=False
     ):
         """
-        Select multiple columns within the 'slc_range' range from each line
+        Select multiple fields within the 'slc_range' range from each line
         from stdout, after splitting the line on 'sep'.
 
         Args:
@@ -952,15 +957,15 @@ class ExternalProgram(object):
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
-            list: List of tuples, where each tuple contains one or more columns from each split line.
+            list: List of tuples, where each tuple contains one or more fields from each split line.
         """
-        return self._take_range_columns(sep, slc_range, pattern, exclude)
+        return self._take_range_fields(sep, slc_range, pattern, exclude)
 
-    def stderr_take_range_columns(
+    def stderr_take_range_fields(
         self, sep=None, slc_range=(0, 1, 1), pattern=None, exclude=False
     ):
         """
-        Select multiple columns within the 'slc_range' range from each line
+        Select multiple fields within the 'slc_range' range from each line
         from stderr, after splitting the line on 'sep'.
 
         Args:
@@ -970,9 +975,9 @@ class ExternalProgram(object):
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
-            list: List of tuples, where each tuple contains one or more columns from each split line.
+            list: List of tuples, where each tuple contains one or more fields from each split line.
         """
-        return self._take_range_columns(
+        return self._take_range_fields(
             sep, slc_range, pattern, exclude, stream="stderr"
         )
 
@@ -996,7 +1001,7 @@ class ExternalProgram(object):
             strip_chars (str, optional): Characters to strip if 'strip_punct' is True. Defaults to PCHARS.
 
         Returns:
-            list: List of tuples, where each tuple contains columns from each split line.
+            list: List of tuples, where each tuple contains fields from each split line.
         """
         return self._line_tuples(
             sep, pattern, exclude, strip_punct, strip_chars
@@ -1022,7 +1027,7 @@ class ExternalProgram(object):
             strip_chars (str, optional): Characters to strip if 'strip_punct' is True. Defaults to PCHARS.
 
         Returns:
-            list: List of tuples, where each tuple contains columns from each split line.
+            list: List of tuples, where each tuple contains fields from each split line.
         """
         return self._line_tuples(
             sep, pattern, exclude, strip_punct, strip_chars, stream="stderr"
@@ -1325,6 +1330,56 @@ class ExternalProgram(object):
         return self._fold_funcs(
             funcs, pattern=pattern, exclude=exclude, stream="stderr"
         )
+
+    def stdout_pairs(
+        self, as_dict=False, sep=None, pattern=None, exclude=False
+    ):
+        """
+        Break-up each line from stdout into pairs, optionally placing these
+        pairs into dicts, with one dict per line. Pairs are effectively
+        adjacent strings. To make this more clear, given this line:
+        `name abc path /var/log/abc.log`, result is a tuple of 2-tuples:
+        `(('name', 'abc'), ('path', '/var/log/abc.log'))`, and converted to
+        dict it becomes: {'name': 'abc', 'path': '/var/log/abc.log'}.
+
+        If a line contains odd number of tokens after being split, last token
+        in the split line will be discarded.
+
+        Args:
+            as_dict (bool, optional): Should pairs be inserted into a dict. Defaults to False.
+            sep (str, optional): Separator character. Defaults to None.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            list: List of tuples of tuples or list of dicts.
+        """
+        return self._pairs(as_dict, sep, pattern, exclude)
+
+    def stderr_pairs(
+        self, as_dict=False, sep=None, pattern=None, exclude=False
+    ):
+        """
+        Break-up each line from stderr into pairs, optionally placing these
+        pairs into dicts, with one dict per line. Pairs are effectively
+        adjacent strings. To make this more clear, given this line:
+        `name abc path /var/log/abc.log`, result is a tuple of 2-tuples:
+        `(('name', 'abc'), ('path', '/var/log/abc.log'))`, and converted to
+        dict it becomes: {'name': 'abc', 'path': '/var/log/abc.log'}.
+
+        If a line contains odd number of tokens after being split, last token
+        in the split line will be discarded.
+
+        Args:
+            as_dict (bool, optional): Should pairs be inserted into a dict. Defaults to False.
+            sep (str, optional): Separator character. Defaults to None.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            list: List of tuples of tuples or list of dicts.
+        """
+        return self._pairs(as_dict, sep, pattern, exclude, stream="stderr")
 
     ### End String Processing Public Methods ###
 

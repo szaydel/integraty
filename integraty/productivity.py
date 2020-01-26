@@ -5,8 +5,48 @@ import hashlib
 import io
 import os
 import tempfile
+import random
 
 READ_LIMIT_BYTES = 1 << 30  # Do not attempt to read more than 1GB of data
+
+
+class RandomStrings:
+    _letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    _digits = "0123456789"
+
+    def __init__(self, seed=None, urandom=False, include_digits=True):
+        if urandom and seed:
+            raise ValueError("Cannot combine seed value with /dev/urandom")
+        if urandom:
+            self._r = random.SystemRandom()
+        elif seed:
+            self._r = random.Random(seed)
+        else:
+            self._r = random.Random()
+
+        if not include_digits:
+            self.chars = self.__class__._letters
+        else:
+            self.chars = self.__class__._letters + self.__class__._digits
+
+    def string(self, length=10):
+        return "".join(
+            [
+                self.chars[self._r.choice(range(0, self.chars.__len__()))]
+                for i in range(0, length)
+            ]
+        )
+
+    def iter_string(self, length=10, count=100):
+        c = count
+        while c:
+            yield "".join(
+                [
+                    self.chars[self._r.choice(range(0, self.chars.__len__()))]
+                    for i in range(0, length)
+                ]
+            )
+            c -= 1
 
 
 class ChecksumStringIO:

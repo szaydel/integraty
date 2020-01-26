@@ -12,7 +12,7 @@ import locale
 import errno
 
 from functools import reduce
-from typing import TypeVar, Callable, Sequence
+from typing import Callable, Dict, List, TypeVar, Sequence, Sequence
 
 from pexpect.popen_spawn import PopenSpawn
 import pexpect
@@ -495,6 +495,28 @@ class ExternalProgram(object):
                 for line in lines
             ]
 
+    def _groupby(
+        self, column=0, sep=None, pattern=None, exclude=False, stream="stdout"
+    ):
+        lines = self._lines_from_impl(
+            pattern=pattern, exclude=exclude, stream=stream
+        )
+        d = {}
+
+        def groupby_rec(column: int, sep: Sequence, d: dict, l: List) -> Dict:
+            if not l:
+                return d
+            tokens = l[0].split(sep)
+            key = tokens[column % len(tokens)]  # protects from bounds errors
+            if key in d:
+                d[key].append(l[0])  # key exists, append line to list
+            else:
+                d[key] = [l[0]]  # new key, create a list with this line
+            # recursively call self until list is empty
+            return groupby_rec(column, sep, d, l[1:])
+
+        return groupby_rec(column, sep, d, lines)
+
     ### End String Processing Private Methods ###
 
     ### String Processing Public Methods Below ###
@@ -553,8 +575,8 @@ class ExternalProgram(object):
         and/or from the end, i.e. the tail of the list of lines from stdout.
         If a pattern results in some subset of original lines, this subset will
         be subject to application of 'skip_head' and/or 'skip_tail'. In other
-        words, skipping of lines occurs after application of 'pattern' and
-        'exclude' parameters, not before.
+        words, skipping of lines occurs after application of `pattern` and
+        `exclude` parameters, not before.
 
         Args:
             skip_head (int, optional): Number of lines to skip relative to beginning of data. Defaults to 0.
@@ -580,8 +602,8 @@ class ExternalProgram(object):
         and/or from the end, i.e. the tail of the list of lines from stderr.
         If a pattern results in some subset of original lines, this subset will
         be subject to application of 'skip_head' and/or 'skip_tail'. In other
-        words, skipping of lines occurs after application of 'pattern' and
-        'exclude' parameters, not before.
+        words, skipping of lines occurs after application of `pattern` and
+        `exclude` parameters, not before.
 
         Args:
             skip_head (int, optional): Number of lines to skip relative to beginning of data. Defaults to 0.
@@ -601,8 +623,8 @@ class ExternalProgram(object):
 
     def stdout_to_dict_func(self, tuple_func, pattern=None, exclude=False):
         """
-        Applies 'tuple_func' to each line from stdout, adding resulting tuple
-        to dict. It is expected that result from 'tuple_func' is a single
+        Applies `tuple_func` to each line from stdout, adding resulting tuple
+        to dict. It is expected that result from `tuple_func` is a single
         two-element tuple object, where first element becomes dict key and
         second value for given key.
 
@@ -612,15 +634,15 @@ class ExternalProgram(object):
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
-            dict: Dict made from tuples for each line over which 'tuple_func'
+            dict: Dict made from tuples for each line over which `tuple_func`
             was applied.
         """
         return self._to_dict_func(tuple_func, pattern, exclude)
 
     def stderr_to_dict_func(self, tuple_func, pattern=None, exclude=False):
         """
-        Applies 'tuple_func' to each line from stdout, adding resulting tuple
-        to dict. It is expected that result from 'tuple_func' is a single
+        Applies `tuple_func` to each line from stdout, adding resulting tuple
+        to dict. It is expected that result from `tuple_func` is a single
         two-element tuple object, where first element becomes dict key and
         second value for given key.
 
@@ -630,7 +652,7 @@ class ExternalProgram(object):
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
-            dict: Dict made from tuples for each line over which 'tuple_func'
+            dict: Dict made from tuples for each line over which `tuple_func`
             was applied.
         """
         return self._to_dict_func(
@@ -641,7 +663,7 @@ class ExternalProgram(object):
         self, keys=None, sep=None, pattern=None, exclude=False
     ):
         """
-        Converts stdout lines into dicts, where 'keys' is a list of keys which 
+        Converts stdout lines into dicts, where `keys` is a list of keys which 
         should be zip(able) with contents of split line. This means that the
         following expression should be true: len(keys) == len(line.split(sep))
         for each line. If len(line) > len(keys), only len(keys) elements are
@@ -667,7 +689,7 @@ class ExternalProgram(object):
         self, keys=None, sep=None, pattern=None, exclude=False
     ):
         """
-        Converts stderr lines into dicts, where 'keys' is a list of keys which 
+        Converts stderr lines into dicts, where `keys` is a list of keys which 
         should be zip(able) with contents of split line. This means that the
         following expression should be true: len(keys) == len(line.split(sep))
         for each line. If len(line) > len(keys), only len(keys) elements are
@@ -751,7 +773,7 @@ class ExternalProgram(object):
 
     def stdout_head(self, sep=None, pattern=None, exclude=False):
         """
-        Select first column of each line from stdout, after splitting on 'sep'.
+        Select first column of each line from stdout, after splitting on `sep`.
 
         Args:
             sep (str, optional): Separator character. Defaults to None.
@@ -765,7 +787,7 @@ class ExternalProgram(object):
 
     def stderr_head(self, sep=None, pattern=None, exclude=False):
         """
-        Select first column of each line from stderr, after splitting on 'sep'.
+        Select first column of each line from stderr, after splitting on `sep`.
 
         Args:
             sep (str, optional): Separator character. Defaults to None.
@@ -779,7 +801,7 @@ class ExternalProgram(object):
 
     def stdout_tail(self, sep=None, pattern=None, exclude=False):
         """
-        Select all but first column of each line from stdout, after splitting on 'sep'.
+        Select all but first column of each line from stdout, after splitting on `sep`.
 
         Args:
             sep (str, optional): Separator character. Defaults to None.
@@ -793,7 +815,7 @@ class ExternalProgram(object):
 
     def stderr_tail(self, sep=None, pattern=None, exclude=False):
         """
-        Select all but first column of each line from stderr, after splitting on 'sep'.
+        Select all but first column of each line from stderr, after splitting on `sep`.
 
         Args:
             sep (str, optional): Separator character. Defaults to None.
@@ -852,7 +874,7 @@ class ExternalProgram(object):
     ):
         """
         Select a single column of each line from stdout, after splitting the
-        line on 'sep'.
+        line on `sep`.
 
         Args:
             sep (str, optional): Separator character. Defaults to None.
@@ -870,7 +892,7 @@ class ExternalProgram(object):
     ):
         """
         Select a single column from each line from stderr, after splitting the
-        line on 'sep'.
+        line on `sep`.
 
         Args:
             sep (str, optional): Separator character. Defaults to None.
@@ -890,7 +912,7 @@ class ExternalProgram(object):
     ):
         """
         Select one or more fields from each line from stdout, after splitting
-        the line on 'sep'.
+        the line on `sep`.
         To make this more concrete let's take this example.
         Given the line: `The quick brown fox jumps over the lazy dog`
         to select words _quick_, _jumps_, _lazy_ and _dog_, indexes field
@@ -919,7 +941,7 @@ class ExternalProgram(object):
     ):
         """
         Select one or more fields from each line from stderr, after splitting
-        the line on 'sep'.
+        the line on `sep`.
         To make this more concrete let's take this example.
         Given the line: `The quick brown fox jumps over the lazy dog`
         to select words _quick_, _jumps_, _lazy_ and _dog_, indexes field
@@ -948,7 +970,7 @@ class ExternalProgram(object):
     ):
         """
         Select multiple fields within the 'slc_range' range from each line
-        from stdout, after splitting the line on 'sep'.
+        from stdout, after splitting the line on `sep`.
 
         Args:
             sep (str, optional): Separator character. Defaults to None.
@@ -966,7 +988,7 @@ class ExternalProgram(object):
     ):
         """
         Select multiple fields within the 'slc_range' range from each line
-        from stderr, after splitting the line on 'sep'.
+        from stderr, after splitting the line on `sep`.
 
         Args:
             sep (str, optional): Separator character. Defaults to None.
@@ -990,7 +1012,7 @@ class ExternalProgram(object):
         strip_chars=PCHARS,
     ):
         """
-        Split lines written to stdout into tuples on 'sep', where each line is
+        Split lines written to stdout into tuples on `sep`, where each line is
         a tuple consisting of all split tokens from that line.
 
         Args:
@@ -1016,7 +1038,7 @@ class ExternalProgram(object):
         strip_chars=PCHARS,
     ):
         """
-        Split lines written to stdout into tuples on 'sep', where each line is
+        Split lines written to stdout into tuples on `sep`, where each line is
         a tuple consisting of all split tokens from that line.
 
         Args:
@@ -1055,7 +1077,7 @@ class ExternalProgram(object):
 
     def stdout_trim_prefix(self, prefix, pattern=None, exclude=False):
         """
-        Trim substring in 'prefix' from beginning of each line from stdout,
+        Trim substring in `prefix` from beginning of each line from stdout,
         assuming substring is present.
 
         Args:
@@ -1070,7 +1092,7 @@ class ExternalProgram(object):
 
     def stderr_trim_prefix(self, prefix, pattern=None, exclude=False):
         """
-        Trim substring in 'prefix' from beginning of each line from stderr,
+        Trim substring in `prefix` from beginning of each line from stderr,
         assuming substring is present.
 
         Args:
@@ -1085,7 +1107,7 @@ class ExternalProgram(object):
 
     def stdout_trim_suffix(self, suffix, pattern=None, exclude=False):
         """
-        Trim substring in 'suffix' from end of each line from stdout,
+        Trim substring in `suffix` from end of each line from stdout,
         assuming substring is present.
 
         Args:
@@ -1100,7 +1122,7 @@ class ExternalProgram(object):
 
     def stderr_trim_suffix(self, suffix, pattern=None, exclude=False):
         """
-        Trim substring in 'suffix' from end of each line from stderr,
+        Trim substring in `suffix` from end of each line from stderr,
         assuming substring is present.
 
         Args:
@@ -1117,9 +1139,9 @@ class ExternalProgram(object):
         """
         Limits included lines from stdout to those matching given prefix.
         If a pattern results in some subset of original lines, this subset
-        will be subject to application of 'prefix'. In other words, lines with
-        'prefix' may be excluded as a result of pattern matching, because
-        prefix checking occurs after application of 'pattern' and 'exclude'
+        will be subject to application of `prefix`. In other words, lines with
+        `prefix` may be excluded as a result of pattern matching, because
+        prefix checking occurs after application of `pattern` and `exclude`
         parameters, not before.
 
         Args:
@@ -1136,9 +1158,9 @@ class ExternalProgram(object):
         """
         Limits included lines from stderr to those matching given prefix.
         If a pattern results in some subset of original lines, this subset
-        will be subject to application of 'prefix'. In other words, lines with
-        'prefix' may be excluded as a result of pattern matching, because
-        prefix checking occurs after application of 'pattern' and 'exclude'
+        will be subject to application of `prefix`. In other words, lines with
+        `prefix` may be excluded as a result of pattern matching, because
+        prefix checking occurs after application of `pattern` and `exclude`
         parameters, not before.
 
         Args:
@@ -1155,9 +1177,9 @@ class ExternalProgram(object):
         """
         Limits included lines from stdout to those matching given suffix.
         If a pattern results in some subset of original lines, this subset
-        will be subject to application of 'suffix'. In other words, lines with
-        'suffix' may be excluded as a result of pattern matching, because
-        suffix checking occurs after application of 'pattern' and 'exclude'
+        will be subject to application of `suffix`. In other words, lines with
+        `suffix` may be excluded as a result of pattern matching, because
+        suffix checking occurs after application of `pattern` and `exclude`
         parameters, not before.
 
         Args:
@@ -1174,9 +1196,9 @@ class ExternalProgram(object):
         """
         Limits included lines from stderr to those matching given suffix.
         If a pattern results in some subset of original lines, this subset
-        will be subject to application of 'suffix'. In other words, lines with
-        'suffix' may be excluded as a result of pattern matching, because
-        suffix checking occurs after application of 'pattern' and 'exclude'
+        will be subject to application of `suffix`. In other words, lines with
+        `suffix` may be excluded as a result of pattern matching, because
+        suffix checking occurs after application of `pattern` and `exclude`
         parameters, not before.
 
         Args:
@@ -1207,7 +1229,7 @@ class ExternalProgram(object):
         'func' argument. This function should expect a single string argument
         which will be a line and return a boolean. Any lines that cause this
         function to return `True` will be included in the resulting list, and
-        those that result in `False` will be excluded, unless 'exclude' is
+        those that result in `False` will be excluded, unless `exclude` is
         `True`, which inverts this logic.
 
         Args:
@@ -1224,7 +1246,7 @@ class ExternalProgram(object):
         'func' argument. This function should expect a single string argument
         which will be a line and return a boolean. Any lines that cause this
         function to return `True` will be included in the resulting list, and
-        those that result in `False` will be excluded, unless 'exclude' is
+        those that result in `False` will be excluded, unless `exclude` is
         `True`, which inverts this logic.
 
         Args:
@@ -1380,6 +1402,52 @@ class ExternalProgram(object):
             list: List of tuples of tuples or list of dicts.
         """
         return self._pairs(as_dict, sep, pattern, exclude, stream="stderr")
+
+    def stdout_groupby(self, column=0, sep=None, pattern=None, exclude=False):
+        """
+        For each line from stdout, split line on `sep` and treat the substring
+        with index specified in `column` as the key for grouping lines with
+        matching key(s). The final product is a dictionary where each key maps
+        to a list of all lines where this key is a substring with the same index
+        specified in `column`.
+
+        Args:
+            column (int, optional): Index of column to perform groupby. Defaults to 0.
+            sep (str, optional): Separator character. Defaults to None.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            dict: A dictionary of str -> List[str] with grouped lines.
+        """
+        return self._groupby(
+            column=column, sep=sep, pattern=pattern, exclude=exclude
+        )
+
+    def stderr_groupby(self, column=0, sep=None, pattern=None, exclude=False):
+        """
+        For each line from stderr, split line on `sep` and treat the substring
+        with index specified in `column` as the key for grouping lines with
+        matching key(s). The final product is a dictionary where each key maps
+        to a list of all lines where this key is a substring with the same index
+        specified in `column`.
+
+        Args:
+            column (int, optional): Index of column to perform groupby. Defaults to 0.
+            sep (str, optional): Separator character. Defaults to None.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            dict: A dictionary of str -> List[str] with grouped lines.
+        """
+        return self._groupby(
+            column=column,
+            sep=sep,
+            pattern=pattern,
+            exclude=exclude,
+            stream="stderr",
+        )
 
     ### End String Processing Public Methods ###
 

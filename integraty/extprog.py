@@ -175,42 +175,61 @@ class ExternalProgram(object):
     ### String Processing Private Methods Below ###
 
     def _lines_from_impl(self, pattern=None, exclude=False, stream=None):
-        if stream == "stdout":
+        if stream == "out":
             return self._stdout_lines(pattern=pattern, exclude=exclude)
-        elif stream == "stderr":
+        elif stream == "err":
             return self._stderr_lines(pattern=pattern, exclude=exclude)
         else:
             raise InvalidStream("Allowed streams are stdout and stderr")
 
-    def _splitlines(self, stream="stdout"):
+    def _splitlines(self, stream="out"):
         if not self.was_run:
             raise ExternalProgramException(
                 "Run program to obtain results before requesting resulting data"
             )
-        if stream == "stdout":
-            return [l.strip() for l in self.out.splitlines()]
-        elif stream == "stderr":
-            return [l.strip() for l in self.err.splitlines()]
-        else:
-            raise InvalidStream("Allowed streams are stdout and stderr")
+        if not stream in ("out", "err"):
+            raise InvalidStream("Allowed streams are out and err")
+        return [l.strip() for l in self.__getattribute__(stream).splitlines()]
 
-    def _stdout_lines(self, pattern=None, exclude=False):
+    def _stdout_lines(
+        self, sub_pattern=None, replacement=None, pattern=None, exclude=False
+    ):
+        compiled_pattern = None if not sub_pattern else re.compile(sub_pattern)
+
+        def sub_if_necessary(pat, repl, s):
+            return s if not pat else re.sub(pat, repl, s)
+
         lines = self._splitlines()
         filtered_lines = None
         if pattern and exclude:
             filtered_lines = [l for l in lines if not re.search(pattern, l)]
         elif pattern:
             filtered_lines = [l for l in lines if re.search(pattern, l)]
-        return filtered_lines if filtered_lines else lines
+        return sub_if_necessary(
+            compiled_pattern,
+            replacement,
+            filtered_lines if filtered_lines else lines,
+        )
 
-    def _stderr_lines(self, pattern=None, exclude=False):
-        lines = self._splitlines(stream="stderr")
+    def _stderr_lines(
+        self, sub_pattern=None, replacement=None, pattern=None, exclude=False
+    ):
+        compiled_pattern = None if not sub_pattern else re.compile(sub_pattern)
+
+        def sub_if_necessary(pat, repl, s):
+            return s if not pat else re.sub(pat, repl, s)
+
+        lines = self._splitlines(stream="err")
         filtered_lines = None
         if pattern and exclude:
             filtered_lines = [l for l in lines if not re.search(pattern, l)]
         elif pattern:
             filtered_lines = [l for l in lines if re.search(pattern, l)]
-        return filtered_lines if filtered_lines else lines
+        return sub_if_necessary(
+            compiled_pattern,
+            replacement,
+            filtered_lines if filtered_lines else lines,
+        )
 
     def _line_tuples(
         self,
@@ -219,7 +238,7 @@ class ExternalProgram(object):
         exclude=False,
         strip_punct=False,
         strip_chars=PCHARS,
-        stream="stdout",
+        stream="out",
     ):
         new_lines = []
         lines = self._lines_from_impl(
@@ -236,9 +255,7 @@ class ExternalProgram(object):
                 new_lines.append(tokens)
         return new_lines
 
-    def _trim_prefix(
-        self, prefix, pattern=None, exclude=False, stream="stdout"
-    ):
+    def _trim_prefix(self, prefix, pattern=None, exclude=False, stream="out"):
         lines = self._lines_from_impl(
             pattern=pattern, exclude=exclude, stream=stream
         )
@@ -248,9 +265,7 @@ class ExternalProgram(object):
             for l in lines
         ]
 
-    def _trim_suffix(
-        self, suffix, pattern=None, exclude=False, stream="stdout"
-    ):
+    def _trim_suffix(self, suffix, pattern=None, exclude=False, stream="out"):
         lines = self._lines_from_impl(
             pattern=pattern, exclude=exclude, stream=stream
         )
@@ -261,7 +276,7 @@ class ExternalProgram(object):
         ]
 
     def _with_prefix(
-        self, prefix=None, pattern=None, exclude=False, stream="stdout"
+        self, prefix=None, pattern=None, exclude=False, stream="out"
     ):
         lines = self._lines_from_impl(
             pattern=pattern, exclude=exclude, stream=stream
@@ -272,7 +287,7 @@ class ExternalProgram(object):
         return [l for l in lines if l.startswith(prefix)]
 
     def _with_suffix(
-        self, suffix=None, pattern=None, exclude=False, stream="stdout"
+        self, suffix=None, pattern=None, exclude=False, stream="out"
     ):
         lines = self._lines_from_impl(
             pattern=pattern, exclude=exclude, stream=stream
@@ -282,7 +297,7 @@ class ExternalProgram(object):
 
         return [l for l in lines if l.endswith(suffix)]
 
-    def _with_substr(self, substr=None, exclude=False, stream="stdout"):
+    def _with_substr(self, substr=None, exclude=False, stream="out"):
         lines = self._lines_from_impl(stream=stream)
         if not substr:
             return lines
@@ -290,20 +305,20 @@ class ExternalProgram(object):
             return [l for l in lines if l.find(substr) == -1]
         return [l for l in lines if l.find(substr) >= 0]
 
-    def _at_least_n_substr(self, substr=None, n=0, stream="stdout"):
+    def _at_least_n_substr(self, substr=None, n=0, stream="out"):
         lines = self._lines_from_impl(stream=stream)
         if not substr:
             return lines
         return [l for l in lines if l.count(substr) >= n]
 
-    def _at_most_n_substr(self, substr=None, n=0, stream="stdout"):
+    def _at_most_n_substr(self, substr=None, n=0, stream="out"):
         lines = self._lines_from_impl(stream=stream)
         if not substr:
             return lines
         return [l for l in lines if l.count(substr) <= n]
 
     def _first_last_n(
-        self, n=1, pattern=None, exclude=False, first=True, stream="stdout"
+        self, n=1, pattern=None, exclude=False, first=True, stream="out"
     ):
         lines = self._lines_from_impl(stream=stream)
         if n < 1:
@@ -322,21 +337,21 @@ class ExternalProgram(object):
             filtered_lines = [l for l in lines if re.search(pattern, l)]
         return filtered_lines[slc_obj]
 
-    def _head(self, sep=None, pattern=None, exclude=False, stream="stdout"):
+    def _head(self, sep=None, pattern=None, exclude=False, stream="out"):
         lines = self._lines_from_impl(
             pattern=pattern, exclude=exclude, stream=stream
         )
 
         return [col.split(sep)[0].strip() for col in lines]
 
-    def _tail(self, sep=None, pattern=None, exclude=False, stream="stdout"):
+    def _tail(self, sep=None, pattern=None, exclude=False, stream="out"):
         lines = self._lines_from_impl(
             pattern=pattern, exclude=exclude, stream=stream
         )
 
         return [tuple(col.split(sep)[1:]) for col in lines]
 
-    def _fields(self, sep=None, pattern=None, exclude=False, stream="stdout"):
+    def _fields(self, sep=None, pattern=None, exclude=False, stream="out"):
         lines = self._lines_from_impl(
             pattern=pattern, exclude=exclude, stream=stream
         )
@@ -346,7 +361,7 @@ class ExternalProgram(object):
         )
 
     def _take_column(
-        self, sep=None, column=0, pattern=None, exclude=False, stream="stdout"
+        self, sep=None, column=0, pattern=None, exclude=False, stream="out"
     ):
         lines = self._lines_from_impl(
             pattern=pattern, exclude=exclude, stream=stream
@@ -354,12 +369,7 @@ class ExternalProgram(object):
         return [col.split(sep)[column].strip() for col in lines]
 
     def _compress(
-        self,
-        sep=None,
-        indexes=(),
-        pattern=None,
-        exclude=False,
-        stream="stdout",
+        self, sep=None, indexes=(), pattern=None, exclude=False, stream="out",
     ):
         lines = self._lines_from_impl(
             pattern=pattern, exclude=exclude, stream=stream
@@ -379,7 +389,7 @@ class ExternalProgram(object):
         slc_range=(0, 1, 1),
         pattern=None,
         exclude=False,
-        stream="stdout",
+        stream="out",
     ):
         lines = self._lines_from_impl(
             pattern=pattern, exclude=exclude, stream=stream
@@ -389,7 +399,7 @@ class ExternalProgram(object):
         return [col.split(sep)[slc_obj] for col in lines]
 
     def _to_dict_func(
-        self, func, pattern=None, exclude=False, stream="stdout",
+        self, func, pattern=None, exclude=False, stream="out",
     ):
         lines = self._lines_from_impl(
             pattern=pattern, exclude=exclude, stream=stream
@@ -397,7 +407,7 @@ class ExternalProgram(object):
 
         return dict(func(line) for line in lines)
 
-    def _filter_func(self, func, exclude=False, stream="stdout"):
+    def _filter_func(self, func, exclude=False, stream="out"):
         lines = self._lines_from_impl(stream=stream)
         if exclude:
             filtered_lines = [line for line in lines if not func(line)]
@@ -405,16 +415,16 @@ class ExternalProgram(object):
             filtered_lines = [line for line in lines if func(line)]
         return filtered_lines
 
-    def _map_func(self, func, pattern=None, exclude=False, stream="stdout"):
+    def _map_func(self, func, pattern=None, exclude=False, stream="out"):
         lines = self._lines_from_impl(
             pattern=pattern, exclude=exclude, stream=stream
         )
         return [func(line) for line in lines]
 
-    def _json_loads(self, stream="stdout"):
-        if stream == "stdout":
+    def _json_loads(self, stream="out"):
+        if stream == "out":
             json_string = self.out
-        elif stream == "stderr":
+        elif stream == "err":
             json_string = self.err
         else:
             raise InvalidStream("Allowed streams are stdout and stderr")
@@ -428,7 +438,7 @@ class ExternalProgram(object):
         return d
 
     def _dict_from_line(
-        self, keys=None, sep=None, pattern=None, exclude=False, stream="stdout"
+        self, keys=None, sep=None, pattern=None, exclude=False, stream="out"
     ):
         lines = self._lines_from_impl(stream=stream)
         if not pattern:
@@ -459,7 +469,7 @@ class ExternalProgram(object):
             for col in filtered_lines
         ]
 
-    def _fold_funcs(self, funcs, pattern=None, exclude=False, stream="stdout"):
+    def _fold_funcs(self, funcs, pattern=None, exclude=False, stream="out"):
         lines = self._lines_from_impl(
             pattern=pattern, exclude=exclude, stream=stream
         )
@@ -479,7 +489,7 @@ class ExternalProgram(object):
         sep=None,
         pattern=None,
         exclude=False,
-        stream="stdout",
+        stream="out",
     ):
         lines = self._lines_from_impl(
             pattern=pattern, exclude=exclude, stream=stream
@@ -496,7 +506,7 @@ class ExternalProgram(object):
             ]
 
     def _groupby(
-        self, column=0, sep=None, pattern=None, exclude=False, stream="stdout"
+        self, column=0, sep=None, pattern=None, exclude=False, stream="out"
     ):
         lines = self._lines_from_impl(
             pattern=pattern, exclude=exclude, stream=stream
@@ -539,7 +549,7 @@ class ExternalProgram(object):
         Returns:
             bool, int, string, dict, list: Unmarshaled JSON data.
         """
-        return self._json_loads(stream="stderr")
+        return self._json_loads(stream="err")
 
     def stdout_count(self, pattern=None, exclude=False):
         """
@@ -655,9 +665,7 @@ class ExternalProgram(object):
             dict: Dict made from tuples for each line over which `tuple_func`
             was applied.
         """
-        return self._to_dict_func(
-            tuple_func, pattern, exclude, stream="stderr"
-        )
+        return self._to_dict_func(tuple_func, pattern, exclude, stream="err")
 
     def stdout_dict_from_line(
         self, keys=None, sep=None, pattern=None, exclude=False
@@ -709,9 +717,7 @@ class ExternalProgram(object):
         Returns:
             list: List of dictionaries generated from lines.
         """
-        return self._dict_from_line(
-            keys, sep, pattern, exclude, stream="stderr"
-        )
+        return self._dict_from_line(keys, sep, pattern, exclude, stream="err")
 
     def stdout_firstn(self, n=1, pattern=None, exclude=None):
         """
@@ -739,7 +745,7 @@ class ExternalProgram(object):
         Returns:
             list: List of lines 0 through n.
         """
-        return self._first_last_n(n, pattern, exclude, stream="stderr")
+        return self._first_last_n(n, pattern, exclude, stream="err")
 
     def stdout_lastn(self, n=1, pattern=None, exclude=None):
         """
@@ -768,7 +774,7 @@ class ExternalProgram(object):
             list: List of lines len(lines) - n through len(lines).
         """
         return self._first_last_n(
-            n, pattern, exclude, first=False, stream="stderr"
+            n, pattern, exclude, first=False, stream="err"
         )
 
     def stdout_head(self, sep=None, pattern=None, exclude=False):
@@ -797,7 +803,7 @@ class ExternalProgram(object):
         Returns:
             list: List of first element of each split line.
         """
-        return self._head(sep, pattern, exclude, stream="stderr")
+        return self._head(sep, pattern, exclude, stream="err")
 
     def stdout_tail(self, sep=None, pattern=None, exclude=False):
         """
@@ -825,7 +831,7 @@ class ExternalProgram(object):
         Returns:
             list: List of tuples with all but first element of each split line.
         """
-        return self._tail(sep, pattern, exclude, stream="stderr")
+        return self._tail(sep, pattern, exclude, stream="err")
 
     def stdout_fields(self, sep=None, pattern=None, exclude=False):
         """
@@ -867,7 +873,7 @@ class ExternalProgram(object):
         Returns:
             list: List of tuples from each split line.
         """
-        return self._fields(sep, pattern, exclude, stream="stderr")
+        return self._fields(sep, pattern, exclude, stream="err")
 
     def stdout_take_column(
         self, sep=None, column=0, pattern=None, exclude=False
@@ -903,9 +909,7 @@ class ExternalProgram(object):
         Returns:
             list: List of elements extracted, one from each split line.
         """
-        return self._take_column(
-            sep, column, pattern, exclude, stream="stderr"
-        )
+        return self._take_column(sep, column, pattern, exclude, stream="err")
 
     def stdout_compress(
         self, sep=None, indexes=(), pattern=None, exclude=False
@@ -963,7 +967,7 @@ class ExternalProgram(object):
         Returns:
             list: List of tuples, where each tuple contains one or more fields from each split line.
         """
-        return self._compress(sep, indexes, pattern, exclude, stream="stderr")
+        return self._compress(sep, indexes, pattern, exclude, stream="err")
 
     def stdout_take_range_fields(
         self, sep=None, slc_range=(0, 1, 1), pattern=None, exclude=False
@@ -1000,7 +1004,7 @@ class ExternalProgram(object):
             list: List of tuples, where each tuple contains one or more fields from each split line.
         """
         return self._take_range_fields(
-            sep, slc_range, pattern, exclude, stream="stderr"
+            sep, slc_range, pattern, exclude, stream="err"
         )
 
     def stdout_line_tuples(
@@ -1052,7 +1056,7 @@ class ExternalProgram(object):
             list: List of tuples, where each tuple contains fields from each split line.
         """
         return self._line_tuples(
-            sep, pattern, exclude, strip_punct, strip_chars, stream="stderr"
+            sep, pattern, exclude, strip_punct, strip_chars, stream="err"
         )
 
     @property
@@ -1103,7 +1107,7 @@ class ExternalProgram(object):
         Returns:
             list: List of lines with prefix trimmed from each.
         """
-        return self._trim_prefix(prefix, pattern, exclude, stream="stderr")
+        return self._trim_prefix(prefix, pattern, exclude, stream="err")
 
     def stdout_trim_suffix(self, suffix, pattern=None, exclude=False):
         """
@@ -1133,7 +1137,7 @@ class ExternalProgram(object):
         Returns:
             list: List of lines with suffix trimmed from each.
         """
-        return self._trim_suffix(suffix, pattern, exclude, stream="stderr")
+        return self._trim_suffix(suffix, pattern, exclude, stream="err")
 
     def stdout_with_prefix(self, prefix, pattern=None, exclude=False):
         """
@@ -1171,7 +1175,7 @@ class ExternalProgram(object):
         Returns:
             list: Lines matching given prefix.
         """
-        return self._with_prefix(prefix, pattern, exclude, stream="stderr")
+        return self._with_prefix(prefix, pattern, exclude, stream="err")
 
     def stdout_with_suffix(self, suffix, pattern=None, exclude=False):
         """
@@ -1209,19 +1213,19 @@ class ExternalProgram(object):
         Returns:
             list: Lines matching given suffix.
         """
-        return self._with_suffix(suffix, pattern, exclude, stream="stderr")
+        return self._with_suffix(suffix, pattern, exclude, stream="err")
 
     def stdout_at_least_n_substr(self, substr=None, n=0):
         return self._at_least_n_substr(substr, n)
 
     def stderr_at_least_n_substr(self, substr=None, n=0):
-        return self._at_least_n_substr(substr, n, stream="stderr")
+        return self._at_least_n_substr(substr, n, stream="err")
 
     def stdout_at_most_n_substr(self, substr=None, n=0):
         return self._at_most_n_substr(substr, n)
 
     def stderr_at_most_n_substr(self, substr=None, n=0):
-        return self._at_most_n_substr(substr, n, stream="stderr")
+        return self._at_most_n_substr(substr, n, stream="err")
 
     def stdout_filter_func(self, func, exclude=False):
         """
@@ -1255,7 +1259,7 @@ class ExternalProgram(object):
         Returns:
             list: List of lines after filtering function is applied.
         """
-        return self._filter_func(func, exclude, stream="stderr")
+        return self._filter_func(func, exclude, stream="err")
 
     def stdout_map_func(self, func, pattern=None, exclude=False):
         """
@@ -1288,7 +1292,7 @@ class ExternalProgram(object):
             list: List of results from application of mapping function.
         """
         return self._map_func(
-            func, pattern=pattern, exclude=exclude, stream="stderr"
+            func, pattern=pattern, exclude=exclude, stream="err"
         )
 
     def stdout_fold_funcs(self, *funcs, pattern=None, exclude=None):
@@ -1350,7 +1354,7 @@ class ExternalProgram(object):
             list: List of results from application of sequence of callables.
         """
         return self._fold_funcs(
-            funcs, pattern=pattern, exclude=exclude, stream="stderr"
+            funcs, pattern=pattern, exclude=exclude, stream="err"
         )
 
     def stdout_pairs(
@@ -1401,7 +1405,7 @@ class ExternalProgram(object):
         Returns:
             list: List of tuples of tuples or list of dicts.
         """
-        return self._pairs(as_dict, sep, pattern, exclude, stream="stderr")
+        return self._pairs(as_dict, sep, pattern, exclude, stream="err")
 
     def stdout_groupby(self, column=0, sep=None, pattern=None, exclude=False):
         """
@@ -1446,7 +1450,7 @@ class ExternalProgram(object):
             sep=sep,
             pattern=pattern,
             exclude=exclude,
-            stream="stderr",
+            stream="err",
         )
 
     ### End String Processing Public Methods ###

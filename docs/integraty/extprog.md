@@ -127,7 +127,7 @@ sources checked out in a convenient place.
 
 ### ExternalProgram().block
 
-[[find in source code]](../../integraty/extprog.py#L1616)
+[[find in source code]](../../integraty/extprog.py#L1620)
 
 ```python
 def block():
@@ -137,7 +137,7 @@ Blocks until process is complete.
 
 ### ExternalProgram().do_shell
 
-[[find in source code]](../../integraty/extprog.py#L1569)
+[[find in source code]](../../integraty/extprog.py#L1573)
 
 ```python
 def do_shell(env=None, shell=True):
@@ -147,7 +147,7 @@ Runs the command and blocks (waits) until the command is complete.
 
 ### ExternalProgram().err
 
-[[find in source code]](../../integraty/extprog.py#L1497)
+[[find in source code]](../../integraty/extprog.py#L1501)
 
 ```python
 @property
@@ -158,7 +158,7 @@ Std/err output (cached)
 
 ### ExternalProgram().expect
 
-[[find in source code]](../../integraty/extprog.py#L1578)
+[[find in source code]](../../integraty/extprog.py#L1582)
 
 ```python
 def expect(pattern, timeout=-1):
@@ -168,7 +168,7 @@ Waits on the given pattern to appear in std_out
 
 ### ExternalProgram().is_alive
 
-[[find in source code]](../../integraty/extprog.py#L1521)
+[[find in source code]](../../integraty/extprog.py#L1525)
 
 ```python
 @property
@@ -179,7 +179,7 @@ Is the process alive?
 
 ### ExternalProgram().kill
 
-[[find in source code]](../../integraty/extprog.py#L1610)
+[[find in source code]](../../integraty/extprog.py#L1614)
 
 ```python
 def kill():
@@ -187,7 +187,7 @@ def kill():
 
 ### ExternalProgram().ok
 
-[[find in source code]](../../integraty/extprog.py#L1458)
+[[find in source code]](../../integraty/extprog.py#L1462)
 
 ```python
 @property
@@ -196,7 +196,7 @@ def ok():
 
 ### ExternalProgram().out
 
-[[find in source code]](../../integraty/extprog.py#L1478)
+[[find in source code]](../../integraty/extprog.py#L1482)
 
 ```python
 @property
@@ -207,7 +207,7 @@ Std/out output (cached)
 
 ### ExternalProgram().pid
 
-[[find in source code]](../../integraty/extprog.py#L1512)
+[[find in source code]](../../integraty/extprog.py#L1516)
 
 ```python
 @property
@@ -218,7 +218,7 @@ The process' PID.
 
 ### ExternalProgram().pipe
 
-[[find in source code]](../../integraty/extprog.py#L1653)
+[[find in source code]](../../integraty/extprog.py#L1657)
 
 ```python
 def pipe(command, timeout=None, cwd=None):
@@ -229,7 +229,7 @@ given process.
 
 ### ExternalProgram().poll
 
-[[find in source code]](../../integraty/extprog.py#L1643)
+[[find in source code]](../../integraty/extprog.py#L1647)
 
 ```python
 def poll():
@@ -237,7 +237,7 @@ def poll():
 
 ### ExternalProgram().return_code
 
-[[find in source code]](../../integraty/extprog.py#L1526)
+[[find in source code]](../../integraty/extprog.py#L1530)
 
 ```python
 @property
@@ -246,7 +246,7 @@ def return_code():
 
 ### ExternalProgram().run
 
-[[find in source code]](../../integraty/extprog.py#L1538)
+[[find in source code]](../../integraty/extprog.py#L1542)
 
 ```python
 def run(block=True, binary=False, cwd=None, env=None, shell=True):
@@ -256,7 +256,7 @@ Runs the given command, with or without pexpect functionality enabled.
 
 ### ExternalProgram().send
 
-[[find in source code]](../../integraty/extprog.py#L1591)
+[[find in source code]](../../integraty/extprog.py#L1595)
 
 ```python
 def send(s, end=os.linesep, signal=False):
@@ -266,7 +266,7 @@ Sends the given string or signal to std_in.
 
 ### ExternalProgram().std_err
 
-[[find in source code]](../../integraty/extprog.py#L1493)
+[[find in source code]](../../integraty/extprog.py#L1497)
 
 ```python
 @property
@@ -275,7 +275,7 @@ def std_err():
 
 ### ExternalProgram().std_in
 
-[[find in source code]](../../integraty/extprog.py#L1534)
+[[find in source code]](../../integraty/extprog.py#L1538)
 
 ```python
 @property
@@ -284,7 +284,7 @@ def std_in():
 
 ### ExternalProgram().std_out
 
-[[find in source code]](../../integraty/extprog.py#L1454)
+[[find in source code]](../../integraty/extprog.py#L1458)
 
 ```python
 @property
@@ -293,7 +293,7 @@ def std_out():
 
 ### ExternalProgram().stderr_at_least_n_substr
 
-[[find in source code]](../../integraty/extprog.py#L1217)
+[[find in source code]](../../integraty/extprog.py#L1221)
 
 ```python
 def stderr_at_least_n_substr(substr=None, n=0):
@@ -301,7 +301,7 @@ def stderr_at_least_n_substr(substr=None, n=0):
 
 ### ExternalProgram().stderr_at_most_n_substr
 
-[[find in source code]](../../integraty/extprog.py#L1223)
+[[find in source code]](../../integraty/extprog.py#L1227)
 
 ```python
 def stderr_at_most_n_substr(substr=None, n=0):
@@ -309,7 +309,7 @@ def stderr_at_most_n_substr(substr=None, n=0):
 
 ### ExternalProgram().stderr_compress
 
-[[find in source code]](../../integraty/extprog.py#L939)
+[[find in source code]](../../integraty/extprog.py#L943)
 
 ```python
 def stderr_compress(sep=None, indexes=(), pattern=None, exclude=False):
@@ -342,7 +342,7 @@ substrings of interest.
 
 ### ExternalProgram().stderr_count
 
-[[find in source code]](../../integraty/extprog.py#L557)
+[[find in source code]](../../integraty/extprog.py#L567)
 
 ```python
 def stderr_count(pattern=None, exclude=False):
@@ -361,7 +361,7 @@ Count number of lines written to stderr.
 
 ### ExternalProgram().stderr_dict_from_line
 
-[[find in source code]](../../integraty/extprog.py#L688)
+[[find in source code]](../../integraty/extprog.py#L696)
 
 ```python
 def stderr_dict_from_line(keys=None, sep=None, pattern=None, exclude=False):
@@ -391,7 +391,7 @@ len(line) == 3, resulting dict is {0: line[0], 1: line[1], 2: line[2]}.
 
 ### ExternalProgram().stderr_fields
 
-[[find in source code]](../../integraty/extprog.py#L851)
+[[find in source code]](../../integraty/extprog.py#L857)
 
 ```python
 def stderr_fields(sep=None, pattern=None, exclude=False):
@@ -418,7 +418,7 @@ this produces: [('alpha', 'delta'), ('beta', 'epsilon'), ('gamma',
 
 ### ExternalProgram().stderr_filter_func
 
-[[find in source code]](../../integraty/extprog.py#L1243)
+[[find in source code]](../../integraty/extprog.py#L1247)
 
 ```python
 def stderr_filter_func(func, exclude=False):
@@ -442,7 +442,7 @@ those that result in `False` will be excluded, unless `exclude` is
 
 ### ExternalProgram().stderr_firstn
 
-[[find in source code]](../../integraty/extprog.py#L730)
+[[find in source code]](../../integraty/extprog.py#L736)
 
 ```python
 def stderr_firstn(n=1, pattern=None, exclude=None):
@@ -462,7 +462,7 @@ Select first n lines from stderr.
 
 ### ExternalProgram().stderr_fold_funcs
 
-[[find in source code]](../../integraty/extprog.py#L1324)
+[[find in source code]](../../integraty/extprog.py#L1328)
 
 ```python
 def stderr_fold_funcs(pattern=None, exclude=None, *funcs):
@@ -499,7 +499,7 @@ c(b(a(line)))
 
 ### ExternalProgram().stderr_groupby
 
-[[find in source code]](../../integraty/extprog.py#L1427)
+[[find in source code]](../../integraty/extprog.py#L1431)
 
 ```python
 def stderr_groupby(column=0, sep=None, pattern=None, exclude=False):
@@ -524,7 +524,7 @@ specified in `column`.
 
 ### ExternalProgram().stderr_head
 
-[[find in source code]](../../integraty/extprog.py#L788)
+[[find in source code]](../../integraty/extprog.py#L794)
 
 ```python
 def stderr_head(sep=None, pattern=None, exclude=False):
@@ -544,7 +544,7 @@ Select first column of each line from stderr, after splitting on `sep`.
 
 ### ExternalProgram().stderr_json_loads
 
-[[find in source code]](../../integraty/extprog.py#L534)
+[[find in source code]](../../integraty/extprog.py#L544)
 
 ```python
 @property
@@ -559,7 +559,7 @@ bool, int, string, dict, list: Unmarshaled JSON data.
 
 ### ExternalProgram().stderr_lastn
 
-[[find in source code]](../../integraty/extprog.py#L758)
+[[find in source code]](../../integraty/extprog.py#L764)
 
 ```python
 def stderr_lastn(n=1, pattern=None, exclude=None):
@@ -579,7 +579,7 @@ Select last n lines from stderr.
 
 ### ExternalProgram().stderr_line_tuples
 
-[[find in source code]](../../integraty/extprog.py#L1032)
+[[find in source code]](../../integraty/extprog.py#L1036)
 
 ```python
 def stderr_line_tuples(
@@ -612,7 +612,7 @@ a tuple consisting of all split tokens from that line.
 
 ### ExternalProgram().stderr_lines
 
-[[find in source code]](../../integraty/extprog.py#L1068)
+[[find in source code]](../../integraty/extprog.py#L1072)
 
 ```python
 @property
@@ -627,7 +627,7 @@ Unfiltered lines written to stderr.
 
 ### ExternalProgram().stderr_map_func
 
-[[find in source code]](../../integraty/extprog.py#L1276)
+[[find in source code]](../../integraty/extprog.py#L1280)
 
 ```python
 def stderr_map_func(func, pattern=None, exclude=None):
@@ -649,7 +649,7 @@ the resulting list. Result of calling 'func' should not be None.
 
 ### ExternalProgram().stderr_pairs
 
-[[find in source code]](../../integraty/extprog.py#L1381)
+[[find in source code]](../../integraty/extprog.py#L1385)
 
 ```python
 def stderr_pairs(as_dict=False, sep=None, pattern=None, exclude=False):
@@ -678,7 +678,7 @@ in the split line will be discarded.
 
 ### ExternalProgram().stderr_skip_lines
 
-[[find in source code]](../../integraty/extprog.py#L597)
+[[find in source code]](../../integraty/extprog.py#L607)
 
 ```python
 def stderr_skip_lines(skip_head=0, skip_tail=0, pattern=None, exclude=False):
@@ -704,7 +704,7 @@ words, skipping of lines occurs after application of `pattern` and
 
 ### ExternalProgram().stderr_tail
 
-[[find in source code]](../../integraty/extprog.py#L816)
+[[find in source code]](../../integraty/extprog.py#L822)
 
 ```python
 def stderr_tail(sep=None, pattern=None, exclude=False):
@@ -724,7 +724,7 @@ Select all but first column of each line from stderr, after splitting on `sep`.
 
 ### ExternalProgram().stderr_take_column
 
-[[find in source code]](../../integraty/extprog.py#L890)
+[[find in source code]](../../integraty/extprog.py#L896)
 
 ```python
 def stderr_take_column(sep=None, column=0, pattern=None, exclude=False):
@@ -746,7 +746,7 @@ line on `sep`.
 
 ### ExternalProgram().stderr_take_range_fields
 
-[[find in source code]](../../integraty/extprog.py#L986)
+[[find in source code]](../../integraty/extprog.py#L990)
 
 ```python
 def stderr_take_range_fields(
@@ -773,7 +773,7 @@ from stderr, after splitting the line on `sep`.
 
 ### ExternalProgram().stderr_to_dict_func
 
-[[find in source code]](../../integraty/extprog.py#L642)
+[[find in source code]](../../integraty/extprog.py#L652)
 
 ```python
 def stderr_to_dict_func(tuple_func, pattern=None, exclude=False):
@@ -797,7 +797,7 @@ was applied.
 
 ### ExternalProgram().stderr_trim_prefix
 
-[[find in source code]](../../integraty/extprog.py#L1093)
+[[find in source code]](../../integraty/extprog.py#L1097)
 
 ```python
 def stderr_trim_prefix(prefix, pattern=None, exclude=False):
@@ -818,7 +818,7 @@ assuming substring is present.
 
 ### ExternalProgram().stderr_trim_suffix
 
-[[find in source code]](../../integraty/extprog.py#L1123)
+[[find in source code]](../../integraty/extprog.py#L1127)
 
 ```python
 def stderr_trim_suffix(suffix, pattern=None, exclude=False):
@@ -839,7 +839,7 @@ assuming substring is present.
 
 ### ExternalProgram().stderr_with_prefix
 
-[[find in source code]](../../integraty/extprog.py#L1157)
+[[find in source code]](../../integraty/extprog.py#L1161)
 
 ```python
 def stderr_with_prefix(prefix, pattern=None, exclude=False):
@@ -864,7 +864,7 @@ parameters, not before.
 
 ### ExternalProgram().stderr_with_suffix
 
-[[find in source code]](../../integraty/extprog.py#L1195)
+[[find in source code]](../../integraty/extprog.py#L1199)
 
 ```python
 def stderr_with_suffix(suffix, pattern=None, exclude=False):
@@ -889,7 +889,7 @@ parameters, not before.
 
 ### ExternalProgram().stdout_at_least_n_substr
 
-[[find in source code]](../../integraty/extprog.py#L1214)
+[[find in source code]](../../integraty/extprog.py#L1218)
 
 ```python
 def stdout_at_least_n_substr(substr=None, n=0):
@@ -897,7 +897,7 @@ def stdout_at_least_n_substr(substr=None, n=0):
 
 ### ExternalProgram().stdout_at_most_n_substr
 
-[[find in source code]](../../integraty/extprog.py#L1220)
+[[find in source code]](../../integraty/extprog.py#L1224)
 
 ```python
 def stdout_at_most_n_substr(substr=None, n=0):
@@ -905,7 +905,7 @@ def stdout_at_most_n_substr(substr=None, n=0):
 
 ### ExternalProgram().stdout_compress
 
-[[find in source code]](../../integraty/extprog.py#L910)
+[[find in source code]](../../integraty/extprog.py#L914)
 
 ```python
 def stdout_compress(sep=None, indexes=(), pattern=None, exclude=False):
@@ -938,7 +938,7 @@ substrings of interest.
 
 ### ExternalProgram().stdout_count
 
-[[find in source code]](../../integraty/extprog.py#L544)
+[[find in source code]](../../integraty/extprog.py#L554)
 
 ```python
 def stdout_count(pattern=None, exclude=False):
@@ -957,7 +957,7 @@ Count number of lines written to stdout.
 
 ### ExternalProgram().stdout_dict_from_line
 
-[[find in source code]](../../integraty/extprog.py#L662)
+[[find in source code]](../../integraty/extprog.py#L670)
 
 ```python
 def stdout_dict_from_line(keys=None, sep=None, pattern=None, exclude=False):
@@ -987,7 +987,7 @@ len(line) == 3, resulting dict is {0: line[0], 1: line[1], 2: line[2]}.
 
 ### ExternalProgram().stdout_fields
 
-[[find in source code]](../../integraty/extprog.py#L830)
+[[find in source code]](../../integraty/extprog.py#L836)
 
 ```python
 def stdout_fields(sep=None, pattern=None, exclude=False):
@@ -1014,7 +1014,7 @@ this produces: [('alpha', 'delta'), ('beta', 'epsilon'), ('gamma',
 
 ### ExternalProgram().stdout_filter_func
 
-[[find in source code]](../../integraty/extprog.py#L1226)
+[[find in source code]](../../integraty/extprog.py#L1230)
 
 ```python
 def stdout_filter_func(func, exclude=False):
@@ -1038,7 +1038,7 @@ those that result in `False` will be excluded, unless `exclude` is
 
 ### ExternalProgram().stdout_firstn
 
-[[find in source code]](../../integraty/extprog.py#L716)
+[[find in source code]](../../integraty/extprog.py#L722)
 
 ```python
 def stdout_firstn(n=1, pattern=None, exclude=None):
@@ -1058,7 +1058,7 @@ Select first n lines from stdout.
 
 ### ExternalProgram().stdout_fold_funcs
 
-[[find in source code]](../../integraty/extprog.py#L1294)
+[[find in source code]](../../integraty/extprog.py#L1298)
 
 ```python
 def stdout_fold_funcs(pattern=None, exclude=None, *funcs):
@@ -1095,7 +1095,7 @@ c(b(a(line)))
 
 ### ExternalProgram().stdout_groupby
 
-[[find in source code]](../../integraty/extprog.py#L1406)
+[[find in source code]](../../integraty/extprog.py#L1410)
 
 ```python
 def stdout_groupby(column=0, sep=None, pattern=None, exclude=False):
@@ -1120,7 +1120,7 @@ specified in `column`.
 
 ### ExternalProgram().stdout_head
 
-[[find in source code]](../../integraty/extprog.py#L774)
+[[find in source code]](../../integraty/extprog.py#L780)
 
 ```python
 def stdout_head(sep=None, pattern=None, exclude=False):
@@ -1140,7 +1140,7 @@ Select first column of each line from stdout, after splitting on `sep`.
 
 ### ExternalProgram().stdout_json_loads
 
-[[find in source code]](../../integraty/extprog.py#L524)
+[[find in source code]](../../integraty/extprog.py#L534)
 
 ```python
 @property
@@ -1155,7 +1155,7 @@ bool, int, string, dict, list: Unmarshaled JSON data.
 
 ### ExternalProgram().stdout_lastn
 
-[[find in source code]](../../integraty/extprog.py#L744)
+[[find in source code]](../../integraty/extprog.py#L750)
 
 ```python
 def stdout_lastn(n=1, pattern=None, exclude=None):
@@ -1175,7 +1175,7 @@ Select last n lines from stdout.
 
 ### ExternalProgram().stdout_line_tuples
 
-[[find in source code]](../../integraty/extprog.py#L1006)
+[[find in source code]](../../integraty/extprog.py#L1010)
 
 ```python
 def stdout_line_tuples(
@@ -1208,7 +1208,7 @@ a tuple consisting of all split tokens from that line.
 
 ### ExternalProgram().stdout_lines
 
-[[find in source code]](../../integraty/extprog.py#L1058)
+[[find in source code]](../../integraty/extprog.py#L1062)
 
 ```python
 @property
@@ -1223,7 +1223,7 @@ Unfiltered lines written to stdout.
 
 ### ExternalProgram().stdout_map_func
 
-[[find in source code]](../../integraty/extprog.py#L1260)
+[[find in source code]](../../integraty/extprog.py#L1264)
 
 ```python
 def stdout_map_func(func, pattern=None, exclude=False):
@@ -1245,7 +1245,7 @@ the resulting list. Result of calling 'func' should not be None.
 
 ### ExternalProgram().stdout_pairs
 
-[[find in source code]](../../integraty/extprog.py#L1356)
+[[find in source code]](../../integraty/extprog.py#L1360)
 
 ```python
 def stdout_pairs(as_dict=False, sep=None, pattern=None, exclude=False):
@@ -1274,7 +1274,7 @@ in the split line will be discarded.
 
 ### ExternalProgram().stdout_skip_lines
 
-[[find in source code]](../../integraty/extprog.py#L570)
+[[find in source code]](../../integraty/extprog.py#L580)
 
 ```python
 def stdout_skip_lines(skip_head=0, skip_tail=0, pattern=None, exclude=False):
@@ -1300,7 +1300,7 @@ words, skipping of lines occurs after application of `pattern` and
 
 ### ExternalProgram().stdout_tail
 
-[[find in source code]](../../integraty/extprog.py#L802)
+[[find in source code]](../../integraty/extprog.py#L808)
 
 ```python
 def stdout_tail(sep=None, pattern=None, exclude=False):
@@ -1320,7 +1320,7 @@ Select all but first column of each line from stdout, after splitting on `sep`.
 
 ### ExternalProgram().stdout_take_column
 
-[[find in source code]](../../integraty/extprog.py#L872)
+[[find in source code]](../../integraty/extprog.py#L878)
 
 ```python
 def stdout_take_column(sep=None, column=0, pattern=None, exclude=False):
@@ -1342,7 +1342,7 @@ line on `sep`.
 
 ### ExternalProgram().stdout_take_range_fields
 
-[[find in source code]](../../integraty/extprog.py#L968)
+[[find in source code]](../../integraty/extprog.py#L972)
 
 ```python
 def stdout_take_range_fields(
@@ -1369,7 +1369,7 @@ from stdout, after splitting the line on `sep`.
 
 ### ExternalProgram().stdout_to_dict_func
 
-[[find in source code]](../../integraty/extprog.py#L624)
+[[find in source code]](../../integraty/extprog.py#L634)
 
 ```python
 def stdout_to_dict_func(tuple_func, pattern=None, exclude=False):
@@ -1393,7 +1393,7 @@ was applied.
 
 ### ExternalProgram().stdout_trim_prefix
 
-[[find in source code]](../../integraty/extprog.py#L1078)
+[[find in source code]](../../integraty/extprog.py#L1082)
 
 ```python
 def stdout_trim_prefix(prefix, pattern=None, exclude=False):
@@ -1414,7 +1414,7 @@ assuming substring is present.
 
 ### ExternalProgram().stdout_trim_suffix
 
-[[find in source code]](../../integraty/extprog.py#L1108)
+[[find in source code]](../../integraty/extprog.py#L1112)
 
 ```python
 def stdout_trim_suffix(suffix, pattern=None, exclude=False):
@@ -1435,7 +1435,7 @@ assuming substring is present.
 
 ### ExternalProgram().stdout_with_prefix
 
-[[find in source code]](../../integraty/extprog.py#L1138)
+[[find in source code]](../../integraty/extprog.py#L1142)
 
 ```python
 def stdout_with_prefix(prefix, pattern=None, exclude=False):
@@ -1460,7 +1460,7 @@ parameters, not before.
 
 ### ExternalProgram().stdout_with_suffix
 
-[[find in source code]](../../integraty/extprog.py#L1176)
+[[find in source code]](../../integraty/extprog.py#L1180)
 
 ```python
 def stdout_with_suffix(suffix, pattern=None, exclude=False):
@@ -1485,7 +1485,7 @@ parameters, not before.
 
 ### ExternalProgram().terminate
 
-[[find in source code]](../../integraty/extprog.py#L1607)
+[[find in source code]](../../integraty/extprog.py#L1611)
 
 ```python
 def terminate():
@@ -1517,7 +1517,7 @@ class NoCommandException(Exception):
 
 ## chain
 
-[[find in source code]](../../integraty/extprog.py#L1704)
+[[find in source code]](../../integraty/extprog.py#L1708)
 
 ```python
 def chain(command, timeout=None, cwd=None, env=None):
@@ -1535,7 +1535,7 @@ Check whether pid exists in the current process table.
 
 ## run
 
-[[find in source code]](../../integraty/extprog.py#L1721)
+[[find in source code]](../../integraty/extprog.py#L1725)
 
 ```python
 def run(command, block=True, binary=False, timeout=None, cwd=None, env=None):

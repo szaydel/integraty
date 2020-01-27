@@ -18,6 +18,7 @@ def stripper(w, chars):
 
 
 class String:
+
     def __init__(self, string: str):
         self._s = string
 
@@ -30,9 +31,11 @@ class String:
 
     ### String Processing Private Methods Below ###
 
-    def _lines_from_impl(
-        self, sub_pattern=None, replacement=None, pattern=None, exclude=False
-    ):
+    def _lines_from_impl(self,
+                         sub_pattern=None,
+                         replacement=None,
+                         pattern=None,
+                         exclude=False):
         return self._lines(
             sub_pattern=sub_pattern,
             replacement=replacement,
@@ -43,9 +46,11 @@ class String:
     def _splitlines(self):
         return [l.strip() for l in self._s.splitlines()]
 
-    def _lines(
-        self, sub_pattern=None, replacement=None, pattern=None, exclude=False
-    ):
+    def _lines(self,
+               sub_pattern=None,
+               replacement=None,
+               pattern=None,
+               exclude=False):
         compiled_pattern = None if not sub_pattern else re.compile(sub_pattern)
 
         def sub_if_necessary(pat, repl, s):
@@ -76,49 +81,102 @@ class String:
     def _line_tuples(
         self,
         sep=None,
-        pattern=None,
-        exclude=False,
         strip_punct=False,
         strip_chars=PCHARS,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
     ):
         new_lines = []
-        lines = self._lines_from_impl(pattern=pattern, exclude=exclude,)
+        lines = self._lines_from_impl(
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
 
         for l in lines:
             tokens = tuple(l.split(sep))
             if tokens:
                 if strip_punct:
-                    tokens = tuple(
-                        stripper(tok, strip_chars) for tok in tokens
-                    )
+                    tokens = tuple(stripper(tok, strip_chars) for tok in tokens)
                 new_lines.append(tokens)
         return new_lines
 
-    def _trim_prefix(self, prefix, pattern=None, exclude=False):
-        lines = self._lines_from_impl(pattern=pattern, exclude=exclude,)
+    def _trim_prefix(
+        self,
+        prefix,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
+        lines = self._lines_from_impl(
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
 
         return [
-            l[len(prefix) :].strip() if l.startswith(prefix) else l
+            l[len(prefix):].strip() if l.startswith(prefix) else l
             for l in lines
         ]
 
-    def _trim_suffix(self, suffix, pattern=None, exclude=False):
-        lines = self._lines_from_impl(pattern=pattern, exclude=exclude,)
+    def _trim_suffix(
+        self,
+        suffix,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
+        lines = self._lines_from_impl(
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
 
         return [
-            l[: l.rindex(suffix)].strip() if l.endswith(suffix) else l
+            l[:l.rindex(suffix)].strip() if l.endswith(suffix) else l
             for l in lines
         ]
 
-    def _with_prefix(self, prefix=None, pattern=None, exclude=False):
-        lines = self._lines_from_impl(pattern=pattern, exclude=exclude,)
+    def _with_prefix(
+        self,
+        prefix=None,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
+        lines = self._lines_from_impl(
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
         if not prefix:
             return lines
 
         return [l for l in lines if l.startswith(prefix)]
 
-    def _with_suffix(self, suffix=None, pattern=None, exclude=False):
-        lines = self._lines_from_impl(pattern=pattern, exclude=exclude,)
+    def _with_suffix(
+        self,
+        suffix=None,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
+        lines = self._lines_from_impl(
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
         if not suffix:
             return lines
 
@@ -144,7 +202,7 @@ class String:
             return lines
         return [l for l in lines if l.count(substr) <= n]
 
-    def _first_last_n(self, n=1, pattern=None, exclude=False, first=True):
+    def _first_last_n(self, n=1, first=True, pattern=None, exclude=False):
         lines = self._lines_from_impl()
         if n < 1:
             raise ValueError("Number of lines cannot be less than '1'")
@@ -162,65 +220,171 @@ class String:
             filtered_lines = [l for l in lines if re.search(pattern, l)]
         return filtered_lines[slc_obj]
 
-    def _head(self, sep=None, pattern=None, exclude=False):
-        lines = self._lines_from_impl(pattern=pattern, exclude=exclude,)
+    def _head(
+        self,
+        sep=None,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
+        lines = self._lines_from_impl(
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
 
         return [col.split(sep)[0].strip() for col in lines]
 
-    def _tail(self, sep=None, pattern=None, exclude=False):
-        lines = self._lines_from_impl(pattern=pattern, exclude=exclude,)
+    def _tail(
+        self,
+        sep=None,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
+        lines = self._lines_from_impl(
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
 
         return [tuple(col.split(sep)[1:]) for col in lines]
 
-    def _fields(self, sep=None, pattern=None, exclude=False):
-        lines = self._lines_from_impl(pattern=pattern, exclude=exclude,)
-
-        return list(
-            zip(*map(lambda x: map(lambda x: x.strip(), x.split()), lines))
+    def _fields(
+        self,
+        sep=None,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
+        lines = self._lines_from_impl(
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
         )
 
-    def _take_column(self, sep=None, column=0, pattern=None, exclude=False):
-        lines = self._lines_from_impl(pattern=pattern, exclude=exclude,)
+        return list(
+            zip(*map(lambda x: map(lambda x: x.strip(), x.split()), lines)))
+
+    def _take_column(
+        self,
+        sep=None,
+        column=0,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
+        lines = self._lines_from_impl(
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
         return [col.split(sep)[column].strip() for col in lines]
 
     def _compress(
-        self, sep=None, indexes=(), pattern=None, exclude=False,
+        self,
+        sep=None,
+        indexes=(),
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
     ):
-        lines = self._lines_from_impl(pattern=pattern, exclude=exclude,)
-
-        selectors = tuple(
-            True if i in indexes else False for i in range(0, max(indexes) + 1)
+        lines = self._lines_from_impl(
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
         )
+        if not indexes or not isinstance(indexes, tuple):
+            raise ValueError(
+                "Argument 'indexes' must be a tuple with at least one index")
+        selectors = tuple(True if i in indexes else False
+                          for i in range(0,
+                                         max(indexes) + 1))
         return [
             tuple(itertools.compress(col.split(sep), selectors))
             for col in lines
         ]
 
     def _take_range_fields(
-        self, sep=None, slc_range=(0, 1, 1), pattern=None, exclude=False,
+        self,
+        sep=None,
+        slc_range=(0, 1, 1),
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
     ):
-        lines = self._lines_from_impl(pattern=pattern, exclude=exclude,)
+        lines = self._lines_from_impl(
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
         slc_obj = slice(*slc_range)
 
         return [col.split(sep)[slc_obj] for col in lines]
 
     def _to_dict_func(
-        self, func, pattern=None, exclude=False,
+        self,
+        func,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
     ):
-        lines = self._lines_from_impl(pattern=pattern, exclude=exclude,)
+        lines = self._lines_from_impl(
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
 
         return dict(func(line) for line in lines)
 
-    def _filter_func(self, func, exclude=False):
-        lines = self._lines_from_impl()
+    def _filter_func(
+        self,
+        func,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
+        lines = self._lines_from_impl(
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
         if exclude:
             filtered_lines = [line for line in lines if not func(line)]
         else:
             filtered_lines = [line for line in lines if func(line)]
         return filtered_lines
 
-    def _map_func(self, func, pattern=None, exclude=False):
-        lines = self._lines_from_impl(pattern=pattern, exclude=exclude,)
+    def _map_func(
+        self,
+        func,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
+        lines = self._lines_from_impl(
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
         return [func(line) for line in lines]
 
     def _json_loads(self):
@@ -233,21 +397,16 @@ class String:
             return None
         return d
 
-    def _dict_from_line(
-        self, keys=None, sep=None, pattern=None, exclude=False
-    ):
+    def _dict_from_line(self, keys=None, sep=None, pattern=None, exclude=False):
         lines = self._lines_from_impl()
         if not pattern:
             return [
                 dict(
                     zip(
                         keys
-                        if keys
-                        else [i for i in range(0, len(col.split(sep)))],
+                        if keys else [i for i in range(0, len(col.split(sep)))],
                         col.split(sep),
-                    )
-                )
-                for col in lines
+                    )) for col in lines
             ]
         if exclude:
             filtered_lines = [l for l in lines if not re.search(pattern, l)]
@@ -257,18 +416,28 @@ class String:
             dict(
                 zip(
                     keys
-                    if keys
-                    else [i for i in range(0, len(col.split(sep)))],
+                    if keys else [i for i in range(0, len(col.split(sep)))],
                     col.split(sep),
-                )
-            )
-            for col in filtered_lines
+                )) for col in filtered_lines
         ]
 
-    def _fold_funcs(self, funcs, pattern=None, exclude=False):
-        lines = self._lines_from_impl(pattern=pattern, exclude=exclude,)
+    def _fold_funcs(
+        self,
+        funcs,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
+        lines = self._lines_from_impl(
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
 
         def compose(*functions):
+
             def compose2(f, g):
                 return lambda x: f(g(x))
 
@@ -277,21 +446,47 @@ class String:
         composed = compose(*funcs[::-1])
         return [composed(line) for line in lines]
 
-    def _pairs(self, as_dict=False, sep=None, pattern=None, exclude=False):
-        lines = self._lines_from_impl(pattern=pattern, exclude=exclude,)
+    def _pairs(
+        self,
+        as_dict=False,
+        sep=None,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
+        lines = self._lines_from_impl(
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
         if as_dict:
             return [
-                dict(zip(line.split(sep)[::2], line.split(sep)[1::2]))
-                for line in lines
+                dict(zip(line.split(sep)[::2],
+                         line.split(sep)[1::2])) for line in lines
             ]
         else:
             return [
-                tuple(zip(line.split(sep)[::2], line.split(sep)[1::2]))
-                for line in lines
+                tuple(zip(line.split(sep)[::2],
+                          line.split(sep)[1::2])) for line in lines
             ]
 
-    def _groupby(self, column=0, sep=None, pattern=None, exclude=False):
-        lines = self._lines_from_impl(pattern=pattern, exclude=exclude,)
+    def _groupby(
+        self,
+        column=0,
+        sep=None,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
+        lines = self._lines_from_impl(
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
         d = {}
 
         def groupby_rec(column: int, sep: Sequence, d: dict, l: List) -> Dict:
@@ -331,12 +526,18 @@ class String:
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
-            int: Count of lines.
+            int: Count of lines in input.
         """
         return self._lines(pattern=pattern, exclude=exclude).__len__()
 
     def skip_lines(
-        self, skip_head=0, skip_tail=0, pattern=None, exclude=False
+        self,
+        skip_head=0,
+        skip_tail=0,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
     ):
         """
         Skips some number of lines from the beginning, i.e. the head of the list
@@ -349,36 +550,58 @@ class String:
         Args:
             skip_head (int, optional): Number of lines to skip relative to beginning of data. Defaults to 0.
             skip_tail (int, optional): Number of lines to skip relative to the end of the data. Defaults to 0.
+            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
+            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
-            list: List of lines written in input.
+            list: List of lines from input with some lines skipped from head and tail.
         """
         if skip_head < 0:
             raise ValueError("skip_head cannot be less than 0")
         if skip_tail < 0:
             raise ValueError("skip_tail cannot be less than 0")
-        lines = self._lines(pattern=pattern, exclude=exclude)
-        return lines[skip_head : len(lines) - skip_tail]
+        lines = self._lines(
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
+        return lines[skip_head:len(lines) - skip_tail]
 
-    def to_dict_func(self, tuple_func, pattern=None, exclude=False):
+    def to_dict_func(
+        self,
+        func,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
         """
-        Applies `tuple_func` to each line from input, adding resulting tuple
-        to dict. It is expected that result from `tuple_func` is a single
+        Applies `func` to each line from input, adding resulting tuple
+        to dict. It is expected that result from `func` is a single
         two-element tuple object, where first element becomes dict key and
         second value for given key.
 
         Args:
-            tuple_func (str): Conversion function from string to two-element tuple.
+            func (str): Conversion function from string to two-element tuple.
+            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
+            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
-            dict: Dict made from tuples for each line over which `tuple_func`
+            dict: Dict made from tuples for each line over which `func`
             was applied.
         """
-        return self._to_dict_func(tuple_func, pattern, exclude)
+        return self._to_dict_func(
+            func=func,
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
 
     def dict_from_line(self, keys=None, sep=None, pattern=None, exclude=False):
         """
@@ -402,7 +625,10 @@ class String:
         Returns:
             list: List of dictionaries generated from lines.
         """
-        return self._dict_from_line(keys, sep, pattern, exclude)
+        return self._dict_from_line(keys=keys,
+                                    sep=sep,
+                                    pattern=pattern,
+                                    exclude=exclude)
 
     def firstn(self, n=1, pattern=None, exclude=None):
         """
@@ -416,7 +642,7 @@ class String:
         Returns:
             list: List of lines 0 through n.
         """
-        return self._first_last_n(n, pattern, exclude)
+        return self._first_last_n(n=n, pattern=pattern, exclude=exclude)
 
     def lastn(self, n=1, pattern=None, exclude=None):
         """
@@ -430,37 +656,77 @@ class String:
         Returns:
             list: List of lines len(lines) - n through len(lines).
         """
-        return self._first_last_n(n, pattern, exclude, first=False)
+        return self._first_last_n(n=n,
+                                  first=False,
+                                  pattern=pattern,
+                                  exclude=exclude)
 
-    def head(self, sep=None, pattern=None, exclude=False):
+    def head(
+        self,
+        sep=None,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
         """
         Select first column of each line from input, after splitting on `sep`.
 
         Args:
             sep (str, optional): Separator character. Defaults to None.
+            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
+            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
             list: List of first element of each split line.
         """
-        return self._head(sep, pattern, exclude)
+        return self._head(
+            sep=sep,
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
 
-    def tail(self, sep=None, pattern=None, exclude=False):
+    def tail(
+        self,
+        sep=None,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
         """
         Select all but first column of each line from input, after splitting on `sep`.
 
         Args:
             sep (str, optional): Separator character. Defaults to None.
+            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
+            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
             list: List of tuples with all but first element of each split line.
         """
-        return self._tail(sep, pattern, exclude)
+        return self._tail(
+            sep=sep,
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
 
-    def fields(self, sep=None, pattern=None, exclude=False):
+    def fields(
+        self,
+        sep=None,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
         """
         Split each line from input into fields and join each column into a
         tuple. This is meant to be used with text where multiple lines contain
@@ -473,15 +739,31 @@ class String:
 
         Args:
             sep (str, optional): Separator character. Defaults to None.
+            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
+            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
             list: List of tuples from each split line.
         """
-        return self._fields(sep, pattern, exclude)
+        return self._fields(
+            sep=sep,
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
 
-    def take_column(self, sep=None, column=0, pattern=None, exclude=False):
+    def take_column(
+        self,
+        sep=None,
+        column=0,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
         """
         Select a single column of each line from input, after splitting the
         line on `sep`.
@@ -489,15 +771,32 @@ class String:
         Args:
             sep (str, optional): Separator character. Defaults to None.
             column (int, optional): Select column matching this index. Defaults to 0.
+            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
+            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
             list: List of elements extracted from each split line.
         """
-        return self._take_column(sep, column, pattern, exclude)
+        return self._take_column(
+            sep=sep,
+            column=column,
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
 
-    def compress(self, sep=None, indexes=(), pattern=None, exclude=False):
+    def compress(
+        self,
+        sep=None,
+        indexes=(),
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
         """
         Select one or more fields from each line from input, after splitting
         the line on `sep`.
@@ -516,16 +815,31 @@ class String:
         Args:
             sep (str, optional): Separator character. Defaults to None.
             indexes (tuple, optional): Sequence of column indexes. Defaults to ().
+            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
+            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
             list: List of tuples, where each tuple contains one or more fields from each split line.
         """
-        return self._compress(sep, indexes, pattern, exclude)
+        return self._compress(
+            sep=sep,
+            indexes=indexes,
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
 
     def take_range_fields(
-        self, sep=None, slc_range=(0, 1, 1), pattern=None, exclude=False
+        self,
+        sep=None,
+        slc_range=(0, 1, 1),
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
     ):
         """
         Select multiple fields within the 'slc_range' range from each line
@@ -534,21 +848,32 @@ class String:
         Args:
             sep (str, optional): Separator character. Defaults to None.
             slc_range (tuple, optional): Range (start, end, stride). Defaults to (0, 1, 1).
+            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
+            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
             list: List of tuples, where each tuple contains one or more fields from each split line.
         """
-        return self._take_range_fields(sep, slc_range, pattern, exclude)
+        return self._take_range_fields(
+            sep=sep,
+            slc_range=slc_range,
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
 
     def line_tuples(
         self,
         sep=None,
-        pattern=None,
-        exclude=False,
         strip_punct=False,
         strip_chars=PCHARS,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
     ):
         """
         Split lines written in input into tuples on `sep`, where each line is
@@ -556,59 +881,118 @@ class String:
 
         Args:
             sep (str, optional): Separator character. Defaults to None.
-            pattern (str, optional): Select lines matching pattern. Defaults to None.
-            exclude (bool, optional): Invert pattern matching. Defaults to False.
             strip_punct (bool, optional): Enable punctuation stripping. Defaults to False.
             strip_chars (str, optional): Characters to strip if 'strip_punct' is True. Defaults to PCHARS.
+            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
+            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
             list: List of tuples, where each tuple contains fields from each split line.
         """
         return self._line_tuples(
-            sep, pattern, exclude, strip_punct, strip_chars
+            sep=sep,
+            strip_punct=strip_punct,
+            strip_chars=strip_chars,
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
         )
 
-    @property
-    def lines(self):
+    def lines(self,
+              sub_pattern=None,
+              replacement=None,
+              pattern=None,
+              exclude=False):
         """
-        Unfiltered lines written in input.
-
+        Lines from input, optionally filtered with expression in `pattern`.
+        
+        Args:
+            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
+            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+        
         Returns:
-            list: List of lines written in input.
+            list: List of lines from input.
         """
-        return self._lines()
+        return self._lines(
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
 
-    def trim_prefix(self, prefix, pattern=None, exclude=False):
+    def trim_prefix(
+        self,
+        prefix,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
         """
         Trim substring in `prefix` from beginning of each line from input,
         assuming substring is present.
 
         Args:
             prefix (str): Prefix to trim from beginning of each line.
+            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
+            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
             list: List of lines with prefix trimmed from each.
         """
-        return self._trim_prefix(prefix, pattern, exclude)
+        return self._trim_prefix(
+            prefix=prefix,
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
 
-    def trim_suffix(self, suffix, pattern=None, exclude=False):
+    def trim_suffix(
+        self,
+        suffix,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
         """
         Trim substring in `suffix` from end of each line from input,
         assuming substring is present.
 
         Args:
             suffix (str): Suffix to trim from end of each line.
+            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
+            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
             list: List of lines with suffix trimmed from each.
         """
-        return self._trim_suffix(suffix, pattern, exclude)
+        return self._trim_suffix(
+            suffix=suffix,
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
 
-    def with_prefix(self, prefix, pattern=None, exclude=False):
+    def with_prefix(
+        self,
+        prefix,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
         """
         Limits included lines from input to those matching given prefix.
         If a pattern results in some subset of original lines, this subset
@@ -619,15 +1003,30 @@ class String:
 
         Args:
             prefix (str): Lines with given prefix should be included.
+            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
+            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
             list: Lines matching given prefix.
         """
-        return self._with_prefix(prefix, pattern, exclude)
+        return self._with_prefix(
+            prefix=prefix,
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
 
-    def with_suffix(self, suffix, pattern=None, exclude=False):
+    def with_suffix(
+        self,
+        suffix,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
         """
         Limits included lines from input to those matching given suffix.
         If a pattern results in some subset of original lines, this subset
@@ -638,13 +1037,21 @@ class String:
 
         Args:
             suffix (str): Lines with given prefix should be included.
+            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
+            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
             list: Lines matching given suffix.
         """
-        return self._with_suffix(suffix, pattern, exclude)
+        return self._with_suffix(
+            suffix=suffix,
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
 
     def at_least_n_substr(self, substr=None, n=0):
         return self._at_least_n_substr(substr, n)
@@ -652,7 +1059,14 @@ class String:
     def at_most_n_substr(self, substr=None, n=0):
         return self._at_most_n_substr(substr, n)
 
-    def filter_func(self, func, exclude=False):
+    def filter_func(
+        self,
+        func,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
         """
         Filters lines written in input with a filtering function in
         'func' argument. This function should expect a single string argument
@@ -663,13 +1077,29 @@ class String:
 
         Args:
             func ((s: str) -> bool): Filtering function emitting a boolean.
+            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
+            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert filtering logic. Defaults to False.
         Returns:
             list: List of lines after filtering function is applied.
         """
-        return self._filter_func(func, exclude)
+        return self._filter_func(
+            func=func,
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
 
-    def map_func(self, func, pattern=None, exclude=False):
+    def map_func(
+        self,
+        func,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
         """
         Applies function in 'func' to each line written in input.
         Transformations from these map operations will be included in
@@ -677,15 +1107,30 @@ class String:
 
         Args:
             func ((s: str) -> Any): Mapping function receiving a string and emitting Any other type.
+            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
+            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
             list: List of results from application of mapping function.
         """
-        return self._map_func(func, pattern=pattern, exclude=exclude)
+        return self._map_func(
+            func=func,
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
 
-    def fold_funcs(self, *funcs, pattern=None, exclude=None):
+    def fold_funcs(
+        self,
+        *funcs,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=None,
+    ):
         """
         Higher-order function taking one or more functions composing them
         together, then applying the composed function over each line from
@@ -709,13 +1154,31 @@ class String:
 
         Args:
             *funcs (Sequence[Callable[(s: str) -> string]]): A sequence of functions, each with a single argument, returning a single value.
+            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
+            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
             list: List of results from application of sequence of callables.
         """
-        return self._fold_funcs(funcs, pattern=pattern, exclude=exclude)
+        return self._fold_funcs(
+            funcs,
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
 
-    def pairs(self, as_dict=False, sep=None, pattern=None, exclude=False):
+    def pairs(
+        self,
+        as_dict=False,
+        sep=None,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
         """
         Break-up each line from input into pairs, optionally placing these
         pairs into dicts, with one dict per line. Pairs are effectively
@@ -730,15 +1193,32 @@ class String:
         Args:
             as_dict (bool, optional): Should pairs be inserted into a dict. Defaults to False.
             sep (str, optional): Separator character. Defaults to None.
+            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
+            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
             list: List of tuples of tuples or list of dicts.
         """
-        return self._pairs(as_dict, sep, pattern, exclude)
+        return self._pairs(
+            as_dict=as_dict,
+            sep=sep,
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
 
-    def groupby(self, column=0, sep=None, pattern=None, exclude=False):
+    def groupby(
+        self,
+        column=0,
+        sep=None,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
         """
         For each line from input, split line on `sep` and treat the substring
         with index specified in `column` as the key for grouping lines with
@@ -749,6 +1229,8 @@ class String:
         Args:
             column (int, optional): Index of column to perform groupby. Defaults to 0.
             sep (str, optional): Separator character. Defaults to None.
+            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
+            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
@@ -756,7 +1238,12 @@ class String:
             dict: A dictionary of str -> List[str] with grouped lines.
         """
         return self._groupby(
-            column=column, sep=sep, pattern=pattern, exclude=exclude
+            column=column,
+            sep=sep,
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
         )
 
     ### End String Processing Public Methods ###

@@ -1,8 +1,8 @@
 # Xstring
 
-> Auto-generated documentation for [integraty.xstring](../../integraty/xstring.py) module.
+> Auto-generated documentation for [integraty.xstring](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py) module.
 
-- [Integraty](../README.md#integraty) / [Modules](../MODULES.md#integraty-modules) / `Integraty` / Xstring
+- [integraty](../README.md#integraty) / [Modules](../MODULES.md#integraty-modules) / [Integraty](index.md#integraty) / Xstring
     - [String](#string)
         - [String().at_least_n_substr](#stringat_least_n_substr)
         - [String().at_most_n_substr](#stringat_most_n_substr)
@@ -34,7 +34,7 @@
 
 ## String
 
-[[find in source code]](../../integraty/xstring.py#L20)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L20)
 
 ```python
 class String():
@@ -43,7 +43,7 @@ class String():
 
 ### String().at_least_n_substr
 
-[[find in source code]](../../integraty/xstring.py#L649)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L1056)
 
 ```python
 def at_least_n_substr(substr=None, n=0):
@@ -51,7 +51,7 @@ def at_least_n_substr(substr=None, n=0):
 
 ### String().at_most_n_substr
 
-[[find in source code]](../../integraty/xstring.py#L652)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L1059)
 
 ```python
 def at_most_n_substr(substr=None, n=0):
@@ -59,10 +59,17 @@ def at_most_n_substr(substr=None, n=0):
 
 ### String().compress
 
-[[find in source code]](../../integraty/xstring.py#L500)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L791)
 
 ```python
-def compress(sep=None, indexes=(), pattern=None, exclude=False):
+def compress(
+    sep=None,
+    indexes=(),
+    sub_pattern=None,
+    replacement=None,
+    pattern=None,
+    exclude=False,
+):
 ```
 
 Select one or more fields from each line from input, after splitting
@@ -83,6 +90,8 @@ substrings of interest.
 
 - `sep` *str, optional* - Separator character. Defaults to None.
 - `indexes` *tuple, optional* - Sequence of column indexes. Defaults to ().
+- `sub_pattern` *string, optional* - Substitution regex pattern. Defaults to None.
+- `replacement` *string, optional* - Text with which to replace all matches of `sub_pattern`. Defaults to None.
 - `pattern` *str, optional* - Select lines matching pattern. Defaults to None.
 - `exclude` *bool, optional* - Invert pattern matching. Defaults to False.
 
@@ -92,7 +101,7 @@ substrings of interest.
 
 ### String().count
 
-[[find in source code]](../../integraty/xstring.py#L325)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L520)
 
 ```python
 def count(pattern=None, exclude=False):
@@ -107,11 +116,11 @@ Count number of lines written in input.
 
 #### Returns
 
-- `int` - Count of lines.
+- `int` - Count of lines in input.
 
 ### String().dict_from_line
 
-[[find in source code]](../../integraty/xstring.py#L383)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L606)
 
 ```python
 def dict_from_line(keys=None, sep=None, pattern=None, exclude=False):
@@ -141,10 +150,16 @@ len(line) == 3, resulting dict is {0: line[0], 1: line[1], 2: line[2]}.
 
 ### String().fields
 
-[[find in source code]](../../integraty/xstring.py#L463)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L722)
 
 ```python
-def fields(sep=None, pattern=None, exclude=False):
+def fields(
+    sep=None,
+    sub_pattern=None,
+    replacement=None,
+    pattern=None,
+    exclude=False,
+):
 ```
 
 Split each line from input into fields and join each column into a
@@ -159,6 +174,8 @@ this produces: [('alpha', 'delta'), ('beta', 'epsilon'), ('gamma',
 #### Arguments
 
 - `sep` *str, optional* - Separator character. Defaults to None.
+- `sub_pattern` *string, optional* - Substitution regex pattern. Defaults to None.
+- `replacement` *string, optional* - Text with which to replace all matches of `sub_pattern`. Defaults to None.
 - `pattern` *str, optional* - Select lines matching pattern. Defaults to None.
 - `exclude` *bool, optional* - Invert pattern matching. Defaults to False.
 
@@ -168,10 +185,16 @@ this produces: [('alpha', 'delta'), ('beta', 'epsilon'), ('gamma',
 
 ### String().filter_func
 
-[[find in source code]](../../integraty/xstring.py#L655)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L1062)
 
 ```python
-def filter_func(func, exclude=False):
+def filter_func(
+    func,
+    sub_pattern=None,
+    replacement=None,
+    pattern=None,
+    exclude=False,
+):
 ```
 
 Filters lines written in input with a filtering function in
@@ -184,6 +207,9 @@ those that result in `False` will be excluded, unless `exclude` is
 #### Arguments
 
 - `func` *((s* - str) -> bool): Filtering function emitting a boolean.
+- `sub_pattern` *string, optional* - Substitution regex pattern. Defaults to None.
+- `replacement` *string, optional* - Text with which to replace all matches of `sub_pattern`. Defaults to None.
+- `pattern` *str, optional* - Select lines matching pattern. Defaults to None.
 - `exclude` *bool, optional* - Invert filtering logic. Defaults to False.
 
 #### Returns
@@ -192,7 +218,7 @@ those that result in `False` will be excluded, unless `exclude` is
 
 ### String().firstn
 
-[[find in source code]](../../integraty/xstring.py#L407)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L633)
 
 ```python
 def firstn(n=1, pattern=None, exclude=None):
@@ -212,10 +238,16 @@ Select first n lines from input.
 
 ### String().fold_funcs
 
-[[find in source code]](../../integraty/xstring.py#L688)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L1126)
 
 ```python
-def fold_funcs(pattern=None, exclude=None, *funcs):
+def fold_funcs(
+    sub_pattern=None,
+    replacement=None,
+    pattern=None,
+    exclude=None,
+    *funcs,
+):
 ```
 
 Higher-order function taking one or more functions composing them
@@ -242,6 +274,10 @@ c(b(a(line)))
 #### Arguments
 
 - `*funcs` *(Sequence[Callable[(s* - str) -> string]]): A sequence of functions, each with a single argument, returning a single value.
+- `sub_pattern` *string, optional* - Substitution regex pattern. Defaults to None.
+- `replacement` *string, optional* - Text with which to replace all matches of `sub_pattern`. Defaults to None.
+- `pattern` *str, optional* - Select lines matching pattern. Defaults to None.
+- `exclude` *bool, optional* - Invert pattern matching. Defaults to False.
 
 #### Returns
 
@@ -249,10 +285,17 @@ c(b(a(line)))
 
 ### String().groupby
 
-[[find in source code]](../../integraty/xstring.py#L741)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L1213)
 
 ```python
-def groupby(column=0, sep=None, pattern=None, exclude=False):
+def groupby(
+    column=0,
+    sep=None,
+    sub_pattern=None,
+    replacement=None,
+    pattern=None,
+    exclude=False,
+):
 ```
 
 For each line from input, split line on `sep` and treat the substring
@@ -265,6 +308,8 @@ specified in `column`.
 
 - `column` *int, optional* - Index of column to perform groupby. Defaults to 0.
 - `sep` *str, optional* - Separator character. Defaults to None.
+- `sub_pattern` *string, optional* - Substitution regex pattern. Defaults to None.
+- `replacement` *string, optional* - Text with which to replace all matches of `sub_pattern`. Defaults to None.
 - `pattern` *str, optional* - Select lines matching pattern. Defaults to None.
 - `exclude` *bool, optional* - Invert pattern matching. Defaults to False.
 
@@ -274,10 +319,16 @@ specified in `column`.
 
 ### String().head
 
-[[find in source code]](../../integraty/xstring.py#L435)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L664)
 
 ```python
-def head(sep=None, pattern=None, exclude=False):
+def head(
+    sep=None,
+    sub_pattern=None,
+    replacement=None,
+    pattern=None,
+    exclude=False,
+):
 ```
 
 Select first column of each line from input, after splitting on `sep`.
@@ -285,6 +336,8 @@ Select first column of each line from input, after splitting on `sep`.
 #### Arguments
 
 - `sep` *str, optional* - Separator character. Defaults to None.
+- `sub_pattern` *string, optional* - Substitution regex pattern. Defaults to None.
+- `replacement` *string, optional* - Text with which to replace all matches of `sub_pattern`. Defaults to None.
 - `pattern` *str, optional* - Select lines matching pattern. Defaults to None.
 - `exclude` *bool, optional* - Invert pattern matching. Defaults to False.
 
@@ -294,7 +347,7 @@ Select first column of each line from input, after splitting on `sep`.
 
 ### String().json_loads
 
-[[find in source code]](../../integraty/xstring.py#L315)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L510)
 
 ```python
 @property
@@ -309,7 +362,7 @@ bool, int, string, dict, list: Unmarshaled JSON data.
 
 ### String().lastn
 
-[[find in source code]](../../integraty/xstring.py#L421)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L647)
 
 ```python
 def lastn(n=1, pattern=None, exclude=None):
@@ -329,15 +382,17 @@ Select last n lines from input.
 
 ### String().line_tuples
 
-[[find in source code]](../../integraty/xstring.py#L545)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L868)
 
 ```python
 def line_tuples(
     sep=None,
-    pattern=None,
-    exclude=False,
     strip_punct=False,
     strip_chars=PCHARS,
+    sub_pattern=None,
+    replacement=None,
+    pattern=None,
+    exclude=False,
 ):
 ```
 
@@ -347,10 +402,12 @@ a tuple consisting of all split tokens from that line.
 #### Arguments
 
 - `sep` *str, optional* - Separator character. Defaults to None.
-- `pattern` *str, optional* - Select lines matching pattern. Defaults to None.
-- `exclude` *bool, optional* - Invert pattern matching. Defaults to False.
 - `strip_punct` *bool, optional* - Enable punctuation stripping. Defaults to False.
 - `strip_chars` *str, optional* - Characters to strip if 'strip_punct' is True. Defaults to PCHARS.
+- `sub_pattern` *string, optional* - Substitution regex pattern. Defaults to None.
+- `replacement` *string, optional* - Text with which to replace all matches of `sub_pattern`. Defaults to None.
+- `pattern` *str, optional* - Select lines matching pattern. Defaults to None.
+- `exclude` *bool, optional* - Invert pattern matching. Defaults to False.
 
 #### Returns
 
@@ -362,25 +419,37 @@ a tuple consisting of all split tokens from that line.
 
 ### String().lines
 
-[[find in source code]](../../integraty/xstring.py#L571)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L904)
 
 ```python
-@property
-def lines():
+def lines(sub_pattern=None, replacement=None, pattern=None, exclude=False):
 ```
 
-Unfiltered lines written in input.
+Lines from input, optionally filtered with expression in `pattern`.
+
+#### Arguments
+
+- `sub_pattern` *string, optional* - Substitution regex pattern. Defaults to None.
+- `replacement` *string, optional* - Text with which to replace all matches of `sub_pattern`. Defaults to None.
+- `pattern` *str, optional* - Select lines matching pattern. Defaults to None.
+- `exclude` *bool, optional* - Invert pattern matching. Defaults to False.
 
 #### Returns
 
-- `list` - List of lines written in input.
+- `list` - List of lines from input.
 
 ### String().map_func
 
-[[find in source code]](../../integraty/xstring.py#L672)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L1095)
 
 ```python
-def map_func(func, pattern=None, exclude=False):
+def map_func(
+    func,
+    sub_pattern=None,
+    replacement=None,
+    pattern=None,
+    exclude=False,
+):
 ```
 
 Applies function in 'func' to each line written in input.
@@ -390,6 +459,8 @@ the resulting list. Result of calling 'func' should not be None.
 #### Arguments
 
 - `func` *((s* - str) -> Any): Mapping function receiving a string and emitting Any other type.
+- `sub_pattern` *string, optional* - Substitution regex pattern. Defaults to None.
+- `replacement` *string, optional* - Text with which to replace all matches of `sub_pattern`. Defaults to None.
 - `pattern` *str, optional* - Select lines matching pattern. Defaults to None.
 - `exclude` *bool, optional* - Invert pattern matching. Defaults to False.
 
@@ -399,10 +470,17 @@ the resulting list. Result of calling 'func' should not be None.
 
 ### String().pairs
 
-[[find in source code]](../../integraty/xstring.py#L718)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L1173)
 
 ```python
-def pairs(as_dict=False, sep=None, pattern=None, exclude=False):
+def pairs(
+    as_dict=False,
+    sep=None,
+    sub_pattern=None,
+    replacement=None,
+    pattern=None,
+    exclude=False,
+):
 ```
 
 Break-up each line from input into pairs, optionally placing these
@@ -419,6 +497,8 @@ in the split line will be discarded.
 
 - `as_dict` *bool, optional* - Should pairs be inserted into a dict. Defaults to False.
 - `sep` *str, optional* - Separator character. Defaults to None.
+- `sub_pattern` *string, optional* - Substitution regex pattern. Defaults to None.
+- `replacement` *string, optional* - Text with which to replace all matches of `sub_pattern`. Defaults to None.
 - `pattern` *str, optional* - Select lines matching pattern. Defaults to None.
 - `exclude` *bool, optional* - Invert pattern matching. Defaults to False.
 
@@ -428,10 +508,17 @@ in the split line will be discarded.
 
 ### String().skip_lines
 
-[[find in source code]](../../integraty/xstring.py#L338)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L533)
 
 ```python
-def skip_lines(skip_head=0, skip_tail=0, pattern=None, exclude=False):
+def skip_lines(
+    skip_head=0,
+    skip_tail=0,
+    sub_pattern=None,
+    replacement=None,
+    pattern=None,
+    exclude=False,
+):
 ```
 
 Skips some number of lines from the beginning, i.e. the head of the list
@@ -445,19 +532,27 @@ words, skipping of lines occurs after application of `pattern` and
 
 - `skip_head` *int, optional* - Number of lines to skip relative to beginning of data. Defaults to 0.
 - `skip_tail` *int, optional* - Number of lines to skip relative to the end of the data. Defaults to 0.
+- `sub_pattern` *string, optional* - Substitution regex pattern. Defaults to None.
+- `replacement` *string, optional* - Text with which to replace all matches of `sub_pattern`. Defaults to None.
 - `pattern` *str, optional* - Select lines matching pattern. Defaults to None.
 - `exclude` *bool, optional* - Invert pattern matching. Defaults to False.
 
 #### Returns
 
-- `list` - List of lines written in input.
+- `list` - List of lines from input with some lines skipped from head and tail.
 
 ### String().tail
 
-[[find in source code]](../../integraty/xstring.py#L449)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L693)
 
 ```python
-def tail(sep=None, pattern=None, exclude=False):
+def tail(
+    sep=None,
+    sub_pattern=None,
+    replacement=None,
+    pattern=None,
+    exclude=False,
+):
 ```
 
 Select all but first column of each line from input, after splitting on `sep`.
@@ -465,6 +560,8 @@ Select all but first column of each line from input, after splitting on `sep`.
 #### Arguments
 
 - `sep` *str, optional* - Separator character. Defaults to None.
+- `sub_pattern` *string, optional* - Substitution regex pattern. Defaults to None.
+- `replacement` *string, optional* - Text with which to replace all matches of `sub_pattern`. Defaults to None.
 - `pattern` *str, optional* - Select lines matching pattern. Defaults to None.
 - `exclude` *bool, optional* - Invert pattern matching. Defaults to False.
 
@@ -474,10 +571,17 @@ Select all but first column of each line from input, after splitting on `sep`.
 
 ### String().take_column
 
-[[find in source code]](../../integraty/xstring.py#L484)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L758)
 
 ```python
-def take_column(sep=None, column=0, pattern=None, exclude=False):
+def take_column(
+    sep=None,
+    column=0,
+    sub_pattern=None,
+    replacement=None,
+    pattern=None,
+    exclude=False,
+):
 ```
 
 Select a single column of each line from input, after splitting the
@@ -487,6 +591,8 @@ line on `sep`.
 
 - `sep` *str, optional* - Separator character. Defaults to None.
 - `column` *int, optional* - Select column matching this index. Defaults to 0.
+- `sub_pattern` *string, optional* - Substitution regex pattern. Defaults to None.
+- `replacement` *string, optional* - Text with which to replace all matches of `sub_pattern`. Defaults to None.
 - `pattern` *str, optional* - Select lines matching pattern. Defaults to None.
 - `exclude` *bool, optional* - Invert pattern matching. Defaults to False.
 
@@ -496,12 +602,14 @@ line on `sep`.
 
 ### String().take_range_fields
 
-[[find in source code]](../../integraty/xstring.py#L527)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L835)
 
 ```python
 def take_range_fields(
     sep=None,
     slc_range=(0, 1, 1),
+    sub_pattern=None,
+    replacement=None,
     pattern=None,
     exclude=False,
 ):
@@ -514,6 +622,8 @@ from input, after splitting the line on `sep`.
 
 - `sep` *str, optional* - Separator character. Defaults to None.
 - `slc_range` *tuple, optional* - Range (start, end, stride). Defaults to (0, 1, 1).
+- `sub_pattern` *string, optional* - Substitution regex pattern. Defaults to None.
+- `replacement` *string, optional* - Text with which to replace all matches of `sub_pattern`. Defaults to None.
 - `pattern` *str, optional* - Select lines matching pattern. Defaults to None.
 - `exclude` *bool, optional* - Invert pattern matching. Defaults to False.
 
@@ -523,34 +633,48 @@ from input, after splitting the line on `sep`.
 
 ### String().to_dict_func
 
-[[find in source code]](../../integraty/xstring.py#L365)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L573)
 
 ```python
-def to_dict_func(tuple_func, pattern=None, exclude=False):
+def to_dict_func(
+    func,
+    sub_pattern=None,
+    replacement=None,
+    pattern=None,
+    exclude=False,
+):
 ```
 
-Applies `tuple_func` to each line from input, adding resulting tuple
-to dict. It is expected that result from `tuple_func` is a single
+Applies `func` to each line from input, adding resulting tuple
+to dict. It is expected that result from `func` is a single
 two-element tuple object, where first element becomes dict key and
 second value for given key.
 
 #### Arguments
 
-- `tuple_func` *str* - Conversion function from string to two-element tuple.
+- `func` *str* - Conversion function from string to two-element tuple.
+- `sub_pattern` *string, optional* - Substitution regex pattern. Defaults to None.
+- `replacement` *string, optional* - Text with which to replace all matches of `sub_pattern`. Defaults to None.
 - `pattern` *str, optional* - Select lines matching pattern. Defaults to None.
 - `exclude` *bool, optional* - Invert pattern matching. Defaults to False.
 
 #### Returns
 
-- `dict` - Dict made from tuples for each line over which `tuple_func`
+- `dict` - Dict made from tuples for each line over which `func`
 was applied.
 
 ### String().trim_prefix
 
-[[find in source code]](../../integraty/xstring.py#L581)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L928)
 
 ```python
-def trim_prefix(prefix, pattern=None, exclude=False):
+def trim_prefix(
+    prefix,
+    sub_pattern=None,
+    replacement=None,
+    pattern=None,
+    exclude=False,
+):
 ```
 
 Trim substring in `prefix` from beginning of each line from input,
@@ -559,6 +683,8 @@ assuming substring is present.
 #### Arguments
 
 - `prefix` *str* - Prefix to trim from beginning of each line.
+- `sub_pattern` *string, optional* - Substitution regex pattern. Defaults to None.
+- `replacement` *string, optional* - Text with which to replace all matches of `sub_pattern`. Defaults to None.
 - `pattern` *str, optional* - Select lines matching pattern. Defaults to None.
 - `exclude` *bool, optional* - Invert pattern matching. Defaults to False.
 
@@ -568,10 +694,16 @@ assuming substring is present.
 
 ### String().trim_suffix
 
-[[find in source code]](../../integraty/xstring.py#L596)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L958)
 
 ```python
-def trim_suffix(suffix, pattern=None, exclude=False):
+def trim_suffix(
+    suffix,
+    sub_pattern=None,
+    replacement=None,
+    pattern=None,
+    exclude=False,
+):
 ```
 
 Trim substring in `suffix` from end of each line from input,
@@ -580,6 +712,8 @@ assuming substring is present.
 #### Arguments
 
 - `suffix` *str* - Suffix to trim from end of each line.
+- `sub_pattern` *string, optional* - Substitution regex pattern. Defaults to None.
+- `replacement` *string, optional* - Text with which to replace all matches of `sub_pattern`. Defaults to None.
 - `pattern` *str, optional* - Select lines matching pattern. Defaults to None.
 - `exclude` *bool, optional* - Invert pattern matching. Defaults to False.
 
@@ -589,10 +723,16 @@ assuming substring is present.
 
 ### String().with_prefix
 
-[[find in source code]](../../integraty/xstring.py#L611)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L988)
 
 ```python
-def with_prefix(prefix, pattern=None, exclude=False):
+def with_prefix(
+    prefix,
+    sub_pattern=None,
+    replacement=None,
+    pattern=None,
+    exclude=False,
+):
 ```
 
 Limits included lines from input to those matching given prefix.
@@ -605,6 +745,8 @@ parameters, not before.
 #### Arguments
 
 - `prefix` *str* - Lines with given prefix should be included.
+- `sub_pattern` *string, optional* - Substitution regex pattern. Defaults to None.
+- `replacement` *string, optional* - Text with which to replace all matches of `sub_pattern`. Defaults to None.
 - `pattern` *str, optional* - Select lines matching pattern. Defaults to None.
 - `exclude` *bool, optional* - Invert pattern matching. Defaults to False.
 
@@ -614,10 +756,16 @@ parameters, not before.
 
 ### String().with_suffix
 
-[[find in source code]](../../integraty/xstring.py#L630)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L1022)
 
 ```python
-def with_suffix(suffix, pattern=None, exclude=False):
+def with_suffix(
+    suffix,
+    sub_pattern=None,
+    replacement=None,
+    pattern=None,
+    exclude=False,
+):
 ```
 
 Limits included lines from input to those matching given suffix.
@@ -630,6 +778,8 @@ parameters, not before.
 #### Arguments
 
 - `suffix` *str* - Lines with given prefix should be included.
+- `sub_pattern` *string, optional* - Substitution regex pattern. Defaults to None.
+- `replacement` *string, optional* - Text with which to replace all matches of `sub_pattern`. Defaults to None.
 - `pattern` *str, optional* - Select lines matching pattern. Defaults to None.
 - `exclude` *bool, optional* - Invert pattern matching. Defaults to False.
 
@@ -639,7 +789,7 @@ parameters, not before.
 
 ## stripper
 
-[[find in source code]](../../integraty/xstring.py#L13)
+[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/xstring.py#L13)
 
 ```python
 def stripper(w, chars):

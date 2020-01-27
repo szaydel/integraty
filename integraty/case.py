@@ -23,14 +23,14 @@ class InvalidStream(Exception):
 
 
 class IntegraTestCase(TestCase):
+
     def __init__(self, methodName="runTest"):
         logger = logging.getLogger("IntegraTestCase")
         logger.setLevel(logging.DEBUG)
         hndlr = logging.StreamHandler(sys.stderr)
         hndlr.setLevel(logging.DEBUG)
         formatter = logging.Formatter(
-            "|%(levelname)s|\t%(funcName)s[%(lineno)d]: %(message)s"
-        )
+            "|%(levelname)s|\t%(funcName)s[%(lineno)d]: %(message)s")
         hndlr.setFormatter(formatter)
         logger.addHandler(hndlr)
         self.log = logger
@@ -49,9 +49,7 @@ class IntegraTestCase(TestCase):
         """
         return self.__class__.__getattribute__(self, name)
 
-    def assertCommandSucceeded(
-        self, extprog: ExternalProgram = None, msg=None
-    ):
+    def assertCommandSucceeded(self, extprog: ExternalProgram = None, msg=None):
         """Assert that the executed command ran successfully."""
         msg = self._formatMessage(
             msg,
@@ -87,25 +85,26 @@ class IntegraTestCase(TestCase):
         else:
             raise NoCommandException("ExternalProgram cannot be None")
 
-    def assertStdOutEqual(
-        self, extprog: ExternalProgram = None, second=None, msg=None
-    ):
+    def assertStdOutEqual(self,
+                          extprog: ExternalProgram = None,
+                          second=None,
+                          msg=None):
         """Assert that stdout from command and 'second' are equal."""
         return self.assertMultiLineEqual(extprog.out, second)
 
-    def assertStdErrEqual(
-        self, extprog: ExternalProgram = None, second=None, msg=None
-    ):
+    def assertStdErrEqual(self,
+                          extprog: ExternalProgram = None,
+                          second=None,
+                          msg=None):
         """Assert that stderr from command and 'second' are equal."""
         return self.assertMultiLineEqual(extprog.err, second)
 
-    def assertStdOutContains(
-        self, extprog: ExternalProgram = None, substr=None, msg=None
-    ):
+    def assertStdOutContains(self,
+                             extprog: ExternalProgram = None,
+                             substr=None,
+                             msg=None):
         """Assert that stdout from command contains a given substring"""
-        self.assertIsInstance(
-            substr, str, "Parameter 'substr' is not a string"
-        )
+        self.assertIsInstance(substr, str, "Parameter 'substr' is not a string")
 
         if extprog:
             if not re.search(substr, extprog.out):
@@ -117,13 +116,12 @@ class IntegraTestCase(TestCase):
         else:
             raise NoCommandException("ExternalProgram cannot be None")
 
-    def assertStdErrContains(
-        self, extprog: ExternalProgram = None, substr=None, msg=None
-    ):
+    def assertStdErrContains(self,
+                             extprog: ExternalProgram = None,
+                             substr=None,
+                             msg=None):
         """Assert that stderr from command contains a given substring"""
-        self.assertIsInstance(
-            substr, str, "Parameter 'substr' is not a string"
-        )
+        self.assertIsInstance(substr, str, "Parameter 'substr' is not a string")
 
         if extprog:
             if not re.search(substr, extprog.err):
@@ -135,9 +133,9 @@ class IntegraTestCase(TestCase):
         else:
             raise NoCommandException("ExternalProgram cannot be None")
 
-    def assertStdoutIsJSONArray(
-        self, extprog: ExternalProgram = None, msg=None
-    ):
+    def assertStdoutIsJSONArray(self,
+                                extprog: ExternalProgram = None,
+                                msg=None):
         """Assert that stdout from command contains JSON Array"""
         if extprog:
             data = None
@@ -166,17 +164,24 @@ class IntegraTestCase(TestCase):
             s = os.stat(path)
             if not stat.S_ISREG(s.st_mode):
                 msg = self._formatMessage(
-                    msg, f"Expected '{path}' to be a regular file",
+                    msg,
+                    f"Expected '{path}' to be a regular file",
                 )
                 raise self.failureException(msg)
         else:
-            msg = self._formatMessage(msg, f"File '{path}' does not exist",)
+            msg = self._formatMessage(
+                msg,
+                f"File '{path}' does not exist",
+            )
             raise self.failureException(msg)
 
     def assertPathDoesNotExist(self, path, msg=None):
         """Assert that given path does not exist."""
         if os.path.exists(path):
-            msg = self._formatMessage(msg, f"Expected '{path}' not to exist",)
+            msg = self._formatMessage(
+                msg,
+                f"Expected '{path}' not to exist",
+            )
             raise self.failureException(msg)
 
     def assertDirExists(self, path, msg=None):
@@ -185,12 +190,14 @@ class IntegraTestCase(TestCase):
             s = os.stat(path)
             if not stat.S_ISDIR(s.st_mode):
                 msg = self._formatMessage(
-                    msg, f"Expected '{path}' to be a directory",
+                    msg,
+                    f"Expected '{path}' to be a directory",
                 )
                 raise self.failureException(msg)
         else:
             msg = self._formatMessage(
-                msg, f"Directory '{path}' does not exist",
+                msg,
+                f"Directory '{path}' does not exist",
             )
             raise self.failureException(msg)
 

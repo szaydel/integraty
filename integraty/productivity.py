@@ -30,26 +30,23 @@ class RandomStrings:
             self.chars = self.__class__._letters + self.__class__._digits
 
     def string(self, length=10):
-        return "".join(
-            [
-                self.chars[self._r.choice(range(0, self.chars.__len__()))]
-                for i in range(0, length)
-            ]
-        )
+        return "".join([
+            self.chars[self._r.choice(range(0, self.chars.__len__()))]
+            for i in range(0, length)
+        ])
 
     def iter_string(self, length=10, count=100):
         c = count
         while c:
-            yield "".join(
-                [
-                    self.chars[self._r.choice(range(0, self.chars.__len__()))]
-                    for i in range(0, length)
-                ]
-            )
+            yield "".join([
+                self.chars[self._r.choice(range(0, self.chars.__len__()))]
+                for i in range(0, length)
+            ])
             c -= 1
 
 
 class ChecksumStringIO:
+
     def __init__(self, stream: io.StringIO):
         self._stream = stream
 
@@ -59,8 +56,7 @@ class ChecksumStringIO:
         if offset:
             self._stream.seek(0)  # rewind if necessary
         digest = hashlib.sha1(
-            self._stream.read(READ_LIMIT_BYTES).encode("utf-8")
-        ).hexdigest()
+            self._stream.read(READ_LIMIT_BYTES).encode("utf-8")).hexdigest()
 
         self._stream.seek(offset)  # reset to original offset
         return digest
@@ -71,8 +67,7 @@ class ChecksumStringIO:
         if offset:
             self._stream.seek(0)  # rewind if necessary
         digest = hashlib.sha256(
-            self._stream.read(READ_LIMIT_BYTES).encode("utf-8")
-        ).hexdigest()
+            self._stream.read(READ_LIMIT_BYTES).encode("utf-8")).hexdigest()
         self._stream.seek(offset)  # reset to original offset
         return digest
 
@@ -82,13 +77,13 @@ class ChecksumStringIO:
         if offset:
             self._stream.seek(0)  # rewind if necessary
         digest = hashlib.md5(
-            self._stream.read(READ_LIMIT_BYTES).encode("utf-8")
-        ).hexdigest()
+            self._stream.read(READ_LIMIT_BYTES).encode("utf-8")).hexdigest()
         self._stream.seek(offset)  # reset to original offset
         return digest
 
 
 class ChecksumBytesIO:
+
     def __init__(self, stream: io.BytesIO):
         self._stream = stream
 
@@ -100,9 +95,7 @@ class ChecksumBytesIO:
 
     @property
     def sha256(self):
-        digest = hashlib.sha256(
-            self._stream.read(READ_LIMIT_BYTES)
-        ).hexdigest()
+        digest = hashlib.sha256(self._stream.read(READ_LIMIT_BYTES)).hexdigest()
         self._stream.seek(0)  # reset to beginning for next operation
         return digest
 
@@ -114,6 +107,7 @@ class ChecksumBytesIO:
 
 
 class ChecksumStream:
+
     def __init__(self, stream: io.IOBase):
         self._stream = stream
 
@@ -133,12 +127,11 @@ class ChecksumStream:
             self._stream.seek(0)
         if isinstance(self._stream, io.TextIOBase):
             digest = hashlib.sha1(
-                self._stream.read(READ_LIMIT_BYTES).encode("utf-8")
-            ).hexdigest()
+                self._stream.read(READ_LIMIT_BYTES).encode(
+                    "utf-8")).hexdigest()
         else:
             digest = hashlib.sha1(
-                self._stream.read(READ_LIMIT_BYTES)
-            ).hexdigest()
+                self._stream.read(READ_LIMIT_BYTES)).hexdigest()
         self._stream.seek(0)  # reset to beginning for next operation
         return digest
 
@@ -154,12 +147,11 @@ class ChecksumStream:
             self._stream.seek(0)
         if isinstance(self._stream, io.TextIOBase):
             digest = hashlib.sha256(
-                self._stream.read(READ_LIMIT_BYTES).encode("utf-8")
-            ).hexdigest()
+                self._stream.read(READ_LIMIT_BYTES).encode(
+                    "utf-8")).hexdigest()
         else:
             digest = hashlib.sha256(
-                self._stream.read(READ_LIMIT_BYTES)
-            ).hexdigest()
+                self._stream.read(READ_LIMIT_BYTES)).hexdigest()
         self._stream.seek(0)  # reset to beginning for next operation
         return digest
 
@@ -175,12 +167,11 @@ class ChecksumStream:
             self._stream.seek(0)
         if isinstance(self._stream, io.TextIOBase):
             digest = hashlib.md5(
-                self._stream.read(READ_LIMIT_BYTES).encode("utf-8")
-            ).hexdigest()
+                self._stream.read(READ_LIMIT_BYTES).encode(
+                    "utf-8")).hexdigest()
         else:
             digest = hashlib.md5(
-                self._stream.read(READ_LIMIT_BYTES)
-            ).hexdigest()
+                self._stream.read(READ_LIMIT_BYTES)).hexdigest()
         self._stream.seek(0)  # reset to beginning for next operation
         return digest
 
@@ -196,8 +187,7 @@ class ChecksumStream:
         encoded: bytes = None
         if isinstance(self._stream, io.TextIOBase):
             encoded = base64.b64encode(
-                bytes(self._stream.read().encode("utf-8"))
-            )
+                bytes(self._stream.read().encode("utf-8")))
         else:
             encoded = base64.b64encode(bytes(self._stream.read()))
         self._stream.seek(offset)
@@ -223,6 +213,7 @@ class ChecksumStream:
 
 
 class ChecksumFile(ChecksumStream):
+
     def __init__(self, path):
         if not os.path.isfile(path):
             raise FileNotFoundError(f"File '{path}' does not exist")
@@ -247,13 +238,14 @@ class TemporaryFile:
         delete=True,
     ):
         if virtual:
-            self._f = tempfile.TemporaryFile(
-                suffix=suffix, prefix=prefix, dir=dir
-            )
+            self._f = tempfile.TemporaryFile(suffix=suffix,
+                                             prefix=prefix,
+                                             dir=dir)
         else:
-            self._f = tempfile.NamedTemporaryFile(
-                suffix=suffix, prefix=prefix, dir=dir, delete=delete
-            )
+            self._f = tempfile.NamedTemporaryFile(suffix=suffix,
+                                                  prefix=prefix,
+                                                  dir=dir,
+                                                  delete=delete)
         if initial_content:
             self._f.write(initial_content)
             self._f.seek(0)  # Seek to starting offset

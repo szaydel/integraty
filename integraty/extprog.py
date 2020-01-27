@@ -107,8 +107,7 @@ class ExternalProgram(object):
 
     def __repr__(self):
         return "ExternalProgram({!r}, timeout={})".format(
-            self.cmd, self.timeout
-        )
+            self.cmd, self.timeout)
 
     def __enter__(self):
         return self
@@ -276,8 +275,7 @@ class ExternalProgram(object):
         """ Runs the command and blocks (waits) until the command is complete. """
         if not shell and not isinstance(self._popen_args, list):
             raise ExternalProgramException(
-                "With 'shell=False' command must be a sequence not a string"
-            )
+                "With 'shell=False' command must be a sequence not a string")
         self.run(env=env, shell=shell)
         self.block()
 
@@ -286,8 +284,7 @@ class ExternalProgram(object):
 
         if self.blocking:
             raise RuntimeError(
-                "expect can only be used on non-blocking commands."
-            )
+                "expect can only be used on non-blocking commands.")
 
         try:
             self.subprocess.expect(pattern=pattern, timeout=timeout)
@@ -299,8 +296,7 @@ class ExternalProgram(object):
 
         if self.blocking:
             raise RuntimeError(
-                "send can only be used on non-blocking commands."
-            )
+                "send can only be used on non-blocking commands.")
 
         if not signal:
             if self._uses_subprocess:
@@ -326,8 +322,7 @@ class ExternalProgram(object):
             if self.blocking:
                 try:
                     stdout, stderr = self.subprocess.communicate(
-                        timeout=self.timeout if self.timeout else None
-                    )
+                        timeout=self.timeout if self.timeout else None)
                     self.__out = stdout
                     self.__err = stderr
                 except ValueError:

@@ -3,6 +3,8 @@ init:
 
 install:
 	pip install -r requirements.txt
+
+build-package:
 	python ./setup.py install
 
 format:
@@ -21,3 +23,7 @@ documentation: integraty/case.py integraty/extprog.py integraty/productivity.py 
 
 test:
 	python -m unittest integraty
+
+.PHONY: all
+
+all: build-package test

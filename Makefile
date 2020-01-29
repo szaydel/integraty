@@ -22,7 +22,7 @@ documentation: integraty/case.py integraty/extprog.py integraty/productivity.py 
 	integraty
 
 test:
-	python -m unittest integraty
+	pytest -v tests
 
 .PHONY: all
 

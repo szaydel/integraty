@@ -1,6 +1,6 @@
 # Extprog
 
-> Auto-generated documentation for [integraty.extprog](https://github.com/szaydel/integraty/blob/master/integraty/extprog.py) module.
+> Auto-generated documentation for [integraty.extprog](https://github.com/szaydel/integratyintegraty/extprog.py) module.
 
 - [integraty](../README.md#integraty) / [Modules](../MODULES.md#integraty-modules) / [Integraty](index.md#integraty) / Extprog
     - [ExternalProgram](#externalprogram)
@@ -29,7 +29,7 @@
 
 ## ExternalProgram
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/extprog.py#L63)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/extprog.py#L63)
 
 ```python
 class ExternalProgram(object):
@@ -72,7 +72,7 @@ sources checked out in a convenient place.
 
 ### ExternalProgram().block
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/extprog.py#L318)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/extprog.py#L318)
 
 ```python
 def block():
@@ -82,7 +82,7 @@ Blocks until process is complete.
 
 ### ExternalProgram().err
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/extprog.py#L202)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/extprog.py#L202)
 
 ```python
 @property
@@ -93,7 +93,7 @@ Std/err output (cached)
 
 ### ExternalProgram().exec
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/extprog.py#L274)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/extprog.py#L274)
 
 ```python
 def exec(env=None, shell=True):
@@ -103,7 +103,7 @@ Runs the command and blocks (waits) until the command is complete.
 
 ### ExternalProgram().expect
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/extprog.py#L282)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/extprog.py#L282)
 
 ```python
 def expect(pattern, timeout=-1):
@@ -113,7 +113,7 @@ Waits on the given pattern to appear in std_out
 
 ### ExternalProgram().is_alive
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/extprog.py#L226)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/extprog.py#L226)
 
 ```python
 @property
@@ -124,7 +124,7 @@ Is the process alive?
 
 ### ExternalProgram().kill
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/extprog.py#L312)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/extprog.py#L312)
 
 ```python
 def kill():
@@ -132,7 +132,7 @@ def kill():
 
 ### ExternalProgram().ok
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/extprog.py#L163)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/extprog.py#L163)
 
 ```python
 @property
@@ -141,7 +141,7 @@ def ok():
 
 ### ExternalProgram().out
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/extprog.py#L183)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/extprog.py#L183)
 
 ```python
 @property
@@ -152,7 +152,7 @@ Std/out output (cached)
 
 ### ExternalProgram().pid
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/extprog.py#L217)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/extprog.py#L217)
 
 ```python
 @property
@@ -163,7 +163,7 @@ The process' PID.
 
 ### ExternalProgram().pipe
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/extprog.py#L354)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/extprog.py#L354)
 
 ```python
 def pipe(command, timeout=None, cwd=None):
@@ -174,7 +174,7 @@ given process.
 
 ### ExternalProgram().poll
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/extprog.py#L344)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/extprog.py#L344)
 
 ```python
 def poll():
@@ -182,7 +182,7 @@ def poll():
 
 ### ExternalProgram().return_code
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/extprog.py#L231)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/extprog.py#L231)
 
 ```python
 @property
@@ -191,7 +191,7 @@ def return_code():
 
 ### ExternalProgram().run
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/extprog.py#L243)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/extprog.py#L243)
 
 ```python
 def run(block=True, binary=False, cwd=None, env=None, shell=True):
@@ -201,7 +201,7 @@ Runs the given command, with or without pexpect functionality enabled.
 
 ### ExternalProgram().send
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/extprog.py#L294)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/extprog.py#L294)
 
 ```python
 def send(s, end=os.linesep, signal=False):
@@ -211,7 +211,7 @@ Sends the given string or signal to std_in.
 
 ### ExternalProgram().std_err
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/extprog.py#L198)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/extprog.py#L198)
 
 ```python
 @property
@@ -220,7 +220,7 @@ def std_err():
 
 ### ExternalProgram().std_in
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/extprog.py#L239)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/extprog.py#L239)
 
 ```python
 @property
@@ -229,7 +229,7 @@ def std_in():
 
 ### ExternalProgram().std_out
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/extprog.py#L159)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/extprog.py#L159)
 
 ```python
 @property
@@ -238,7 +238,7 @@ def std_out():
 
 ### ExternalProgram().terminate
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/extprog.py#L309)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/extprog.py#L309)
 
 ```python
 def terminate():
@@ -246,7 +246,7 @@ def terminate():
 
 ## ExternalProgramException
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/extprog.py#L31)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/extprog.py#L31)
 
 ```python
 class ExternalProgramException(Exception):
@@ -254,7 +254,7 @@ class ExternalProgramException(Exception):
 
 ## chain
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/extprog.py#L405)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/extprog.py#L405)
 
 ```python
 def chain(command, timeout=None, cwd=None, env=None):
@@ -262,7 +262,7 @@ def chain(command, timeout=None, cwd=None, env=None):
 
 ## pid_exists
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/extprog.py#L35)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/extprog.py#L35)
 
 ```python
 def pid_exists(pid):
@@ -272,7 +272,7 @@ Check whether pid exists in the current process table.
 
 ## run
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/extprog.py#L422)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/extprog.py#L422)
 
 ```python
 def run(command, block=True, binary=False, timeout=None, cwd=None, env=None):

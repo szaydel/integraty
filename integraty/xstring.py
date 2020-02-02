@@ -17,7 +17,7 @@ def stripper(w, chars):
         return w
 
 
-class String:
+class String(str):
 
     def __init__(self, string: str):
         self._s = string
@@ -62,14 +62,12 @@ class String:
         if pattern and exclude:
             filtered_lines = [
                 sub_if_necessary(compiled_pattern, replacement, l)
-                for l in lines
-                if not re.search(pattern, l)
+                for l in lines if not re.search(pattern, l)
             ]
         elif pattern:
             filtered_lines = [
                 sub_if_necessary(compiled_pattern, replacement, l)
-                for l in lines
-                if re.search(pattern, l)
+                for l in lines if re.search(pattern, l)
             ]
         else:
             filtered_lines = [
@@ -100,7 +98,8 @@ class String:
             tokens = tuple(l.split(sep))
             if tokens:
                 if strip_punct:
-                    tokens = tuple(stripper(tok, strip_chars) for tok in tokens)
+                    tokens = tuple(
+                        stripper(tok, strip_chars) for tok in tokens)
                 new_lines.append(tokens)
         return new_lines
 
@@ -181,6 +180,12 @@ class String:
             return lines
 
         return [l for l in lines if l.endswith(suffix)]
+
+    def _count_substrs(self, substr=None, pattern=None, exclude=False):
+        lines = self._lines_from_impl(pattern=pattern, exclude=exclude)
+        if not substr:
+            return len(lines)
+        return sum(1 for line in lines if line.find(substr) >= 0)
 
     def _with_substr(self, substr=None, exclude=False):
         lines = self._lines_from_impl()
@@ -348,8 +353,7 @@ class String:
             pattern=pattern,
             exclude=exclude,
         )
-
-        return dict(func(line) for line in lines)
+        return [dict(func(line)) for line in lines if line]
 
     def _filter_func(
         self,
@@ -397,28 +401,24 @@ class String:
             return None
         return d
 
-    def _dict_from_line(self, keys=None, sep=None, pattern=None, exclude=False):
-        lines = self._lines_from_impl()
-        if not pattern:
-            return [
-                dict(
-                    zip(
-                        keys
-                        if keys else [i for i in range(0, len(col.split(sep)))],
-                        col.split(sep),
-                    )) for col in lines
-            ]
-        if exclude:
-            filtered_lines = [l for l in lines if not re.search(pattern, l)]
-        else:
-            filtered_lines = [l for l in lines if re.search(pattern, l)]
+    def _to_dict(self,
+                 keys=None,
+                 sep=None,
+                 sub_pattern=None,
+                 replacement=None,
+                 pattern=None,
+                 exclude=False):
+        lines = self._lines_from_impl(sub_pattern=sub_pattern,
+                                      replacement=replacement,
+                                      pattern=pattern,
+                                      exclude=exclude)
         return [
             dict(
                 zip(
                     keys
-                    if keys else [i for i in range(0, len(col.split(sep)))],
-                    col.split(sep),
-                )) for col in filtered_lines
+                    if keys else [i for i in range(0, len(line.split(sep)))],
+                    line.split(sep),
+                )) for line in lines if line
         ]
 
     def _fold_funcs(
@@ -519,7 +519,7 @@ class String:
 
     def count(self, pattern=None, exclude=False):
         """
-        Count number of lines written in input.
+        Count number of lines in the supplied string.
 
         Args:
             pattern (str, optional): Select lines matching pattern. Defaults to None.
@@ -545,7 +545,11 @@ class String:
         If a pattern results in some subset of original lines, this subset will
         be subject to application of 'skip_head' and/or 'skip_tail'. In other
         words, skipping of lines occurs after application of `pattern` and
-        `exclude` parameters, not before.
+        `exclude` parameters, not before. Think about this in terms of `grep`
+        and `head` or `tail`, as in this example:
+        ```
+        $ some_command | head -5 | grep 'some string'
+        ```
 
         Args:
             skip_head (int, optional): Number of lines to skip relative to beginning of data. Defaults to 0.
@@ -603,7 +607,7 @@ class String:
             exclude=exclude,
         )
 
-    def dict_from_line(self, keys=None, sep=None, pattern=None, exclude=False):
+    def to_dict(self, keys=None, sep=None, pattern=None, exclude=False):
         """
         Converts input lines into dicts, where `keys` is a list of keys which 
         should be zip(able) with contents of split line. This means that the
@@ -625,10 +629,10 @@ class String:
         Returns:
             list: List of dictionaries generated from lines.
         """
-        return self._dict_from_line(keys=keys,
-                                    sep=sep,
-                                    pattern=pattern,
-                                    exclude=exclude)
+        return self._to_dict(keys=keys,
+                             sep=sep,
+                             pattern=pattern,
+                             exclude=exclude)
 
     def firstn(self, n=1, pattern=None, exclude=None):
         """
@@ -671,7 +675,23 @@ class String:
     ):
         """
         Select first column of each line from input, after splitting on `sep`.
+        Substitution of all `sub_pattern` matches for `replacement` occurs
+        after lines have been filtered based on `pattern`, not before.
 
+        This method is meant to be similar to recursive list iteration in
+        functional languages. Where a list is a combination of a _head_, first
+        element, and _rest_ or _tail_, which is the remainder of the list.
+        ```
+        >>> import integraty
+        >>> s = integraty.xstring.String('123 abc def\\n456 ghi jkl\\n789 mno pqr\\n') 
+        >>> s.head()
+        ['123', '456', '789']
+        >>> s.head(pattern='123')
+        ['123']
+        >>> s.head(pattern='123', exclude=True)
+        ['456', '789']
+
+        ```
         Args:
             sep (str, optional): Separator character. Defaults to None.
             sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
@@ -699,8 +719,24 @@ class String:
         exclude=False,
     ):
         """
-        Select all but first column of each line from input, after splitting on `sep`.
+        Select all but first column of each line from input, after splitting on 
+        `sep`. Substitution of all `sub_pattern` matches for `replacement`
+        occurs after lines have been filtered based on `pattern`, not before.
 
+        This method is meant to be similar to recursive list iteration in
+        functional languages. Where a list is a combination of a _head_, first
+        element, and _rest_ or _tail_, which is the remainder of the list.
+        ```
+        >>> import integraty
+        >>> s = integraty.xstring.String('123 abc def\\n456 ghi jkl\\n789 mno pqr\\n') 
+        >>> s.tail()
+        [('abc', 'def'), ('ghi', 'jkl'), ('mno', 'pqr')]
+        >>> s.tail(pattern='mno')
+        [('mno', 'pqr')]
+        >>> s.tail(pattern='123', exclude=True)
+        [('ghi', 'jkl'), ('mno', 'pqr')]
+
+        ```
         Args:
             sep (str, optional): Separator character. Defaults to None.
             sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
@@ -876,9 +912,26 @@ class String:
         exclude=False,
     ):
         """
-        Split lines written in input into tuples on `sep`, where each line is
-        a tuple consisting of all split tokens from that line.
+        Split lines in supplied string into tuples with `sep` as optional
+        separator, where each line is converted into a N-tuple containing
+        all (N) tokens after the split of that line.
+        ```
+        >>> from integraty.xstring import String
+        >>> s = String('# alpha Ω\\n# beta Ω\\n# gamma Ω\\n# delta Δ\\n') 
+        >>> s.line_tuples()
+        [('#', 'alpha', 'Ω'), ('#', 'beta', 'Ω'), ('#', 'gamma', 'Ω'), ('#', 'delta', 'Δ')]
+        >>> s.line_tuples(pattern='ta')
+        [('#', 'beta', 'Ω'), ('#', 'delta', 'Δ')]
+        >>> s.line_tuples(pattern='ta', exclude=True)
+        [('#', 'alpha', 'Ω'), ('#', 'gamma', 'Ω')]
 
+        >>> s = String('alpha Ω,# beta Ω,# gamma Ω,# delta Δ')
+        >>> s.lines()
+        ['alpha Ω,# beta Ω,# gamma Ω,# delta Δ']
+        >>> s.line_tuples(sep=',')
+        [('alpha Ω', '# beta Ω', '# gamma Ω', '# delta Δ')]
+
+        ```
         Args:
             sep (str, optional): Separator character. Defaults to None.
             strip_punct (bool, optional): Enable punctuation stripping. Defaults to False.
@@ -907,8 +960,23 @@ class String:
               pattern=None,
               exclude=False):
         """
-        Lines from input, optionally filtered with expression in `pattern`.
-        
+        Lines from supplied string, optionally filtered with regular expression
+        in `pattern`.
+        ```
+        >>> from integraty.xstring import String
+        >>> s = String('2020-01-02 alpha Ω\\n2020-01-02 beta Ω\\n2020-02-01 gamma Ω\\n2020-02-03 delta Δ\\n')
+        >>> s.lines(sub_pattern=r'\\d{4}-\\d{2}-\\d{2} ', replacement='')
+        ['alpha Ω', 'beta Ω', 'gamma Ω', 'delta Δ']
+        >>> s.lines(sub_pattern=r'^\\S+ ', replacement='')
+        ['alpha Ω', 'beta Ω', 'gamma Ω', 'delta Δ']
+        >>> s.lines(sub_pattern=r'^\\S+', replacement='*'*5)
+        ['***** alpha Ω', '***** beta Ω', '***** gamma Ω', '***** delta Δ']
+        >>> s.lines(sub_pattern=r'^\\S+', replacement='*'*5, pattern='ha')
+        ['***** alpha Ω']
+        >>> s.lines(sub_pattern=r'^\\S+', replacement='*'*5, pattern='ha', exclude=True)
+        ['***** beta Ω', '***** gamma Ω', '***** delta Δ']
+
+        ```
         Args:
             sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
             replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
@@ -1000,7 +1068,15 @@ class String:
         `prefix` may be excluded as a result of pattern matching, because
         prefix checking occurs after application of `pattern` and `exclude`
         parameters, not before.
+        ```
+        >>> from integraty.xstring import String
+        >>> s = String('# alpha Ω\\n# beta Ω\\n# gamma Ω\\n# delta Δ\\n')
+        >>> s.with_prefix('#')
+        ['# alpha Ω', '# beta Ω', '# gamma Ω', '# delta Δ']
+        >>> s.with_prefix(prefix='%', sub_pattern='#', replacement='%')  
+        ['% alpha Ω', '% beta Ω', '% gamma Ω', '% delta Δ']
 
+        ```
         Args:
             prefix (str): Lines with given prefix should be included.
             sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
@@ -1053,6 +1129,35 @@ class String:
             exclude=exclude,
         )
 
+    def count_substrs(self, substr=None, pattern=None, exclude=False):
+        """
+        Counts lines in supplied string where at least one match for substring
+        given in `substr` is found. This is a count of matching lines, not a
+        total count of substrings, which could be greater if any given line
+        contains more than a single matching substring.
+        ```
+        >>> from integraty.xstring import String
+        >>> s = String('alpha Ω\\nbeta Ω\\ngamma Ω\\ndelta Δ\\n')
+        >>> s.count_substrs(substr='Ω')
+        3
+        >>> s.count_substrs(substr='Ω', pattern='alpha', exclude=True)
+        2
+        >>> s.count_substrs(substr='Ω', pattern='alpha')
+        1
+
+        ```
+        Args:
+            substr (str, optional): Substring to find in each line. Defaults to None.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            int: Count of lines with at least one substring match.
+        """
+        return self._count_substrs(substr=substr,
+                                   pattern=pattern,
+                                   exclude=exclude)
+
     def at_least_n_substr(self, substr=None, n=0):
         return self._at_least_n_substr(substr, n)
 
@@ -1068,13 +1173,21 @@ class String:
         exclude=False,
     ):
         """
-        Filters lines written in input with a filtering function in
-        'func' argument. This function should expect a single string argument
+        Filters lines from supplied string with a filtering function in
+        `func` argument. This function should expect a single string argument
         which will be a line and return a boolean. Any lines that cause this
         function to return `True` will be included in the resulting list, and
         those that result in `False` will be excluded, unless `exclude` is
         `True`, which inverts this logic.
+        ```
+        from integraty.xstring import String
+        >>> s = String('alpha beta gamma\\ndelta epsilon zeta\\n')
+        >>> s.filter_func(lambda x: 'zeta' in x.split())
+        ['delta epsilon zeta']
+        >>> s.filter_func(lambda x: 'zeta' in x.split(), exclude=True) 
+        ['alpha beta gamma']
 
+        ```
         Args:
             func ((s: str) -> bool): Filtering function emitting a boolean.
             sub_pattern (string, optional): Substitution regex pattern. Defaults to None.

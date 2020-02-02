@@ -1,6 +1,6 @@
 # Case
 
-> Auto-generated documentation for [integraty.case](https://github.com/szaydel/integraty/blob/master/integraty/case.py) module.
+> Auto-generated documentation for [integraty.case](https://github.com/szaydel/integratyintegraty/case.py) module.
 
 - [integraty](../README.md#integraty) / [Modules](../MODULES.md#integraty-modules) / [Integraty](index.md#integraty) / Case
     - [IntegraTestCase](#integratestcase)
@@ -20,11 +20,13 @@
         - [IntegraTestCase().assertStdOutContains](#integratestcaseassertstdoutcontains)
         - [IntegraTestCase().assertStdOutEqual](#integratestcaseassertstdoutequal)
         - [IntegraTestCase().assertStdoutIsJSONArray](#integratestcaseassertstdoutisjsonarray)
+        - [IntegraTestCase().assertStringsAlmostEqual](#integratestcaseassertstringsalmostequal)
+        - [IntegraTestCase().assertStringsAlmostEqualCosine](#integratestcaseassertstringsalmostequalcosine)
         - [IntegraTestCase().get_class_var](#integratestcaseget_class_var)
 
 ## IntegraTestCase
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/case.py#L25)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L93)
 
 ```python
 class IntegraTestCase(TestCase):
@@ -33,7 +35,7 @@ class IntegraTestCase(TestCase):
 
 ### IntegraTestCase().assertCommandSucceeded
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/case.py#L52)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L120)
 
 ```python
 def assertCommandSucceeded(extprog: ExternalProgram = None, msg=None):
@@ -47,7 +49,7 @@ Assert that the executed command ran successfully.
 
 ### IntegraTestCase().assertDirExists
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/case.py#L187)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L298)
 
 ```python
 def assertDirExists(path, msg=None):
@@ -57,7 +59,7 @@ Assert that given path is an existing directory.
 
 ### IntegraTestCase().assertDirModifiedAfter
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/case.py#L218)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L329)
 
 ```python
 def assertDirModifiedAfter(path, timestamp: float, msg=None):
@@ -67,7 +69,7 @@ Assert that given directory path is more recent than timestamp.
 
 ### IntegraTestCase().assertFileMD5Equals
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/case.py#L252)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L363)
 
 ```python
 def assertFileMD5Equals(path, checksum: str, msg=None):
@@ -77,7 +79,7 @@ Assert that MD5 checksum is correct.
 
 ### IntegraTestCase().assertFileModifiedAfter
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/case.py#L204)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L315)
 
 ```python
 def assertFileModifiedAfter(path, timestamp: float, msg=None):
@@ -87,7 +89,7 @@ Assert that given file path is more recent than timestamp.
 
 ### IntegraTestCase().assertFileSHA1Equals
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/case.py#L232)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L343)
 
 ```python
 def assertFileSHA1Equals(path, checksum: str, msg=None):
@@ -97,7 +99,7 @@ Assert that SHA1 checksum is correct.
 
 ### IntegraTestCase().assertFileSHA256Equals
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/case.py#L242)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L353)
 
 ```python
 def assertFileSHA256Equals(path, checksum: str, msg=None):
@@ -107,7 +109,7 @@ Assert that SHA256 checksum is correct.
 
 ### IntegraTestCase().assertNoStderr
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/case.py#L76)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L146)
 
 ```python
 def assertNoStderr(extprog: ExternalProgram = None, msg=None):
@@ -121,7 +123,7 @@ Assert that the executed command produced nothing to stderr.
 
 ### IntegraTestCase().assertNoStdout
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/case.py#L64)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L134)
 
 ```python
 def assertNoStdout(extprog: ExternalProgram = None, msg=None):
@@ -135,7 +137,7 @@ Assert that the executed command produced nothing to stdout.
 
 ### IntegraTestCase().assertPathDoesNotExist
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/case.py#L178)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L289)
 
 ```python
 def assertPathDoesNotExist(path, msg=None):
@@ -145,7 +147,7 @@ Assert that given path does not exist.
 
 ### IntegraTestCase().assertRegFileExists
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/case.py#L161)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L272)
 
 ```python
 def assertRegFileExists(path, msg=None):
@@ -155,7 +157,7 @@ Assert that given path is an existing regular file.
 
 ### IntegraTestCase().assertStdErrContains
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/case.py#L119)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L190)
 
 ```python
 def assertStdErrContains(
@@ -173,7 +175,7 @@ Assert that stderr from command contains a given substring
 
 ### IntegraTestCase().assertStdErrEqual
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/case.py#L95)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L165)
 
 ```python
 def assertStdErrEqual(extprog: ExternalProgram = None, second=None, msg=None):
@@ -187,7 +189,7 @@ Assert that stderr from command and 'second' are equal.
 
 ### IntegraTestCase().assertStdOutContains
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/case.py#L102)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L172)
 
 ```python
 def assertStdOutContains(
@@ -205,7 +207,7 @@ Assert that stdout from command contains a given substring
 
 ### IntegraTestCase().assertStdOutEqual
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/case.py#L88)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L158)
 
 ```python
 def assertStdOutEqual(extprog: ExternalProgram = None, second=None, msg=None):
@@ -219,7 +221,7 @@ Assert that stdout from command and 'second' are equal.
 
 ### IntegraTestCase().assertStdoutIsJSONArray
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/case.py#L136)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L208)
 
 ```python
 def assertStdoutIsJSONArray(extprog: ExternalProgram = None, msg=None):
@@ -231,9 +233,35 @@ Assert that stdout from command contains JSON Array
 
 - [ExternalProgram](extprog.md#externalprogram)
 
+### IntegraTestCase().assertStringsAlmostEqual
+
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L233)
+
+```python
+def assertStringsAlmostEqual(
+    str1,
+    str2,
+    ratio: float = 0.8,
+    max_distance: int = None,
+    msg=None,
+):
+```
+
+Assert that two strings are similar enough; by default 80% in common using Levenshtein Distance
+
+### IntegraTestCase().assertStringsAlmostEqualCosine
+
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L256)
+
+```python
+def assertStringsAlmostEqualCosine(str1, str2, ratio: float = 0.8, msg=None):
+```
+
+Assert that two strings are similar enough; by default 80% in common using Cosine Similarity
+
 ### IntegraTestCase().get_class_var
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/case.py#L39)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L107)
 
 ```python
 def get_class_var(name):

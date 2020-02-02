@@ -25,7 +25,7 @@ pexpect.EOF.__module__ = "pexpect.exceptions"
 try:
     STR_TYPES = (str, unicode)
 except NameError:
-    STR_TYPES = (str,)
+    STR_TYPES = (str, )
 
 
 class ExternalProgramException(Exception):

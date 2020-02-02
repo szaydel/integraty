@@ -9,4 +9,5 @@ Full list of [integraty](README.md#integraty) project modules.
     - [Case](integraty/case.md#case)
     - [Extprog](integraty/extprog.md#extprog)
     - [Productivity](integraty/productivity.md#productivity)
+    - [Sandbox](integraty/sandbox.md#sandbox)
     - [Xstring](integraty/xstring.md#xstring)

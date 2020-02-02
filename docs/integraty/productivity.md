@@ -1,6 +1,6 @@
 # Productivity
 
-> Auto-generated documentation for [integraty.productivity](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py) module.
+> Auto-generated documentation for [integraty.productivity](https://github.com/szaydel/integratyintegraty/productivity.py) module.
 
 - [integraty](../README.md#integraty) / [Modules](../MODULES.md#integraty-modules) / [Integraty](index.md#integraty) / Productivity
     - [ChecksumBytesIO](#checksumbytesio)
@@ -33,7 +33,7 @@
 
 ## ChecksumBytesIO
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L85)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L85)
 
 ```python
 class ChecksumBytesIO():
@@ -42,7 +42,7 @@ class ChecksumBytesIO():
 
 ### ChecksumBytesIO().md5
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L102)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L102)
 
 ```python
 @property
@@ -51,7 +51,7 @@ def md5():
 
 ### ChecksumBytesIO().sha1
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L90)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L90)
 
 ```python
 @property
@@ -60,7 +60,7 @@ def sha1():
 
 ### ChecksumBytesIO().sha256
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L96)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L96)
 
 ```python
 @property
@@ -69,7 +69,7 @@ def sha256():
 
 ## ChecksumFile
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L215)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L215)
 
 ```python
 class ChecksumFile(ChecksumStream):
@@ -82,7 +82,7 @@ class ChecksumFile(ChecksumStream):
 
 ## ChecksumStream
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L109)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L109)
 
 ```python
 class ChecksumStream():
@@ -91,7 +91,7 @@ class ChecksumStream():
 
 ### ChecksumStream().base64_dec
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L196)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L196)
 
 ```python
 @property
@@ -106,7 +106,7 @@ Decode base64 encoded bytes from stream
 
 ### ChecksumStream().base64_enc
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L178)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L178)
 
 ```python
 @property
@@ -121,7 +121,7 @@ Generate base64 encoded bytes for stream
 
 ### ChecksumStream().md5
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L158)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L158)
 
 ```python
 @property
@@ -136,7 +136,7 @@ Generate MD5 checksum for stream
 
 ### ChecksumStream().sha1
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L118)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L118)
 
 ```python
 @property
@@ -151,7 +151,7 @@ Generate SHA1 checksum for stream
 
 ### ChecksumStream().sha256
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L138)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L138)
 
 ```python
 @property
@@ -166,7 +166,7 @@ Generate SHA256 checksum for stream
 
 ## ChecksumStringIO
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L48)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L48)
 
 ```python
 class ChecksumStringIO():
@@ -175,7 +175,7 @@ class ChecksumStringIO():
 
 ### ChecksumStringIO().md5
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L74)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L74)
 
 ```python
 @property
@@ -184,7 +184,7 @@ def md5():
 
 ### ChecksumStringIO().sha1
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L53)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L53)
 
 ```python
 @property
@@ -193,7 +193,7 @@ def sha1():
 
 ### ChecksumStringIO().sha256
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L64)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L64)
 
 ```python
 @property
@@ -202,7 +202,7 @@ def sha256():
 
 ## RandomStrings
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L13)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L13)
 
 ```python
 class RandomStrings():
@@ -211,7 +211,7 @@ class RandomStrings():
 
 ### RandomStrings().iter_string
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L38)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L38)
 
 ```python
 def iter_string(length=10, count=100):
@@ -219,7 +219,7 @@ def iter_string(length=10, count=100):
 
 ### RandomStrings().string
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L32)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L32)
 
 ```python
 def string(length=10):
@@ -227,7 +227,7 @@ def string(length=10):
 
 ## TemporaryFile
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L228)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L228)
 
 ```python
 class TemporaryFile():
@@ -245,7 +245,7 @@ Temporary file with automatic deletion.
 
 ### TemporaryFile().abspath
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L263)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L263)
 
 ```python
 @property
@@ -254,7 +254,7 @@ def abspath():
 
 ### TemporaryFile().content
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L301)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L301)
 
 ```python
 @property
@@ -263,7 +263,7 @@ def content():
 
 ### TemporaryFile().fp
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L267)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L267)
 
 ```python
 @property
@@ -272,7 +272,7 @@ def fp():
 
 ### TemporaryFile().md5
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L291)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L291)
 
 ```python
 @property
@@ -287,7 +287,7 @@ MD5 checksum of file content.
 
 ### TemporaryFile().read
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L257)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L257)
 
 ```python
 def read(size=-1):
@@ -295,7 +295,7 @@ def read(size=-1):
 
 ### TemporaryFile().sha1
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L271)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L271)
 
 ```python
 @property
@@ -310,7 +310,7 @@ SHA1 checksum of file content.
 
 ### TemporaryFile().sha256
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L281)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L281)
 
 ```python
 @property
@@ -325,7 +325,7 @@ SHA256 checksum of file content.
 
 ### TemporaryFile().write
 
-[[find in source code]](https://github.com/szaydel/integraty/blob/master/integraty/productivity.py#L260)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/productivity.py#L260)
 
 ```python
 def write(b):

@@ -4,8 +4,10 @@ import itertools
 import json
 import re
 
+import sys
+
 from functools import reduce
-from typing import Callable, Dict, List, TypeVar, Sequence, Sequence
+from typing import Callable, Dict, Iterable, Iterator, List, TypeVar, Sequence, Sequence
 
 PCHARS = r'!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
 
@@ -15,6 +17,36 @@ def stripper(w, chars):
         return stripper(w.replace(chars[0], ""), chars[1:])
     else:
         return w
+
+
+def map_if_possible(func: Callable, source: Iterable) -> Iterator:
+    """
+    Silently drops any data which causes `func` calls with given data to raise
+    any Exception. The intention is to allow messy data to be processed where
+    certain data may be incomplete, fields missing, etc. For example, a string
+    with newlines is split on `\\n`, and each resulting line is further
+    tokenized. If `func` can only be successfully called with a subset of these
+    lines, while the other lines would normally cause an exception to be raised,
+    we let those exceptional cases fall out, yielding results of calling `func`
+    on each item in `source` that does not cause `func` to raise an exception.
+    
+    Args:
+        func (Callable): Function being mapped over data in `source`.
+        source (Iterable): Sequence of data over which `func` is getting called.
+    
+    Returns:
+        Iterator: All results from applying `func` which were not discarded due to Exception.
+    
+    Yields:
+        Iterator: Function `func` applied over an item from `source`.
+    """
+    for x in source:
+        try:
+            yield func(x)
+        except Exception as e:  # pylint: disable=unused-variable
+            # to debug uncomment this print statement
+            # print(e)
+            pass
 
 
 class String(str):
@@ -44,7 +76,9 @@ class String(str):
         )
 
     def _splitlines(self):
-        return [l.strip() for l in self._s.splitlines()]
+        # We silently drop any entirely empty lines, which after splitting
+        # would basically be come an empty string, i.e. ''.
+        return [l.strip() for l in self._s.splitlines() if l]
 
     def _lines(self,
                sub_pattern=None,
@@ -353,7 +387,7 @@ class String(str):
             pattern=pattern,
             exclude=exclude,
         )
-        return [dict(func(line)) for line in lines if line]
+        return [dict(i) for i in map_if_possible(func, lines)]
 
     def _filter_func(
         self,
@@ -587,7 +621,15 @@ class String(str):
         to dict. It is expected that result from `func` is a single
         two-element tuple object, where first element becomes dict key and
         second value for given key.
+        ```
+        from integraty.xstring import String
+        >>> s1 = 'beta\\nalpha beta\\nbeta gamma\\nalpha delta beta\\nsigma epsilon\\n'
+        >>> s = String(s1)
+        >>> f1 = lambda l: zip([l.split()[0]], [l.split()[1]])
+        >>> s.to_dict_func(f1)
+        [{'alpha': 'beta'}, {'beta': 'gamma'}, {'alpha': 'delta'}, {'sigma': 'epsilon'}]
 
+        ```
         Args:
             func (str): Conversion function from string to two-element tuple.
             sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
@@ -596,7 +638,7 @@ class String(str):
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
-            dict: Dict made from tuples for each line over which `func`
+            list: List of dicts made from tuples for each line over which `func`
             was applied.
         """
         return self._to_dict_func(

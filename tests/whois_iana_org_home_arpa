@@ -1,0 +1,46 @@
+% IANA WHOIS server
+% for more information on IANA, visit http://www.iana.org
+% This query returned 1 object
+
+domain:       HOME.ARPA
+
+organisation: Internet Architecture Board (IAB)
+address:      c/o IETF Administrative Support Activity, ISOC
+address:      1775 Wiehle Ave.
+address:      Suite 102
+address:      Reston Virginia 20190-5108
+address:      United States
+
+contact:      administrative
+name:         Internet Architecture Board (IAB)
+organisation: Internet Architecture Board (IAB)
+address:      c/o IETF Administrative Support Activity, ISOC
+address:      1775 Wiehle Ave.
+address:      Suite 102
+address:      Reston Virginia 20190-5108
+address:      United States
+phone:        +1 703 326 9880
+fax-no:       +1 703 326 9881
+e-mail:       iab@iab.org
+
+contact:      technical
+name:         Internet Assigned Numbers Authority (IANA)
+organisation: Internet Corporation for Assigned Names and Numbers (ICANN)
+address:      12025 Waterfront Drive
+address:      Suite 300
+address:      Los Angeles California 90094
+address:      United States
+phone:        +1 310 301 5800
+fax-no:       +1 310 823 8649
+e-mail:       tld-contact@iana.org
+
+nserver:      BLACKHOLE-1.IANA.ORG 192.175.48.6 2620:4f:8000::6
+nserver:      BLACKHOLE-2.IANA.ORG 192.175.48.42 2620:4f:8000::42
+
+remarks:      This domain is administered as part of the .ARPA zone
+remarks:      management, described at https://iana.org/domains/arpa
+
+created:      2018-03-15
+changed:      2018-06-11
+source:       IANA
+

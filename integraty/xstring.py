@@ -7,7 +7,7 @@ import re
 import sys
 
 from functools import reduce
-from typing import Callable, Dict, Iterable, Iterator, List, TypeVar, Sequence, Sequence
+from typing import Any, Callable, Dict, Iterable, Iterator, List, TypeVar, Sequence, Sequence
 
 PCHARS = r'!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
 
@@ -19,7 +19,13 @@ def stripper(w, chars):
         return w
 
 
-def map_if_possible(func: Callable, source: Iterable) -> Iterator:
+def apply_filtered(map_func: Callable[[Any], Any],
+                   filter_func: Callable[[Any], bool], lines: Iterable):
+    for line in filter(filter_func, lines):
+        yield map_func(line)
+
+
+def map_if_possible(func: Callable[[Any], Any], source: Iterable) -> Iterator:
     """
     Silently drops any data which causes `func` calls with given data to raise
     any Exception. The intention is to allow messy data to be processed where
@@ -31,7 +37,7 @@ def map_if_possible(func: Callable, source: Iterable) -> Iterator:
     on each item in `source` that does not cause `func` to raise an exception.
     
     Args:
-        func (Callable): Function being mapped over data in `source`.
+        func (Callable[[Any], Any]): Function being mapped over data in `source`.
         source (Iterable): Sequence of data over which `func` is getting called.
     
     Returns:
@@ -424,6 +430,23 @@ class String(str):
             exclude=exclude,
         )
         return [func(line) for line in lines]
+
+    def _filtered_map(
+        self,
+        map_func,
+        filter_func,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
+        lines = self._lines_from_impl(
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
+        return [l for l in apply_filtered(map_func, filter_func, lines)]
 
     def _json_loads(self):
         if not self._s:
@@ -1272,6 +1295,45 @@ class String(str):
         """
         return self._map_func(
             func=func,
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
+
+    def filtered_map(
+        self,
+        map_func,
+        filter_func,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
+        """
+        Higher-order function taking a mapping function and a filtering
+        function.
+        For every line for which `filter_func` returns `True`, `map_func` is
+        applied over it, producing subset of transformed lines. Filtering and
+        mapping occur after optional substitution and selection or excludion
+        of lines matching a pattern. This method is meant to give user much
+        more control over how to select lines and what to do with them, before
+        having them returned as a list.
+
+        Args:
+            map_func (Callable[[Any], Any]): Function to apply over given lines.
+            filter_func (Callable[[Any], bool]): Function to select lines.
+            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
+            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            list: List of filtered results over which mapping function was applied.
+        """
+        return self._filtered_map(
+            map_func=map_func,
+            filter_func=filter_func,
             sub_pattern=sub_pattern,
             replacement=replacement,
             pattern=pattern,

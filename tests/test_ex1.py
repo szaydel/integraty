@@ -1,5 +1,8 @@
+import re
 import os
 import sys
+
+from collections import ChainMap
 
 from integraty.case import IntegraTestCase
 from integraty.case import run_integra_tests
@@ -13,12 +16,13 @@ class LibraryUsageEx1(IntegraTestCase):
     def setUpClass(cls):
         # When we run in Travis-CI, we basically mock output of `whois` because
         # the command is not available on at least some test platforms.
-        cls.whois_cloudflare_com_cmd = 'whois -h whois.cloudflare.com cloudflare.com'
+        cls.whois_cloudflare_com = 'whois -h whois.cloudflare.com cloudflare.com'
+        cls.whois_iana_org_home_arpa = 'whois -h whois.cloudflare.com cloudflare.com'
         if os.getenv('TRAVIS', 'false') == 'true':
-            p = os.path.join(os.path.dirname(__file__), 'whois_cloudflare_com')
-            cls.whois_cloudflare_com_cmd = f'cat {p}'
-
-        pass
+            for elem in ['whois_cloudflare_com', 'whois_iana_org_home_arpa']:
+                setattr(
+                    cls, f'{elem}',
+                    f'cat {os.path.join(os.path.dirname(__file__), elem)}')
 
     @classmethod
     def tearDownClass(cls):
@@ -73,7 +77,7 @@ class LibraryUsageEx1(IntegraTestCase):
 
     def test_with_prefix(self):
         self.log.info("Tests expected behaviour of with_prefix method")
-        cmd = self.get_class_var('whois_cloudflare_com_cmd')
+        cmd = self.get_class_var('whois_cloudflare_com')
         with ExternalProgram(cmd) as c:
             c.exec()
             self.assertCommandSucceeded(c)
@@ -90,7 +94,7 @@ class LibraryUsageEx1(IntegraTestCase):
 
     def test_with_suffix(self):
         self.log.info("Tests expected behaviour of the with_suffix method")
-        cmd = self.get_class_var('whois_cloudflare_com_cmd')
+        cmd = self.get_class_var('whois_cloudflare_com')
         with ExternalProgram(cmd) as c:
             c.exec()
             self.assertCommandSucceeded(c)
@@ -106,7 +110,7 @@ class LibraryUsageEx1(IntegraTestCase):
 
     def test_fields(self):
         self.log.info("Tests expected behaviour of the fields method")
-        cmd = self.get_class_var('whois_cloudflare_com_cmd')
+        cmd = self.get_class_var('whois_cloudflare_com')
         with ExternalProgram(cmd) as c:
             c.exec()
             self.assertCommandSucceeded(c)
@@ -127,8 +131,8 @@ class LibraryUsageEx1(IntegraTestCase):
                 })
 
     def test_take_column(self):
-        cmd = 'host -t AAAA cloudflare.com'
         self.log.info("Tests expected behaviour of the take_column method")
+        cmd = 'host -t AAAA cloudflare.com'
         with ExternalProgram(cmd) as c:
             c.exec()
             self.assertCommandSucceeded(c)
@@ -156,6 +160,72 @@ class LibraryUsageEx1(IntegraTestCase):
                     'alt2.aspmx.l.google.com.', 'aspmx2.googlemail.com.',
                     'aspmx3.googlemail.com.'
                 ]))
+
+    def test_compress(self):
+        self.log.info("Tests expected behaviour of the compress method")
+        cmd = 'dig -t MX cloudflare.com'
+        with ExternalProgram(cmd) as c:
+            c.exec()
+            self.assertCommandSucceeded(c)
+            results = c.out.compress(indexes=(0, 5),
+                                     pattern='[;]',
+                                     exclude=True)
+            # This is also an example of a fairly fragile test, because these
+            # types of information may be volatile. It may be better to test
+            # if one or more stable values are present in the results, or that
+            # results is not empty.
+            self.assertSetEqual(
+                set(results),
+                set([('cloudflare.com.', 'aspmx.l.google.com.'),
+                     ('cloudflare.com.', 'alt1.aspmx.l.google.com.'),
+                     ('cloudflare.com.', 'alt2.aspmx.l.google.com.'),
+                     ('cloudflare.com.', 'aspmx2.googlemail.com.'),
+                     ('cloudflare.com.', 'aspmx3.googlemail.com.')]))
+            self.assertCountEqual(
+                results, [('cloudflare.com.', 'aspmx.l.google.com.'),
+                          ('cloudflare.com.', 'alt1.aspmx.l.google.com.'),
+                          ('cloudflare.com.', 'alt2.aspmx.l.google.com.'),
+                          ('cloudflare.com.', 'aspmx2.googlemail.com.'),
+                          ('cloudflare.com.', 'aspmx3.googlemail.com.')])
+
+    def test_filter_func(self):
+        self.log.info("Tests expected behaviour of the filter method")
+        cmd = self.get_class_var('whois_iana_org_home_arpa')
+        with ExternalProgram(cmd) as c:
+            c.exec()
+            results = c.out.filter_func(lambda l: re.search(
+                r'\s(?:[0-9]{1,3}\.){3}[0-9]{1,3}\s', l))
+            results = [tuple(elem.split()[1:3]) for elem in results]
+            results = {k.lower(): v for k, v in results}
+            self.assertDictEqual(
+                results, {
+                    'blackhole-1.iana.org': '192.175.48.6',
+                    'blackhole-2.iana.org': '192.175.48.42'
+                })
+
+    def test_filtered_map(self):
+        self.log.info("Tests expected behaviour of the filtered_map method")
+        cmd = self.get_class_var('whois_iana_org_home_arpa')
+
+        def to_dict(l):
+            """ Builds a nested dictionary """
+            tokens = l.split()
+            return {
+                tokens[1].lower(): {
+                    'v4_addr': tokens[2],
+                    'v6_addr': tokens[3]
+                }
+            }
+
+        with ExternalProgram(cmd) as c:
+            c.exec()
+            results = c.out.filtered_map(
+                filter_func=lambda l: l.startswith('nserver'),
+                map_func=to_dict)
+            results_dict = dict(ChainMap(*results))
+            self.assertIn('blackhole-1.iana.org', results_dict)
+            self.assertIn('blackhole-2.iana.org', results_dict)
+            self.assertNotIn('blackhole-3.iana.org', results_dict)
 
 
 if __name__ == "__main__":

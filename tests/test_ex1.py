@@ -17,9 +17,13 @@ class LibraryUsageEx1(IntegraTestCase):
         # When we run in Travis-CI, we basically mock output of `whois` because
         # the command is not available on at least some test platforms.
         cls.whois_cloudflare_com = 'whois -h whois.cloudflare.com cloudflare.com'
-        cls.whois_iana_org_home_arpa = 'whois -h whois.cloudflare.com cloudflare.com'
+        cls.whois_iana_org_home_arpa = 'whois -h whois.iana.org home.arpa'
+        cls.whois_iana_org_ip6_servers_arpa = 'whois -h whois.iana.org ip6-servers.arpa'
         if os.getenv('TRAVIS', 'false') == 'true':
-            for elem in ['whois_cloudflare_com', 'whois_iana_org_home_arpa']:
+            for elem in [
+                    'whois_cloudflare_com', 'whois_iana_org_home_arpa',
+                    'whois_iana_org_ip6_servers_arpa'
+            ]:
                 setattr(
                     cls, f'{elem}',
                     f'cat {os.path.join(os.path.dirname(__file__), elem)}')
@@ -226,6 +230,32 @@ class LibraryUsageEx1(IntegraTestCase):
             self.assertIn('blackhole-1.iana.org', results_dict)
             self.assertIn('blackhole-2.iana.org', results_dict)
             self.assertNotIn('blackhole-3.iana.org', results_dict)
+
+    def test_groupby(self):
+        self.log.info("Tests expected behaviour of the groupby method")
+        cmd = self.get_class_var('whois_iana_org_ip6_servers_arpa')
+
+        def key_func(l):
+            return 'group A' if l.split()[1][0] <= 'C' else 'group B'
+
+        with ExternalProgram(cmd) as c:
+            c.exec()
+            results_dict = c.out.groupby(key_func, pattern='nserver:')
+            self.assertGreaterEqual(len(results_dict['group A']), 3)
+            self.assertGreaterEqual(len(results_dict['group B']), 3)
+
+    def test_groupby_count(self):
+        self.log.info("Tests expected behaviour of the groupby_count method")
+        cmd = self.get_class_var('whois_iana_org_ip6_servers_arpa')
+
+        def key_func(l):
+            return 'group A' if l.split()[1][0] <= 'C' else 'group B'
+
+        with ExternalProgram(cmd) as c:
+            c.exec()
+            results_dict = c.out.groupby_count(key_func, pattern='nserver:')
+            self.assertEqual(results_dict['group A'], 3)
+            self.assertEqual(results_dict['group B'], 3)
 
 
 if __name__ == "__main__":

@@ -6,6 +6,7 @@ import re
 
 import sys
 
+from collections import Counter
 from functools import reduce
 from typing import Any, Callable, Dict, Iterable, Iterator, List, TypeVar, Sequence, Sequence
 
@@ -531,8 +532,7 @@ class String(str):
 
     def _groupby(
         self,
-        column=0,
-        sep=None,
+        key_func,
         sub_pattern=None,
         replacement=None,
         pattern=None,
@@ -546,19 +546,36 @@ class String(str):
         )
         d = {}
 
-        def groupby_rec(column: int, sep: Sequence, d: dict, l: List) -> Dict:
+        def groupby_rec(key_func: Callable[[str], str], d: dict,
+                        l: List) -> Dict:
             if not l:
                 return d
-            tokens = l[0].split(sep)
-            key = tokens[column % len(tokens)]  # protects from bounds errors
+            head, *rest = l
+            key = key_func(head)
             if key in d:
-                d[key].append(l[0])  # key exists, append line to list
+                d[key].append(head)  # key exists, append line to list
             else:
-                d[key] = [l[0]]  # new key, create a list with this line
+                d[key] = [head]  # new key, create a list with this line
             # recursively call self until list is empty
-            return groupby_rec(column, sep, d, l[1:])
+            return groupby_rec(key_func, d, rest)
 
-        return groupby_rec(column, sep, d, lines)
+        return groupby_rec(key_func, d, lines)
+
+    def _groupby_count(
+        self,
+        key_func,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
+        lines = self._lines_from_impl(
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
+        return dict(Counter([key for key in map(key_func, lines)]))
 
     ### End String Processing Private Methods ###
 
@@ -611,8 +628,8 @@ class String(str):
         Args:
             skip_head (int, optional): Number of lines to skip relative to beginning of data. Defaults to 0.
             skip_tail (int, optional): Number of lines to skip relative to the end of the data. Defaults to 0.
-            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
-            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
+            replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
@@ -655,8 +672,8 @@ class String(str):
         ```
         Args:
             func (str): Conversion function from string to two-element tuple.
-            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
-            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
+            replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
@@ -759,8 +776,8 @@ class String(str):
         ```
         Args:
             sep (str, optional): Separator character. Defaults to None.
-            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
-            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
+            replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
@@ -804,8 +821,8 @@ class String(str):
         ```
         Args:
             sep (str, optional): Separator character. Defaults to None.
-            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
-            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
+            replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
@@ -840,8 +857,8 @@ class String(str):
 
         Args:
             sep (str, optional): Separator character. Defaults to None.
-            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
-            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
+            replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
@@ -872,8 +889,8 @@ class String(str):
         Args:
             sep (str, optional): Separator character. Defaults to None.
             column (int, optional): Select column matching this index. Defaults to 0.
-            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
-            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
+            replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
@@ -916,8 +933,8 @@ class String(str):
         Args:
             sep (str, optional): Separator character. Defaults to None.
             indexes (tuple, optional): Sequence of column indexes. Defaults to ().
-            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
-            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
+            replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
@@ -949,8 +966,8 @@ class String(str):
         Args:
             sep (str, optional): Separator character. Defaults to None.
             slc_range (tuple, optional): Range (start, end, stride). Defaults to (0, 1, 1).
-            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
-            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
+            replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
@@ -1001,8 +1018,8 @@ class String(str):
             sep (str, optional): Separator character. Defaults to None.
             strip_punct (bool, optional): Enable punctuation stripping. Defaults to False.
             strip_chars (str, optional): Characters to strip if 'strip_punct' is True. Defaults to PCHARS.
-            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
-            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
+            replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
@@ -1025,7 +1042,7 @@ class String(str):
               pattern=None,
               exclude=False):
         """
-        Lines from supplied string, optionally filtered with regular expression
+        Lines from supplied str, optionally filtered with regular expression
         in `pattern`.
         ```
         >>> from integraty.xstring import String
@@ -1043,8 +1060,8 @@ class String(str):
 
         ```
         Args:
-            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
-            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
+            replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
         
@@ -1072,8 +1089,8 @@ class String(str):
 
         Args:
             prefix (str): Prefix to trim from beginning of each line.
-            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
-            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
+            replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
@@ -1102,8 +1119,8 @@ class String(str):
 
         Args:
             suffix (str): Suffix to trim from end of each line.
-            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
-            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
+            replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
@@ -1144,8 +1161,8 @@ class String(str):
         ```
         Args:
             prefix (str): Lines with given prefix should be included.
-            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
-            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
+            replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
@@ -1178,8 +1195,8 @@ class String(str):
 
         Args:
             suffix (str): Lines with given prefix should be included.
-            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
-            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
+            replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
@@ -1255,8 +1272,8 @@ class String(str):
         ```
         Args:
             func ((s: str) -> bool): Filtering function emitting a boolean.
-            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
-            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
+            replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert filtering logic. Defaults to False.
         Returns:
@@ -1285,8 +1302,8 @@ class String(str):
 
         Args:
             func ((s: str) -> Any): Mapping function receiving a string and emitting Any other type.
-            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
-            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
+            replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
@@ -1323,8 +1340,8 @@ class String(str):
         Args:
             map_func (Callable[[Any], Any]): Function to apply over given lines.
             filter_func (Callable[[Any], bool]): Function to select lines.
-            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
-            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
+            replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
@@ -1371,8 +1388,8 @@ class String(str):
 
         Args:
             *funcs (Sequence[Callable[(s: str) -> string]]): A sequence of functions, each with a single argument, returning a single value.
-            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
-            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
+            replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
@@ -1410,8 +1427,8 @@ class String(str):
         Args:
             as_dict (bool, optional): Should pairs be inserted into a dict. Defaults to False.
             sep (str, optional): Separator character. Defaults to None.
-            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
-            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
+            replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
@@ -1429,25 +1446,23 @@ class String(str):
 
     def groupby(
         self,
-        column=0,
-        sep=None,
+        key_func,
         sub_pattern=None,
         replacement=None,
         pattern=None,
         exclude=False,
     ):
         """
-        For each line from input, split line on `sep` and treat the substring
-        with index specified in `column` as the key for grouping lines with
-        matching key(s). The final product is a dictionary where each key maps
-        to a list of all lines where this key is a substring with the same index
-        specified in `column`.
+        A groupby function, which for each line based on the key function in
+        `key_func` adds the line to an already existing group, or creates and
+        adds it to a new group if the derived key is first seen. The final
+        product is a dictionary where each key maps to a list of one or more
+        lines.
 
         Args:
-            column (int, optional): Index of column to perform groupby. Defaults to 0.
-            sep (str, optional): Separator character. Defaults to None.
-            sub_pattern (string, optional): Substitution regex pattern. Defaults to None.
-            replacement (string, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            key_func (Callable[[str], Any]): For each line generate a key to establish a group to which the line will be added.
+            sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
+            replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
@@ -1455,8 +1470,42 @@ class String(str):
             dict: A dictionary of str -> List[str] with grouped lines.
         """
         return self._groupby(
-            column=column,
-            sep=sep,
+            key_func=key_func,
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
+
+    def groupby_count(
+        self,
+        key_func,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
+        """
+        A groupby histogram function, which for each line based on the key
+        function in `key_func` increments count of an existing group or adds a
+        new group to collection of groups. The intent of this function is to
+        give a flexible mechanism for group results without keeping all the
+        lines, and instead just a histogram of the data. This is most useful
+        when we know for example that we expect at least X number of items in
+        a particular group.
+
+        Args:
+            key_func (Callable[[str], Any]): For each line generate a key to establish a group to which the line will be added.
+            sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
+            replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            dict: A dictionary of Any -> int with count for each distinct group.
+        """
+        return self._groupby_count(
+            key_func=key_func,
             sub_pattern=sub_pattern,
             replacement=replacement,
             pattern=pattern,

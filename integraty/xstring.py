@@ -6,7 +6,7 @@ import re
 
 import sys
 
-from collections import Counter
+from collections import Counter, defaultdict
 from functools import reduce
 from typing import Any, Callable, Dict, Iterable, Iterator, List, TypeVar, Sequence, Sequence
 
@@ -544,7 +544,7 @@ class String(str):
             pattern=pattern,
             exclude=exclude,
         )
-        d = {}
+        d = defaultdict(list)
 
         def groupby_rec(key_func: Callable[[str], str], d: dict,
                         l: List) -> Dict:
@@ -552,10 +552,7 @@ class String(str):
                 return d
             head, *rest = l
             key = key_func(head)
-            if key in d:
-                d[key].append(head)  # key exists, append line to list
-            else:
-                d[key] = [head]  # new key, create a list with this line
+            d[key].append(head) # new list is created automatically
             # recursively call self until list is empty
             return groupby_rec(key_func, d, rest)
 

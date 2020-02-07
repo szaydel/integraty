@@ -112,6 +112,35 @@ class LibraryUsageEx1(IntegraTestCase):
             self.assertIn('Tech Name', results)
             self.assertNotIn('Registrar', results)
 
+    def test_line_tuples(self):
+        self.log.info("Tests expected behaviour of the line_tuples method")
+        cmd = 'host -t MX googlemail.com'
+        with ExternalProgram(cmd) as c:
+            c.exec()
+            self.assertCommandSucceeded(c)
+            results = c.out.line_tuples(pattern='^;', exclude=True)
+            results_dict = dict(
+                zip((i[5] for i in results), (i[6] for i in results)))
+            self.assertSetEqual(set(results_dict.keys()),
+                                set(['5', '10', '20', '30', '40']))
+            self.assertDictEqual(
+                results_dict, {
+                    '10': 'alt1.gmail-smtp-in.l.google.com.',
+                    '20': 'alt2.gmail-smtp-in.l.google.com.',
+                    '30': 'alt3.gmail-smtp-in.l.google.com.',
+                    '40': 'alt4.gmail-smtp-in.l.google.com.',
+                    '5': 'gmail-smtp-in.l.google.com.'
+                })
+            # Order no longer matters...
+            self.assertDictEqual(
+                results_dict, {
+                    '5': 'gmail-smtp-in.l.google.com.',
+                    '40': 'alt4.gmail-smtp-in.l.google.com.',
+                    '20': 'alt2.gmail-smtp-in.l.google.com.',
+                    '10': 'alt1.gmail-smtp-in.l.google.com.',
+                    '30': 'alt3.gmail-smtp-in.l.google.com.',
+                })
+
     def test_fields(self):
         self.log.info("Tests expected behaviour of the fields method")
         cmd = self.get_class_var('whois_cloudflare_com')
@@ -197,6 +226,7 @@ class LibraryUsageEx1(IntegraTestCase):
         cmd = self.get_class_var('whois_iana_org_home_arpa')
         with ExternalProgram(cmd) as c:
             c.exec()
+            self.assertCommandSucceeded(c)
             results = c.out.filter_func(lambda l: re.search(
                 r'\s(?:[0-9]{1,3}\.){3}[0-9]{1,3}\s', l))
             results = [tuple(elem.split()[1:3]) for elem in results]
@@ -223,6 +253,7 @@ class LibraryUsageEx1(IntegraTestCase):
 
         with ExternalProgram(cmd) as c:
             c.exec()
+            self.assertCommandSucceeded(c)
             results = c.out.filtered_map(
                 filter_func=lambda l: l.startswith('nserver'),
                 map_func=to_dict)
@@ -240,6 +271,7 @@ class LibraryUsageEx1(IntegraTestCase):
 
         with ExternalProgram(cmd) as c:
             c.exec()
+            self.assertCommandSucceeded(c)
             results_dict = c.out.groupby(key_func, pattern='nserver:')
             self.assertGreaterEqual(len(results_dict['group A']), 3)
             self.assertGreaterEqual(len(results_dict['group B']), 3)
@@ -253,6 +285,7 @@ class LibraryUsageEx1(IntegraTestCase):
 
         with ExternalProgram(cmd) as c:
             c.exec()
+            self.assertCommandSucceeded(c)
             results_dict = c.out.groupby_count(key_func, pattern='nserver:')
             self.assertEqual(results_dict['group A'], 3)
             self.assertEqual(results_dict['group B'], 3)

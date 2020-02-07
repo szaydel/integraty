@@ -13,6 +13,31 @@ from typing import Any, Callable, Dict, Iterable, Iterator, List, TypeVar, Seque
 PCHARS = r'!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
 
 
+class Map:
+    """
+    Generic implementation of a Callable class which takes an iterable and for
+    each element applies `func` Callable, unless the element was filtered out
+    by the `filter` function.
+    
+    Returns:
+        map: An iterable object with filtered elements after filter function.
+    """
+    __slots__ = ["filter", "func"]
+
+    def __init__(self, filter: Callable[[Any], bool], func: Callable[[Any],
+                                                                     Any]):
+        self.filter = filter
+        self.func = func
+
+    def __call__(self, iterable: Iterable) -> Any:
+        # FIXME: I have not yet settled on which approach is better.
+        # Alternative approach is commented out for now.
+        # for i in iterable:
+        #     if self.filter(i):
+        #         yield self.func(i)
+        return map(self.func, (i for i in iterable if self.filter(i)))
+
+
 def stripper(w, chars):
     if chars:
         return stripper(w.replace(chars[0], ""), chars[1:])
@@ -430,7 +455,8 @@ class String(str):
             pattern=pattern,
             exclude=exclude,
         )
-        return [func(line) for line in lines]
+        c = Map(lambda i: True, func)
+        return list(c(lines))
 
     def _filtered_map(
         self,
@@ -447,7 +473,8 @@ class String(str):
             pattern=pattern,
             exclude=exclude,
         )
-        return [l for l in apply_filtered(map_func, filter_func, lines)]
+        c = Map(filter_func, map_func)
+        return list(c(lines))
 
     def _json_loads(self):
         if not self._s:
@@ -552,7 +579,7 @@ class String(str):
                 return d
             head, *rest = l
             key = key_func(head)
-            d[key].append(head) # new list is created automatically
+            d[key].append(head)  # new list is created automatically
             # recursively call self until list is empty
             return groupby_rec(key_func, d, rest)
 

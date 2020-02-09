@@ -19,10 +19,12 @@ class LibraryUsageEx1(IntegraTestCase):
         cls.whois_cloudflare_com = 'whois -h whois.cloudflare.com cloudflare.com'
         cls.whois_iana_org_home_arpa = 'whois -h whois.iana.org home.arpa'
         cls.whois_iana_org_ip6_servers_arpa = 'whois -h whois.iana.org ip6-servers.arpa'
+        cls.whois_iana_org_ip6_arpa = 'whois -h whois.iana.org ip6.arpa'
         if os.getenv('TRAVIS', 'false') == 'true':
             for elem in [
                     'whois_cloudflare_com', 'whois_iana_org_home_arpa',
-                    'whois_iana_org_ip6_servers_arpa'
+                    'whois_iana_org_ip6_servers_arpa',
+                    'whois_iana_org_ip6_arpa'
             ]:
                 setattr(
                     cls, f'{elem}',
@@ -111,6 +113,68 @@ class LibraryUsageEx1(IntegraTestCase):
             self.assertIn('Tech Country', results)
             self.assertIn('Tech Name', results)
             self.assertNotIn('Registrar', results)
+
+    def test_trim_prefix(self):
+        self.log.info("Tests expected behaviour of trim_prefix method")
+        cmd = self.get_class_var('whois_iana_org_ip6_arpa')
+        with ExternalProgram(cmd) as c:
+            c.exec()
+            self.assertCommandSucceeded(c)
+            results = [
+                ns.split(maxsplit=2)
+                for ns in c.out.trim_prefix('nserver:      ',
+                                            pattern='nserver')
+            ]
+            results_dict = {l[0].lower(): tuple(l[1:]) for l in results}
+            self.assertGreaterEqual(len(results), 6)
+            self.assertIn('a.ip6-servers.arpa', results_dict)
+            self.assertIn('e.ip6-servers.arpa', results_dict)
+            self.assertNotIn('h.ip6-servers.arpa', results_dict)
+            self.assertNotIn('k.ip6-servers.arpa', results_dict)
+            self.assertTupleEqual(results_dict['d.ip6-servers.arpa'],
+                                  ('200.7.86.53', '2001:13c7:7012::53'))
+            self.assertTupleEqual(results_dict['b.ip6-servers.arpa'],
+                                  ('199.253.182.182', '2001:500:86::86'))
+
+    def test_lastn(self):
+        self.log.info("Tests expected behaviour of lastn method")
+        cmd = self.get_class_var('whois_iana_org_ip6_arpa')
+        with ExternalProgram(cmd) as c:
+            c.exec()
+            self.assertCommandSucceeded(c)
+            results_pairs = [
+                line.split() for line in c.out.lastn(
+                    3, sub_pattern=r':\s{0,}', replacement=' ')
+            ]
+            results_dict = {k: v for k, v in results_pairs}
+            self.assertEqual(len(results_pairs), 3)
+            self.assertDictEqual(results_dict, {
+                'created': '2001-11-10',
+                'changed': '2018-11-13',
+                'source': 'IANA'
+            })
+
+    def test_firstn(self):
+        self.log.info("Tests expected behaviour of firstn method")
+        cmd = self.get_class_var('whois_iana_org_ip6_arpa')
+        with ExternalProgram(cmd) as c:
+            c.exec()
+            self.assertCommandSucceeded(c)
+            results_pairs = [
+                line.split(maxsplit=1)
+                for line in c.out.firstn(2,
+                                         sub_pattern=r':\s{0,}',
+                                         replacement=' ',
+                                         pattern='(^[% ] | ^$)',
+                                         exclude=True)
+            ]
+            results_dict = {k: v for k, v in results_pairs}
+            self.assertEqual(len(results_pairs), 2)
+            self.assertDictEqual(
+                results_dict, {
+                    'domain': 'IP6.ARPA',
+                    'organisation': 'Internet Architecture Board (IAB)'
+                })
 
     def test_line_tuples(self):
         self.log.info("Tests expected behaviour of the line_tuples method")

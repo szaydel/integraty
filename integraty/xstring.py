@@ -145,6 +145,7 @@ class String(str):
     def _line_tuples(
         self,
         sep=None,
+        maxsplit=-1,
         strip_punct=False,
         strip_chars=PCHARS,
         sub_pattern=None,
@@ -161,7 +162,7 @@ class String(str):
         )
 
         for l in lines:
-            tokens = tuple(l.split(sep))
+            tokens = tuple(l.split(sep=sep, maxsplit=maxsplit))
             if tokens:
                 if strip_punct:
                     tokens = tuple(
@@ -273,27 +274,29 @@ class String(str):
             return lines
         return [l for l in lines if l.count(substr) <= n]
 
-    def _first_last_n(self, n=1, first=True, pattern=None, exclude=False):
-        lines = self._lines_from_impl()
+    def _first_last_n(self,
+                      n=1,
+                      first=True,
+                      sub_pattern=None,
+                      replacement=None,
+                      pattern=None,
+                      exclude=False):
+        lines = self._lines_from_impl(sub_pattern=sub_pattern,
+                                      replacement=replacement,
+                                      pattern=pattern,
+                                      exclude=exclude)
         if n < 1:
             raise ValueError("Number of lines cannot be less than '1'")
         if first:
             slc_obj = slice(0, n, 1)
         else:
             slc_obj = slice(-n, len(lines), 1)
-        if not pattern:
-            unfiltered_lines = [l for l in lines]
-            return unfiltered_lines[slc_obj]
-        if exclude:
-            filtered_lines = [l for l in lines if not re.search(pattern, l)]
-            return filtered_lines[slc_obj]
-        else:
-            filtered_lines = [l for l in lines if re.search(pattern, l)]
-        return filtered_lines[slc_obj]
+        return lines[slc_obj]
 
     def _head(
         self,
         sep=None,
+        maxsplit=-1,
         sub_pattern=None,
         replacement=None,
         pattern=None,
@@ -306,11 +309,14 @@ class String(str):
             exclude=exclude,
         )
 
-        return [col.split(sep)[0].strip() for col in lines]
+        return [
+            line.split(sep=sep, maxsplit=maxsplit)[0].strip() for line in lines
+        ]
 
     def _tail(
         self,
         sep=None,
+        maxsplit=-1,
         sub_pattern=None,
         replacement=None,
         pattern=None,
@@ -323,11 +329,14 @@ class String(str):
             exclude=exclude,
         )
 
-        return [tuple(col.split(sep)[1:]) for col in lines]
+        return [
+            tuple(line.split(sep=sep, maxsplit=maxsplit)[1:]) for line in lines
+        ]
 
     def _fields(
         self,
         sep=None,
+        maxsplit=-1,
         sub_pattern=None,
         replacement=None,
         pattern=None,
@@ -346,6 +355,7 @@ class String(str):
     def _take_column(
         self,
         sep=None,
+        maxsplit=-1,
         column=0,
         sub_pattern=None,
         replacement=None,
@@ -358,11 +368,15 @@ class String(str):
             pattern=pattern,
             exclude=exclude,
         )
-        return [col.split(sep)[column].strip() for col in lines]
+        return [
+            line.split(sep=sep, maxsplit=maxsplit)[column].strip()
+            for line in lines
+        ]
 
     def _compress(
         self,
         sep=None,
+        maxsplit=-1,
         indexes=(),
         sub_pattern=None,
         replacement=None,
@@ -382,13 +396,15 @@ class String(str):
                           for i in range(0,
                                          max(indexes) + 1))
         return [
-            tuple(itertools.compress(col.split(sep), selectors))
-            for col in lines
+            tuple(
+                itertools.compress(line.split(sep=sep, maxsplit=maxsplit),
+                                   selectors)) for line in lines
         ]
 
     def _take_range_fields(
         self,
         sep=None,
+        maxsplit=-1,
         slc_range=(0, 1, 1),
         sub_pattern=None,
         replacement=None,
@@ -403,7 +419,9 @@ class String(str):
         )
         slc_obj = slice(*slc_range)
 
-        return [col.split(sep)[slc_obj] for col in lines]
+        return [
+            line.split(sep=sep, maxsplit=maxsplit)[slc_obj] for line in lines
+        ]
 
     def _to_dict_func(
         self,
@@ -489,6 +507,7 @@ class String(str):
     def _to_dict(self,
                  keys=None,
                  sep=None,
+                 maxsplit=-1,
                  sub_pattern=None,
                  replacement=None,
                  pattern=None,
@@ -500,9 +519,11 @@ class String(str):
         return [
             dict(
                 zip(
-                    keys
-                    if keys else [i for i in range(0, len(line.split(sep)))],
-                    line.split(sep),
+                    keys if keys else [
+                        i for i in range(
+                            0, len(line.split(sep=sep, maxsplit=maxsplit)))
+                    ],
+                    line.split(sep=sep, maxsplit=maxsplit),
                 )) for line in lines if line
         ]
 
@@ -535,6 +556,7 @@ class String(str):
         self,
         as_dict=False,
         sep=None,
+        maxsplit=-1,
         sub_pattern=None,
         replacement=None,
         pattern=None,
@@ -548,13 +570,19 @@ class String(str):
         )
         if as_dict:
             return [
-                dict(zip(line.split(sep)[::2],
-                         line.split(sep)[1::2])) for line in lines
+                dict(
+                    zip(
+                        line.split(sep=sep, maxsplit=maxsplit)[::2],
+                        line.split(sep=sep, maxsplit=maxsplit)[1::2]))
+                for line in lines
             ]
         else:
             return [
-                tuple(zip(line.split(sep)[::2],
-                          line.split(sep)[1::2])) for line in lines
+                tuple(
+                    zip(
+                        line.split(sep=sep, maxsplit=maxsplit)[::2],
+                        line.split(sep=sep, maxsplit=maxsplit)[1::2]))
+                for line in lines
             ]
 
     def _groupby(
@@ -713,14 +741,19 @@ class String(str):
             exclude=exclude,
         )
 
-    def to_dict(self, keys=None, sep=None, pattern=None, exclude=False):
+    def to_dict(self,
+                keys=None,
+                sep=None,
+                maxsplit=-1,
+                pattern=None,
+                exclude=False):
         """
         Converts input lines into dicts, where `keys` is a list of keys which 
         should be zip(able) with contents of split line. This means that the
-        following expression should be true: len(keys) == len(line.split(sep))
+        following expression should be true: len(keys) == len(line.split(sep=sep, maxsplit=maxsplit))
         for each line. If len(line) > len(keys), only len(keys) elements are
         taken from each split line. Reverse of this is true also. This is done
-        so that equal number of key=value pairs was available for establishing
+        so that equal number of _key=value_ pairs was available for establishing
         a mapping.
         If keys == None, then after a line is split, it is zipped with a range
         object generated from length of split line. In other words, if
@@ -728,6 +761,7 @@ class String(str):
 
         Args:
             keys (hashable, optional): A list of keys to build a dict from line. Defaults to None.
+            maxsplit (int, optional): Split line at most this many times. Defaults to `-1`, no limit.
             sep (str, optional): Separator character. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
@@ -740,26 +774,44 @@ class String(str):
                              pattern=pattern,
                              exclude=exclude)
 
-    def firstn(self, n=1, pattern=None, exclude=None):
+    def firstn(self,
+               n=1,
+               sub_pattern=None,
+               replacement=None,
+               pattern=None,
+               exclude=None):
         """
         Select first n lines from input.
 
         Args:
             n (int, optional): Number of lines to select. Defaults to 1.
+            sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
+            replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
         Returns:
             list: List of lines 0 through n.
         """
-        return self._first_last_n(n=n, pattern=pattern, exclude=exclude)
+        return self._first_last_n(n=n,
+                                  sub_pattern=sub_pattern,
+                                  replacement=replacement,
+                                  pattern=pattern,
+                                  exclude=exclude)
 
-    def lastn(self, n=1, pattern=None, exclude=None):
+    def lastn(self,
+              n=1,
+              sub_pattern=None,
+              replacement=None,
+              pattern=None,
+              exclude=None):
         """
         Select last n lines from input.
 
         Args:
             n (int, optional): Number of lines to select. Defaults to 1.
+            sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
+            replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
             exclude (bool, optional): Invert pattern matching. Defaults to False.
 
@@ -768,12 +820,15 @@ class String(str):
         """
         return self._first_last_n(n=n,
                                   first=False,
+                                  sub_pattern=sub_pattern,
+                                  replacement=replacement,
                                   pattern=pattern,
                                   exclude=exclude)
 
     def head(
         self,
         sep=None,
+        maxsplit=-1,
         sub_pattern=None,
         replacement=None,
         pattern=None,
@@ -800,6 +855,7 @@ class String(str):
         ```
         Args:
             sep (str, optional): Separator character. Defaults to None.
+            maxsplit (int, optional): Split line at most this many times. Defaults to `-1`, no limit.
             sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
             replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
@@ -819,6 +875,7 @@ class String(str):
     def tail(
         self,
         sep=None,
+        maxsplit=-1,
         sub_pattern=None,
         replacement=None,
         pattern=None,
@@ -845,6 +902,7 @@ class String(str):
         ```
         Args:
             sep (str, optional): Separator character. Defaults to None.
+            maxsplit (int, optional): Split line at most this many times. Defaults to `-1`, no limit.
             sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
             replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
@@ -864,6 +922,7 @@ class String(str):
     def fields(
         self,
         sep=None,
+        maxsplit=-1,
         sub_pattern=None,
         replacement=None,
         pattern=None,
@@ -881,6 +940,7 @@ class String(str):
 
         Args:
             sep (str, optional): Separator character. Defaults to None.
+            maxsplit (int, optional): Split line at most this many times. Defaults to `-1`, no limit.
             sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
             replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
@@ -900,6 +960,7 @@ class String(str):
     def take_column(
         self,
         sep=None,
+        maxsplit=-1,
         column=0,
         sub_pattern=None,
         replacement=None,
@@ -912,6 +973,7 @@ class String(str):
 
         Args:
             sep (str, optional): Separator character. Defaults to None.
+            maxsplit (int, optional): Split line at most this many times. Defaults to `-1`, no limit.
             column (int, optional): Select column matching this index. Defaults to 0.
             sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
             replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
@@ -933,6 +995,7 @@ class String(str):
     def compress(
         self,
         sep=None,
+        maxsplit=-1,
         indexes=(),
         sub_pattern=None,
         replacement=None,
@@ -956,6 +1019,7 @@ class String(str):
 
         Args:
             sep (str, optional): Separator character. Defaults to None.
+            maxsplit (int, optional): Split line at most this many times. Defaults to `-1`, no limit.
             indexes (tuple, optional): Sequence of column indexes. Defaults to ().
             sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
             replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
@@ -977,6 +1041,7 @@ class String(str):
     def take_range_fields(
         self,
         sep=None,
+        maxsplit=-1,
         slc_range=(0, 1, 1),
         sub_pattern=None,
         replacement=None,
@@ -989,6 +1054,7 @@ class String(str):
 
         Args:
             sep (str, optional): Separator character. Defaults to None.
+            maxsplit (int, optional): Split line at most this many times. Defaults to `-1`, no limit.
             slc_range (tuple, optional): Range (start, end, stride). Defaults to (0, 1, 1).
             sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
             replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
@@ -1010,6 +1076,7 @@ class String(str):
     def line_tuples(
         self,
         sep=None,
+        maxsplit=-1,
         strip_punct=False,
         strip_chars=PCHARS,
         sub_pattern=None,
@@ -1040,6 +1107,7 @@ class String(str):
         ```
         Args:
             sep (str, optional): Separator character. Defaults to None.
+            maxsplit (int, optional): Split line at most this many times. Defaults to `-1`, no limit.
             strip_punct (bool, optional): Enable punctuation stripping. Defaults to False.
             strip_chars (str, optional): Characters to strip if 'strip_punct' is True. Defaults to PCHARS.
             sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
@@ -1432,6 +1500,7 @@ class String(str):
         self,
         as_dict=False,
         sep=None,
+        maxsplit=-1,
         sub_pattern=None,
         replacement=None,
         pattern=None,
@@ -1450,6 +1519,7 @@ class String(str):
 
         Args:
             as_dict (bool, optional): Should pairs be inserted into a dict. Defaults to False.
+            maxsplit (int, optional): Split line at most this many times. Defaults to `-1`, no limit.
             sep (str, optional): Separator character. Defaults to None.
             sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
             replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.

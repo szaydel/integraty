@@ -1,0 +1,21 @@
+
+; <<>> DiG 9.10.6 <<>> -t AAAA cloudflare.com
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 5985
+;; flags: qr rd ra; QUERY: 1, ANSWER: 2, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;cloudflare.com.			IN	AAAA
+
+;; ANSWER SECTION:
+cloudflare.com.		160	IN	AAAA	2606:4700::6811:af55
+cloudflare.com.		160	IN	AAAA	2606:4700::6811:b055
+
+;; Query time: 15 msec
+;; SERVER: 192.168.0.2#53(192.168.0.2)
+;; WHEN: Sat Feb 08 23:11:53 PST 2020
+;; MSG SIZE  rcvd: 99
+

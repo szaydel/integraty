@@ -20,11 +20,26 @@ class LibraryUsageEx1(IntegraTestCase):
         cls.whois_iana_org_home_arpa = 'whois -h whois.iana.org home.arpa'
         cls.whois_iana_org_ip6_servers_arpa = 'whois -h whois.iana.org ip6-servers.arpa'
         cls.whois_iana_org_ip6_arpa = 'whois -h whois.iana.org ip6.arpa'
-        if os.getenv('TRAVIS', 'false') == 'true':
+        cls.host_t_mx_cloudflare_com = 'host -t MX cloudflare.com'
+        cls.host_t_mx_googlemail_com = 'host -t MX googlemail.com'
+        cls.host_t_aaaa_cloudflare_com = 'host -t AAAA cloudflare.com'
+        cls.dig_t_txt_microsoft_com = 'dig -t TXT microsoft.com'
+        cls.dig_x_t_ns_microsoft_com = 'dig -x -t NS microsoft.com'
+        cls.dig_t_aaaa_cloudflare_com = 'dig -t AAAA cloudflare.com'
+        cls.dig_t_mx_cloudflare_com = 'dig -t MX cloudflare.com'
+        if any([os.getenv('TRAVIS', 'false'), os.getenv('CIRCLECI', 'false')]):
             for elem in [
-                    'whois_cloudflare_com', 'whois_iana_org_home_arpa',
+                    'whois_cloudflare_com',
+                    'whois_iana_org_home_arpa',
                     'whois_iana_org_ip6_servers_arpa',
-                    'whois_iana_org_ip6_arpa'
+                    'whois_iana_org_ip6_arpa',
+                    'host_t_mx_cloudflare_com',
+                    'host_t_mx_googlemail_com',
+                    'host_t_aaaa_cloudflare_com',
+                    'dig_t_txt_microsoft_com',
+                    'dig_x_t_ns_microsoft_com',
+                    'dig_t_aaaa_cloudflare_com',
+                    'dig_t_mx_cloudflare_com',
             ]:
                 setattr(
                     cls, f'{elem}',
@@ -37,7 +52,7 @@ class LibraryUsageEx1(IntegraTestCase):
 
     def test_domain_name_is_almost_equal(self):
         self.log.info("Tests string near equality assertions")
-        cmd = 'dig -t TXT microsoft.com'
+        cmd = self.get_class_var('dig_t_txt_microsoft_com')
         with ExternalProgram(cmd) as c:
             c.exec()
             self.assertCommandSucceeded(c)
@@ -62,7 +77,7 @@ class LibraryUsageEx1(IntegraTestCase):
             tokens = line.split()
             return zip([tokens[4]], [tokens[0]])
 
-        cmd = 'dig -x -t NS microsoft.com'
+        cmd = self.get_class_var('dig_x_t_ns_microsoft_com')
         with ExternalProgram(cmd) as c:
             c.exec()
             self.assertCommandSucceeded(c)
@@ -178,7 +193,7 @@ class LibraryUsageEx1(IntegraTestCase):
 
     def test_line_tuples(self):
         self.log.info("Tests expected behaviour of the line_tuples method")
-        cmd = 'host -t MX googlemail.com'
+        cmd = self.get_class_var('host_t_mx_googlemail_com')
         with ExternalProgram(cmd) as c:
             c.exec()
             self.assertCommandSucceeded(c)
@@ -216,7 +231,7 @@ class LibraryUsageEx1(IntegraTestCase):
             self.assertEqual(domain_name.lower(), 'cloudflare.com')
             self.assertEqual(registrar_url, 'https://www.cloudflare.com')
 
-        cmd = 'dig -t AAAA cloudflare.com'
+        cmd = self.get_class_var('dig_t_aaaa_cloudflare_com')
         with ExternalProgram(cmd) as c:
             c.exec()
             self.assertCommandSucceeded(c)
@@ -229,7 +244,7 @@ class LibraryUsageEx1(IntegraTestCase):
 
     def test_take_column(self):
         self.log.info("Tests expected behaviour of the take_column method")
-        cmd = 'host -t AAAA cloudflare.com'
+        cmd = self.get_class_var('host_t_aaaa_cloudflare_com')
         with ExternalProgram(cmd) as c:
             c.exec()
             self.assertCommandSucceeded(c)
@@ -245,7 +260,7 @@ class LibraryUsageEx1(IntegraTestCase):
             self.assertIn('2606:4700::6811:af55', results)
             self.assertIn('2606:4700::6811:b055', results)
 
-        cmd = 'host -t MX cloudflare.com'
+        cmd = self.get_class_var('host_t_mx_cloudflare_com')
         with ExternalProgram(cmd) as c:
             c.exec()
             self.assertCommandSucceeded(c)
@@ -260,7 +275,7 @@ class LibraryUsageEx1(IntegraTestCase):
 
     def test_compress(self):
         self.log.info("Tests expected behaviour of the compress method")
-        cmd = 'dig -t MX cloudflare.com'
+        cmd = self.get_class_var('dig_t_mx_cloudflare_com')
         with ExternalProgram(cmd) as c:
             c.exec()
             self.assertCommandSucceeded(c)

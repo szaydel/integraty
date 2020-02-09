@@ -1,0 +1,35 @@
+
+; <<>> DiG 9.10.6 <<>> -t TXT microsoft.com
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 7495
+;; flags: qr rd ra; QUERY: 1, ANSWER: 16, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;microsoft.com.			IN	TXT
+
+;; ANSWER SECTION:
+microsoft.com.		3034	IN	TXT	"3lp8f84rbvcsohupiil488dlj9"
+microsoft.com.		3034	IN	TXT	"docusign=52998482-393d-46f7-95d4-15ac6509bfdd"
+microsoft.com.		3034	IN	TXT	"docusign=d5a3737c-c23c-4bd0-9095-d2ff621f2840"
+microsoft.com.		3034	IN	TXT	"adobe-sign-verification=c1fea9b4cdd4df0d5778517f29e0934"
+microsoft.com.		3034	IN	TXT	"facebook-domain-verification=bcas5uzlvu0s3mrw139a00os3o66wr"
+microsoft.com.		3034	IN	TXT	"facebook-domain-verification=gx5s19fp3o8aczby6a22clfhzm03as"
+microsoft.com.		3034	IN	TXT	"facebook-domain-verification=m54hfzczreqq2z1pf99y2p0kpwwpkv"
+microsoft.com.		3034	IN	TXT	"google-site-verification=6P08Ow5E-8Q0m6vQ7FMAqAYIDprkVV8fUf_7hZ4Qvc8"
+microsoft.com.		3034	IN	TXT	"google-site-verification=7BhRYd_4jVpBnrAKBLNQdi5ioTVzLzwwXMSlcTkxWZ8"
+microsoft.com.		3034	IN	TXT	"google-site-verification=8-zFCaUXhhPcvN29EVw2RvtASDCaDPQ02L1HJ8Om8I0"
+microsoft.com.		3034	IN	TXT	"google-site-verification=Zv1IvEEZg4N9wbEXpBSSyAiIjDyyB3S-fzfFClb7D1E"
+microsoft.com.		3034	IN	TXT	"google-site-verification=yUE_SrjKKb4FHH1H04VWidfwstTGeS1FLx3Mcsnijjs"
+microsoft.com.		3034	IN	TXT	"FbUF6DbkE+Aw1/wi9xgDi8KVrIIZus5v8L6tbIQZkGrQ/rVQKJi8CjQbBtWtE64ey4NJJwj5J65PIggVYNabdQ=="
+microsoft.com.		3034	IN	TXT	"adobe-idp-site-verification=8aa35c528af5d72beb19b1bd3ed9b86d87ea7f24b2ba3c99ffcd00c27e9d809c"
+microsoft.com.		3034	IN	TXT	"atlassian-domain-verification=jbey7I2+3Wyl+PZ0QUCC6fCz2Gu5KO7GQPcy/0c4za7ebQxar/qqujJH4kZLVQHZ"
+microsoft.com.		3034	IN	TXT	"v=spf1 include:_spf-a.microsoft.com include:_spf-b.microsoft.com include:_spf-c.microsoft.com include:_spf-ssg-a.microsoft.com include:spf-a.hotmail.com ip4:147.243.128.24 ip4:147.243.128.26 ip4:147.243.1.153 ip4:147.243.1.47 ip4:147.243.1.48 -all"
+
+;; Query time: 16 msec
+;; SERVER: 192.168.0.2#53(192.168.0.2)
+;; WHEN: Sat Feb 08 23:09:32 PST 2020
+;; MSG SIZE  rcvd: 1459
+

@@ -1,0 +1,41 @@
+
+; <<>> DiG 9.10.6 <<>> -x -t NS microsoft.com
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NXDOMAIN, id: 63429
+;; flags: qr rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 1, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;-t.in-addr.arpa.		IN	NS
+
+;; AUTHORITY SECTION:
+in-addr.arpa.		2379	IN	SOA	b.in-addr-servers.arpa. nstld.iana.org. 2020011944 1800 900 604800 3600
+
+;; Query time: 15 msec
+;; SERVER: 192.168.0.2#53(192.168.0.2)
+;; WHEN: Sat Feb 08 23:10:46 PST 2020
+;; MSG SIZE  rcvd: 112
+
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 58773
+;; flags: qr rd ra; QUERY: 1, ANSWER: 5, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;microsoft.com.			IN	A
+
+;; ANSWER SECTION:
+microsoft.com.		1888	IN	A	40.76.4.15
+microsoft.com.		1888	IN	A	13.77.161.179
+microsoft.com.		1888	IN	A	104.215.148.63
+microsoft.com.		1888	IN	A	40.113.200.201
+microsoft.com.		1888	IN	A	40.112.72.205
+
+;; Query time: 2 msec
+;; SERVER: 192.168.0.2#53(192.168.0.2)
+;; WHEN: Sat Feb 08 23:10:46 PST 2020
+;; MSG SIZE  rcvd: 122
+

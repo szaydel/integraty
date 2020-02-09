@@ -1,0 +1,24 @@
+
+; <<>> DiG 9.10.6 <<>> -t MX cloudflare.com
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 33037
+;; flags: qr rd ra; QUERY: 1, ANSWER: 5, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;cloudflare.com.			IN	MX
+
+;; ANSWER SECTION:
+cloudflare.com.		1813	IN	MX	10 aspmx.l.google.com.
+cloudflare.com.		1813	IN	MX	20 alt1.aspmx.l.google.com.
+cloudflare.com.		1813	IN	MX	30 alt2.aspmx.l.google.com.
+cloudflare.com.		1813	IN	MX	40 aspmx2.googlemail.com.
+cloudflare.com.		1813	IN	MX	50 aspmx3.googlemail.com.
+
+;; Query time: 15 msec
+;; SERVER: 192.168.0.2#53(192.168.0.2)
+;; WHEN: Sat Feb 08 23:15:07 PST 2020
+;; MSG SIZE  rcvd: 173
+

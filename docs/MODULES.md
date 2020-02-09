@@ -10,4 +10,5 @@ Full list of [integraty](README.md#integraty) project modules.
     - [Extprog](integraty/extprog.md#extprog)
     - [Productivity](integraty/productivity.md#productivity)
     - [Sandbox](integraty/sandbox.md#sandbox)
+    - [Utils](integraty/utils.md#utils)
     - [Xstring](integraty/xstring.md#xstring)

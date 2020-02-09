@@ -8,4 +8,5 @@
         - [Extprog](extprog.md#extprog)
         - [Productivity](productivity.md#productivity)
         - [Sandbox](sandbox.md#sandbox)
+        - [Utils](utils.md#utils)
         - [Xstring](xstring.md#xstring)

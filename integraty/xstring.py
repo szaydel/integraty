@@ -3,82 +3,16 @@
 import itertools
 import json
 import re
-
 import sys
 
 from collections import Counter, defaultdict
 from functools import reduce
 from typing import Any, Callable, Dict, Iterable, Iterator, List, TypeVar, Sequence, Sequence
 
+from integraty.utils import Map, Split
+from integraty.utils import apply_filtered, map_if_possible, stripper
+
 PCHARS = r'!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
-
-
-class Map:
-    """
-    Generic implementation of a Callable class which takes an iterable and for
-    each element applies `func` Callable, unless the element was filtered out
-    by the `filter` function.
-    
-    Returns:
-        map: An iterable object with filtered elements after filter function.
-    """
-    __slots__ = ["filter", "func"]
-
-    def __init__(self, filter: Callable[[Any], bool], func: Callable[[Any],
-                                                                     Any]):
-        self.filter = filter
-        self.func = func
-
-    def __call__(self, iterable: Iterable) -> Any:
-        # FIXME: I have not yet settled on which approach is better.
-        # Alternative approach is commented out for now.
-        # for i in iterable:
-        #     if self.filter(i):
-        #         yield self.func(i)
-        return map(self.func, (i for i in iterable if self.filter(i)))
-
-
-def stripper(w, chars):
-    if chars:
-        return stripper(w.replace(chars[0], ""), chars[1:])
-    else:
-        return w
-
-
-def apply_filtered(map_func: Callable[[Any], Any],
-                   filter_func: Callable[[Any], bool], lines: Iterable):
-    for line in filter(filter_func, lines):
-        yield map_func(line)
-
-
-def map_if_possible(func: Callable[[Any], Any], source: Iterable) -> Iterator:
-    """
-    Silently drops any data which causes `func` calls with given data to raise
-    any Exception. The intention is to allow messy data to be processed where
-    certain data may be incomplete, fields missing, etc. For example, a string
-    with newlines is split on `\\n`, and each resulting line is further
-    tokenized. If `func` can only be successfully called with a subset of these
-    lines, while the other lines would normally cause an exception to be raised,
-    we let those exceptional cases fall out, yielding results of calling `func`
-    on each item in `source` that does not cause `func` to raise an exception.
-    
-    Args:
-        func (Callable[[Any], Any]): Function being mapped over data in `source`.
-        source (Iterable): Sequence of data over which `func` is getting called.
-    
-    Returns:
-        Iterator: All results from applying `func` which were not discarded due to Exception.
-    
-    Yields:
-        Iterator: Function `func` applied over an item from `source`.
-    """
-    for x in source:
-        try:
-            yield func(x)
-        except Exception as e:  # pylint: disable=unused-variable
-            # to debug uncomment this print statement
-            # print(e)
-            pass
 
 
 class String(str):
@@ -162,7 +96,8 @@ class String(str):
         )
 
         for l in lines:
-            tokens = tuple(l.split(sep=sep, maxsplit=maxsplit))
+            split = Split(l)
+            tokens = tuple(split(sep=sep, maxsplit=maxsplit))
             if tokens:
                 if strip_punct:
                     tokens = tuple(
@@ -310,7 +245,8 @@ class String(str):
         )
 
         return [
-            line.split(sep=sep, maxsplit=maxsplit)[0].strip() for line in lines
+            Split(line)(sep=sep, maxsplit=maxsplit)[0].strip()
+            for line in lines
         ]
 
     def _tail(
@@ -330,7 +266,8 @@ class String(str):
         )
 
         return [
-            tuple(line.split(sep=sep, maxsplit=maxsplit)[1:]) for line in lines
+            tuple(Split(line)(sep=sep, maxsplit=maxsplit)[1:])
+            for line in lines
         ]
 
     def _fields(
@@ -369,7 +306,7 @@ class String(str):
             exclude=exclude,
         )
         return [
-            line.split(sep=sep, maxsplit=maxsplit)[column].strip()
+            Split(line)(sep=sep, maxsplit=maxsplit)[column].strip()
             for line in lines
         ]
 
@@ -397,8 +334,9 @@ class String(str):
                                          max(indexes) + 1))
         return [
             tuple(
-                itertools.compress(line.split(sep=sep, maxsplit=maxsplit),
-                                   selectors)) for line in lines
+                itertools.compress(
+                    Split(line)(sep=sep, maxsplit=maxsplit), selectors))
+            for line in lines
         ]
 
     def _take_range_fields(
@@ -420,7 +358,7 @@ class String(str):
         slc_obj = slice(*slc_range)
 
         return [
-            line.split(sep=sep, maxsplit=maxsplit)[slc_obj] for line in lines
+            Split(line)(sep=sep, maxsplit=maxsplit)[slc_obj] for line in lines
         ]
 
     def _to_dict_func(
@@ -521,9 +459,9 @@ class String(str):
                 zip(
                     keys if keys else [
                         i for i in range(
-                            0, len(line.split(sep=sep, maxsplit=maxsplit)))
+                            0, len(Split(line)(sep=sep, maxsplit=maxsplit)))
                     ],
-                    line.split(sep=sep, maxsplit=maxsplit),
+                    Split(line)(sep=sep, maxsplit=maxsplit),
                 )) for line in lines if line
         ]
 
@@ -572,16 +510,16 @@ class String(str):
             return [
                 dict(
                     zip(
-                        line.split(sep=sep, maxsplit=maxsplit)[::2],
-                        line.split(sep=sep, maxsplit=maxsplit)[1::2]))
+                        Split(line)(sep=sep, maxsplit=maxsplit)[::2],
+                        Split(line)(sep=sep, maxsplit=maxsplit)[1::2]))
                 for line in lines
             ]
         else:
             return [
                 tuple(
                     zip(
-                        line.split(sep=sep, maxsplit=maxsplit)[::2],
-                        line.split(sep=sep, maxsplit=maxsplit)[1::2]))
+                        Split(line)(sep=sep, maxsplit=maxsplit)[::2],
+                        Split(line)(sep=sep, maxsplit=maxsplit)[1::2]))
                 for line in lines
             ]
 
@@ -750,7 +688,7 @@ class String(str):
         """
         Converts input lines into dicts, where `keys` is a list of keys which 
         should be zip(able) with contents of split line. This means that the
-        following expression should be true: len(keys) == len(line.split(sep=sep, maxsplit=maxsplit))
+        following expression should be true: len(keys) == len(Split(line)(sep=sep, maxsplit=maxsplit))
         for each line. If len(line) > len(keys), only len(keys) elements are
         taken from each split line. Reverse of this is true also. This is done
         so that equal number of _key=value_ pairs was available for establishing
@@ -1176,8 +1114,8 @@ class String(str):
         exclude=False,
     ):
         """
-        Trim substring in `prefix` from beginning of each line from input,
-        assuming substring is present.
+        Trim substring in `prefix` from beginning of each line of input, after
+        splitting, assuming substring is present.
 
         Args:
             prefix (str): Prefix to trim from beginning of each line.
@@ -1206,8 +1144,8 @@ class String(str):
         exclude=False,
     ):
         """
-        Trim substring in `suffix` from end of each line from input,
-        assuming substring is present.
+        Trim substring in `suffix` from beginning of each line of input, after
+        splitting, assuming substring is present.
 
         Args:
             suffix (str): Suffix to trim from end of each line.

@@ -248,6 +248,16 @@ class LibraryUsageEx1(IntegraTestCase):
         with ExternalProgram(cmd) as c:
             c.exec()
             self.assertCommandSucceeded(c)
+
+            # One approach could be to take two columns with two separate calls
+            # and zip them together to build dicts.
+            results_values = c.out.take_column(column=0)
+            results_keys = c.out.take_column(column=4)
+            self.assertDictEqual(
+                dict(zip(results_keys, results_values)), {
+                    '2606:4700::6811:af55': 'cloudflare.com',
+                    '2606:4700::6811:b055': 'cloudflare.com'
+                })
             results = c.out.take_column(column=4)
             # This is arguably fragile as well, because over time these may
             # change, or new quad records may get added.

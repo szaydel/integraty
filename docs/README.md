@@ -3,6 +3,7 @@
 > Auto-generated documentation index.
 
 [![Build Status](https://travis-ci.org/szaydel/integraty.svg?branch=master)](https://travis-ci.org/szaydel/integraty)
+[![CircleCI](https://circleci.com/gh/szaydel/integraty.svg?style=svg)](https://circleci.com/gh/szaydel/integraty)
 
 Full integraty project documentation can be found in [Modules](MODULES.md#integraty-modules)
 

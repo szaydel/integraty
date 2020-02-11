@@ -3,6 +3,7 @@ import os
 import sys
 
 from collections import ChainMap
+from itertools import chain
 
 from integraty.case import IntegraTestCase
 from integraty.case import run_integra_tests
@@ -318,13 +319,52 @@ class LibraryUsageEx1(IntegraTestCase):
             self.assertCommandSucceeded(c)
             results = c.out.filter_func(lambda l: re.search(
                 r'\s(?:[0-9]{1,3}\.){3}[0-9]{1,3}\s', l))
-            results = [tuple(elem.split()[1:3]) for elem in results]
-            results = {k.lower(): v for k, v in results}
+            results_tuples = [tuple(elem.split()[1:3]) for elem in results]
+            results_dict = {k.lower(): v for k, v in results_tuples}
             self.assertDictEqual(
-                results, {
+                results_dict, {
                     'blackhole-1.iana.org': '192.175.48.6',
                     'blackhole-2.iana.org': '192.175.48.42'
                 })
+
+    def test_fold_funcs(self):
+        self.log.info("Tests expected behaviour of the fold_funcs method")
+        cmd = self.get_class_var('whois_iana_org_home_arpa')
+        with ExternalProgram(cmd) as c:
+            c.exec()
+            self.assertCommandSucceeded(c)
+            results = c.out.fold_funcs(
+                # This may seem silly, because it is possible to combine them
+                # into fewer expressions, but the goal here is to show how
+                # function composition could be used to transform from input to
+                # something we can make some sensible assertions about.
+                lambda l: re.split(r'^.*:\s{0,}?(?=B)', l),
+                lambda l: l[1].lower(),
+                lambda l: l.split(),
+                lambda l: {l[0]: l[2]},
+                pattern='^nserver')
+            self.assertListEqual(results,
+                                 [{
+                                     'blackhole-1.iana.org': '2620:4f:8000::6'
+                                 }, {
+                                     'blackhole-2.iana.org': '2620:4f:8000::42'
+                                 }])
+
+    def test_take_range_fields(self):
+        self.log.info(
+            "Tests expected behaviour of the take_range_fields method")
+        cmd = self.get_class_var('whois_iana_org_home_arpa')
+        with ExternalProgram(cmd) as c:
+            c.exec()
+            self.assertCommandSucceeded(c)
+            results = c.out.take_range_fields(
+                sep=r'^.*:\s{0,}?(?=[a-zA-Z0-9])',
+                slc_range=(0, 2),
+                pattern='address')
+            self.assertEqual(
+                " ".join(chain(*results[:5])),
+                'c/o IETF Administrative Support Activity, ISOC 1775 Wiehle Ave. Suite 102 Reston Virginia 20190-5108 United States'
+            )
 
     def test_filtered_map(self):
         self.log.info("Tests expected behaviour of the filtered_map method")

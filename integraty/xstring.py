@@ -604,15 +604,26 @@ class String(str):
         exclude=False,
     ):
         """
-        Skips some number of lines from the beginning, i.e. the head of the list
-        and/or from the end, i.e. the tail of the list of lines from input.
-        If a pattern results in some subset of original lines, this subset will
-        be subject to application of 'skip_head' and/or 'skip_tail'. In other
-        words, skipping of lines occurs after application of `pattern` and
-        `exclude` parameters, not before. Think about this in terms of `grep`
-        and `head` or `tail`, as in this example:
+        Skips some number of lines from the beginning, i.e. the head of the
+        list of lines, and/or from the end, i.e. the tail of the list of lines
+        from input. If a pattern results in some subset of original lines,
+        this subset will be subject to application of 'skip_head' and/or
+        'skip_tail'. In other words, skipping of lines occurs after application
+        of `pattern` and `exclude` parameters, not before. Think about this in
+        terms of `grep` and `head` or `tail`, as in this example:
+        `$ some_command | head -5 | grep 'some string'`
         ```
-        $ some_command | head -5 | grep 'some string'
+        >>> from integraty.xstring import String
+        >>> s1 = String('first line\\nsecond line\\nthird line\\nfourth line\\nfifth line\\n')
+        >>> s1.skip_lines(skip_head=2)
+        ['third line', 'fourth line', 'fifth line']
+        >>> s1.skip_lines(skip_tail=2)
+        ['first line', 'second line', 'third line']
+        >>> s1.skip_lines(skip_head=1, skip_tail=1)
+        ['second line', 'third line', 'fourth line']
+        >>> s1.skip_lines(skip_head=1, skip_tail=1, pattern='third', exclude=True)
+        ['second line', 'fourth line']
+
         ```
 
         Args:
@@ -652,11 +663,10 @@ class String(str):
         two-element tuple object, where first element becomes dict key and
         second value for given key.
         ```
-        from integraty.xstring import String
-        >>> s1 = 'beta\\nalpha beta\\nbeta gamma\\nalpha delta beta\\nsigma epsilon\\n'
-        >>> s = String(s1)
+        >>> from integraty.xstring import String
+        >>> s1 = String('beta\\nalpha beta\\nbeta gamma\\nalpha delta beta\\nsigma epsilon\\n')
         >>> f1 = lambda l: zip([l.split()[0]], [l.split()[1]])
-        >>> s.to_dict_func(f1)
+        >>> s1.to_dict_func(f1)
         [{'alpha': 'beta'}, {'beta': 'gamma'}, {'alpha': 'delta'}, {'sigma': 'epsilon'}]
 
         ```
@@ -696,9 +706,19 @@ class String(str):
         If keys == None, then after a line is split, it is zipped with a range
         object generated from length of split line. In other words, if
         len(line) == 3, resulting dict is {0: line[0], 1: line[1], 2: line[2]}.
+        ```
+        >>> from integraty.xstring import String
+        >>> s1 = String('first line\\nsecond line\\nthird line\\nfourth line\\nfifth line\\n')
+        >>> s1.to_dict(keys=('key', 'value'))
+        [{'key': 'first', 'value': 'line'}, {'key': 'second', 'value': 'line'}, {'key': 'third', 'value': 'line'}, {'key': 'fourth', 'value': 'line'}, {'key': 'fifth', 'value': 'line'}]
+        >>> s1.to_dict(keys=('key', 'value'), pattern='(first|second)')
+        [{'key': 'first', 'value': 'line'}, {'key': 'second', 'value': 'line'}]
+        >>> s1.to_dict()
+        [{0: 'first', 1: 'line'}, {0: 'second', 1: 'line'}, {0: 'third', 1: 'line'}, {0: 'fourth', 1: 'line'}, {0: 'fifth', 1: 'line'}]
 
+        ```
         Args:
-            keys (hashable, optional): A list of keys to build a dict from line. Defaults to None.
+            keys (Sequence, optional): A list of keys to build a dict from line. Defaults to None.
             maxsplit (int, optional): Split line at most this many times. Defaults to `-1`, no limit.
             sep (str, optional): Separator character. Defaults to None.
             pattern (str, optional): Select lines matching pattern. Defaults to None.
@@ -720,7 +740,13 @@ class String(str):
                exclude=None):
         """
         Select first n lines from input.
+        ```
+        >>> from integraty.xstring import String
+        >>> s1 = String("first line\\nsecond line\\nthird line\\nfourth line\\nfifth line\\n")
+        >>> s1.firstn(3)
+        ['first line', 'second line', 'third line']
 
+        ```
         Args:
             n (int, optional): Number of lines to select. Defaults to 1.
             sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
@@ -745,7 +771,13 @@ class String(str):
               exclude=None):
         """
         Select last n lines from input.
+        ```
+        >>> from integraty.xstring import String
+        >>> s1 = String("first line\\nsecond line\\nthird line\\nfourth line\\nfifth line\\n")
+        >>> s1.lastn(3)
+        ['third line', 'fourth line', 'fifth line']
 
+        ```
         Args:
             n (int, optional): Number of lines to select. Defaults to 1.
             sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
@@ -781,13 +813,13 @@ class String(str):
         functional languages. Where a list is a combination of a _head_, first
         element, and _rest_ or _tail_, which is the remainder of the list.
         ```
-        >>> import integraty
-        >>> s = integraty.xstring.String('123 abc def\\n456 ghi jkl\\n789 mno pqr\\n') 
-        >>> s.head()
+        >>> from integraty.xstring import String
+        >>> s1 = String('123 abc def\\n456 ghi jkl\\n789 mno pqr\\n') 
+        >>> s1.head()
         ['123', '456', '789']
-        >>> s.head(pattern='123')
+        >>> s1.head(pattern='123')
         ['123']
-        >>> s.head(pattern='123', exclude=True)
+        >>> s1.head(pattern='123', exclude=True)
         ['456', '789']
 
         ```
@@ -828,8 +860,8 @@ class String(str):
         functional languages. Where a list is a combination of a _head_, first
         element, and _rest_ or _tail_, which is the remainder of the list.
         ```
-        >>> import integraty
-        >>> s = integraty.xstring.String('123 abc def\\n456 ghi jkl\\n789 mno pqr\\n') 
+        >>> from integraty.xstring import String
+        >>> s = String('123 abc def\\n456 ghi jkl\\n789 mno pqr\\n') 
         >>> s.tail()
         [('abc', 'def'), ('ghi', 'jkl'), ('mno', 'pqr')]
         >>> s.tail(pattern='mno')
@@ -875,7 +907,13 @@ class String(str):
         Given a string: 'alpha beta gamma\\ndelta epsilon zeta\\n',
         this produces: [('alpha', 'delta'), ('beta', 'epsilon'), ('gamma', 
         'zeta')].
+        ```
+        >>> from integraty.xstring import String
+        >>> s1 = String('alpha beta gamma\\ndelta epsilon zeta\\n')
+        >>> s1.fields()
+        [('alpha', 'delta'), ('beta', 'epsilon'), ('gamma', 'zeta')]
 
+        ```
         Args:
             sep (str, optional): Separator character. Defaults to None.
             maxsplit (int, optional): Split line at most this many times. Defaults to `-1`, no limit.
@@ -906,9 +944,19 @@ class String(str):
         exclude=False,
     ):
         """
-        Select a single column of each line from input, after splitting the
+        Take a single column out of each line from input, after splitting the
         line on `sep`.
+        ```
+        >>> from integraty.xstring import String
+        >>> s1 = String('a b c d\\ne f g h h i j k\\nl m n o\\n')
+        >>> s1.take_column(column=0)
+        ['a', 'e', 'l']
+        >>> s1.take_column(column=1)
+        ['b', 'f', 'm']
+        >>> s1.take_column(column=2)
+        ['c', 'g', 'n']
 
+        ```
         Args:
             sep (str, optional): Separator character. Defaults to None.
             maxsplit (int, optional): Split line at most this many times. Defaults to `-1`, no limit.
@@ -954,7 +1002,15 @@ class String(str):
         `len(line)-1` positions or indexes if you think of this line as a list
         of tokens. By specifying only certain indexes one can extract
         substrings of interest.
+        ```
+        >>> from integraty.xstring import String
+        >>> s1 = String('a b c d\\ne f g h h i j k\\nl m n o\\n')
+        >>> s1.compress(indexes=(0,3))
+        [('a', 'd'), ('e', 'h'), ('l', 'o')]
+        >>> s1.compress(indexes=(0,2,3))
+        [('a', 'c', 'd'), ('e', 'g', 'h'), ('l', 'n', 'o')]
 
+        ```
         Args:
             sep (str, optional): Separator character. Defaults to None.
             maxsplit (int, optional): Split line at most this many times. Defaults to `-1`, no limit.

@@ -23,6 +23,7 @@ documentation: integraty/case.py integraty/extprog.py integraty/productivity.py 
 
 test:
 	pytest --log-cli-level=info -v tests
+	python -m doctest integraty/xstring.py
 
 .PHONY: all
 

@@ -405,6 +405,28 @@ class LibraryUsageEx1(IntegraTestCase):
             self.assertGreaterEqual(len(results_dict['group A']), 3)
             self.assertGreaterEqual(len(results_dict['group B']), 3)
 
+            results_dict = c.out.groupby(
+                lambda l: l.split(":", 1)[0],
+                sub_pattern=r':\s{0,}?(?=[a-zA-Z0-9])',
+                replacement=':',
+                pattern=r'^%',
+                exclude=True)
+            groups = {
+                k: [each.split(":", 1)[1] for each in v]
+                for k, v in results_dict.items()
+            }
+            self.assertListEqual(groups['nserver'], [
+                'A.IP6-SERVERS.ARPA 199.180.182.53 2620:37:e000::53',
+                'B.IP6-SERVERS.ARPA 199.253.182.182 2001:500:86::86',
+                'C.IP6-SERVERS.ARPA 196.216.169.11 2001:43f8:110::11',
+                'D.IP6-SERVERS.ARPA 200.7.86.53 2001:13c7:7012::53',
+                'E.IP6-SERVERS.ARPA 2001:dd8:6::101 203.119.86.101',
+                'F.IP6-SERVERS.ARPA 193.0.9.2 2001:67c:e0::2'
+            ])
+            self.assertIn('IP6-SERVERS.ARPA', groups['domain'])
+            self.assertIn('Los Angeles California 90094', groups['address'])
+            self.assertIn('Reston Virginia 20190-5108', groups['address'])
+
     def test_groupby_count(self):
         self.log.info("Tests expected behaviour of the groupby_count method")
         cmd = self.get_class_var('whois_iana_org_ip6_servers_arpa')

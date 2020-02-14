@@ -45,7 +45,7 @@ class String(str):
 
 ### String().at_least_n_substr
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1273)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1329)
 
 ```python
 def at_least_n_substr(substr=None, n=0):
@@ -53,7 +53,7 @@ def at_least_n_substr(substr=None, n=0):
 
 ### String().at_most_n_substr
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1276)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1332)
 
 ```python
 def at_most_n_substr(substr=None, n=0):
@@ -61,7 +61,7 @@ def at_most_n_substr(substr=None, n=0):
 
 ### String().compress
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L933)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L981)
 
 ```python
 def compress(
@@ -88,6 +88,16 @@ one or more substrings, once split on `sep` is going to have
 `len(line)-1` positions or indexes if you think of this line as a list
 of tokens. By specifying only certain indexes one can extract
 substrings of interest.
+
+```
+>>> from integraty.xstring import String
+>>> s1 = String('a b c d\ne f g h h i j k\nl m n o\n')
+>>> s1.compress(indexes=(0,3))
+[('a', 'd'), ('e', 'h'), ('l', 'o')]
+>>> s1.compress(indexes=(0,2,3))
+[('a', 'c', 'd'), ('e', 'g', 'h'), ('l', 'n', 'o')]
+
+```
 
 #### Arguments
 
@@ -124,7 +134,7 @@ Count number of lines in the supplied string.
 
 ### String().count_substrs
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1244)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1300)
 
 ```python
 def count_substrs(substr=None, pattern=None, exclude=False):
@@ -159,7 +169,7 @@ contains more than a single matching substring.
 
 ### String().fields
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L860)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L892)
 
 ```python
 def fields(
@@ -181,6 +191,14 @@ Given a string: 'alpha beta gamma\ndelta epsilon zeta\n',
 this produces: [('alpha', 'delta'), ('beta', 'epsilon'), ('gamma',
 'zeta')].
 
+```
+>>> from integraty.xstring import String
+>>> s1 = String('alpha beta gamma\ndelta epsilon zeta\n')
+>>> s1.fields()
+[('alpha', 'delta'), ('beta', 'epsilon'), ('gamma', 'zeta')]
+
+```
+
 #### Arguments
 
 - `sep` *str, optional* - Separator character. Defaults to None.
@@ -196,7 +214,7 @@ this produces: [('alpha', 'delta'), ('beta', 'epsilon'), ('gamma',
 
 ### String().filter_func
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1279)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1335)
 
 ```python
 def filter_func(
@@ -239,7 +257,7 @@ from integraty.xstring import String
 
 ### String().filtered_map
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1351)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1407)
 
 ```python
 def filtered_map(
@@ -276,7 +294,7 @@ filter_func (Callable[[Any], bool]): Function to select lines.
 
 ### String().firstn
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L715)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L735)
 
 ```python
 def firstn(
@@ -289,6 +307,14 @@ def firstn(
 ```
 
 Select first n lines from input.
+
+```
+>>> from integraty.xstring import String
+>>> s1 = String("first line\nsecond line\nthird line\nfourth line\nfifth line\n")
+>>> s1.firstn(3)
+['first line', 'second line', 'third line']
+
+```
 
 #### Arguments
 
@@ -304,7 +330,7 @@ Select first n lines from input.
 
 ### String().fold_funcs
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1390)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1446)
 
 ```python
 def fold_funcs(
@@ -351,7 +377,7 @@ c(b(a(line)))
 
 ### String().groupby
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1479)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1535)
 
 ```python
 def groupby(
@@ -383,7 +409,7 @@ key_func (Callable[[str], Any]): For each line generate a key to establish a gro
 
 ### String().groupby_count
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1512)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1568)
 
 ```python
 def groupby_count(
@@ -417,7 +443,7 @@ key_func (Callable[[str], Any]): For each line generate a key to establish a gro
 
 ### String().head
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L766)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L798)
 
 ```python
 def head(
@@ -439,13 +465,13 @@ functional languages. Where a list is a combination of a _head_, first
 element, and _rest_ or _tail_, which is the remainder of the list.
 
 ```
->>> import integraty
->>> s = integraty.xstring.String('123 abc def\n456 ghi jkl\n789 mno pqr\n')
->>> s.head()
+>>> from integraty.xstring import String
+>>> s1 = String('123 abc def\n456 ghi jkl\n789 mno pqr\n')
+>>> s1.head()
 ['123', '456', '789']
->>> s.head(pattern='123')
+>>> s1.head(pattern='123')
 ['123']
->>> s.head(pattern='123', exclude=True)
+>>> s1.head(pattern='123', exclude=True)
 ['456', '789']
 
 ```
@@ -480,7 +506,7 @@ bool, int, string, dict, list: Unmarshaled JSON data.
 
 ### String().lastn
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L740)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L766)
 
 ```python
 def lastn(
@@ -493,6 +519,14 @@ def lastn(
 ```
 
 Select last n lines from input.
+
+```
+>>> from integraty.xstring import String
+>>> s1 = String("first line\nsecond line\nthird line\nfourth line\nfifth line\n")
+>>> s1.lastn(3)
+['third line', 'fourth line', 'fifth line']
+
+```
 
 #### Arguments
 
@@ -508,7 +542,7 @@ Select last n lines from input.
 
 ### String().line_tuples
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1014)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1070)
 
 ```python
 def line_tuples(
@@ -566,7 +600,7 @@ all (N) tokens after the split of that line.
 
 ### String().lines
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1069)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1125)
 
 ```python
 def lines(sub_pattern=None, replacement=None, pattern=None, exclude=False):
@@ -604,7 +638,7 @@ in `pattern`.
 
 ### String().map_func
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1320)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1376)
 
 ```python
 def map_func(
@@ -634,7 +668,7 @@ the resulting list. Result of calling 'func' should not be None.
 
 ### String().pairs
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1437)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1493)
 
 ```python
 def pairs(
@@ -687,16 +721,27 @@ def skip_lines(
 ):
 ```
 
-Skips some number of lines from the beginning, i.e. the head of the list
-and/or from the end, i.e. the tail of the list of lines from input.
-If a pattern results in some subset of original lines, this subset will
-be subject to application of 'skip_head' and/or 'skip_tail'. In other
-words, skipping of lines occurs after application of `pattern` and
-`exclude` parameters, not before. Think about this in terms of `grep`
-and [String().head](#stringhead) or [String().tail](#stringtail), as in this example:
+Skips some number of lines from the beginning, i.e. the head of the
+list of lines, and/or from the end, i.e. the tail of the list of lines
+from input. If a pattern results in some subset of original lines,
+this subset will be subject to application of 'skip_head' and/or
+'skip_tail'. In other words, skipping of lines occurs after application
+of `pattern` and `exclude` parameters, not before. Think about this in
+terms of `grep` and [String().head](#stringhead) or [String().tail](#stringtail), as in this example:
+`$ some_command | head -5 | grep 'some string'`
 
 ```
-$ some_command | head -5 | grep 'some string'
+>>> from integraty.xstring import String
+>>> s1 = String('first line\nsecond line\nthird line\nfourth line\nfifth line\n')
+>>> s1.skip_lines(skip_head=2)
+['third line', 'fourth line', 'fifth line']
+>>> s1.skip_lines(skip_tail=2)
+['first line', 'second line', 'third line']
+>>> s1.skip_lines(skip_head=1, skip_tail=1)
+['second line', 'third line', 'fourth line']
+>>> s1.skip_lines(skip_head=1, skip_tail=1, pattern='third', exclude=True)
+['second line', 'fourth line']
+
 ```
 
 #### Arguments
@@ -714,7 +759,7 @@ $ some_command | head -5 | grep 'some string'
 
 ### String().tail
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L813)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L845)
 
 ```python
 def tail(
@@ -736,8 +781,8 @@ functional languages. Where a list is a combination of a _head_, first
 element, and _rest_ or _tail_, which is the remainder of the list.
 
 ```
->>> import integraty
->>> s = integraty.xstring.String('123 abc def\n456 ghi jkl\n789 mno pqr\n')
+>>> from integraty.xstring import String
+>>> s = String('123 abc def\n456 ghi jkl\n789 mno pqr\n')
 >>> s.tail()
 [('abc', 'def'), ('ghi', 'jkl'), ('mno', 'pqr')]
 >>> s.tail(pattern='mno')
@@ -762,7 +807,7 @@ element, and _rest_ or _tail_, which is the remainder of the list.
 
 ### String().take_column
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L898)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L936)
 
 ```python
 def take_column(
@@ -776,8 +821,20 @@ def take_column(
 ):
 ```
 
-Select a single column of each line from input, after splitting the
+Take a single column out of each line from input, after splitting the
 line on `sep`.
+
+```
+>>> from integraty.xstring import String
+>>> s1 = String('a b c d\ne f g h h i j k\nl m n o\n')
+>>> s1.take_column(column=0)
+['a', 'e', 'l']
+>>> s1.take_column(column=1)
+['b', 'f', 'm']
+>>> s1.take_column(column=2)
+['c', 'g', 'n']
+
+```
 
 #### Arguments
 
@@ -795,7 +852,7 @@ line on `sep`.
 
 ### String().take_range_fields
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L979)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1035)
 
 ```python
 def take_range_fields(
@@ -828,7 +885,7 @@ from input, after splitting the line on `sep`.
 
 ### String().to_dict
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L682)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L692)
 
 ```python
 def to_dict(keys=None, sep=None, maxsplit=-1, pattern=None, exclude=False):
@@ -845,9 +902,21 @@ If keys == None, then after a line is split, it is zipped with a range
 object generated from length of split line. In other words, if
 len(line) == 3, resulting dict is {0: line[0], 1: line[1], 2: line[2]}.
 
+```
+>>> from integraty.xstring import String
+>>> s1 = String('first line\nsecond line\nthird line\nfourth line\nfifth line\n')
+>>> s1.to_dict(keys=('key', 'value'))
+[{'key': 'first', 'value': 'line'}, {'key': 'second', 'value': 'line'}, {'key': 'third', 'value': 'line'}, {'key': 'fourth', 'value': 'line'}, {'key': 'fifth', 'value': 'line'}]
+>>> s1.to_dict(keys=('key', 'value'), pattern='(first|second)')
+[{'key': 'first', 'value': 'line'}, {'key': 'second', 'value': 'line'}]
+>>> s1.to_dict()
+[{0: 'first', 1: 'line'}, {0: 'second', 1: 'line'}, {0: 'third', 1: 'line'}, {0: 'fourth', 1: 'line'}, {0: 'fifth', 1: 'line'}]
+
+```
+
 #### Arguments
 
-- `keys` *hashable, optional* - A list of keys to build a dict from line. Defaults to None.
+- `keys` *Sequence, optional* - A list of keys to build a dict from line. Defaults to None.
 - `maxsplit` *int, optional* - Split line at most this many times. Defaults to `-1`, no limit.
 - `sep` *str, optional* - Separator character. Defaults to None.
 - `pattern` *str, optional* - Select lines matching pattern. Defaults to None.
@@ -859,7 +928,7 @@ len(line) == 3, resulting dict is {0: line[0], 1: line[1], 2: line[2]}.
 
 ### String().to_dict_func
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L641)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L652)
 
 ```python
 def to_dict_func(
@@ -877,11 +946,10 @@ two-element tuple object, where first element becomes dict key and
 second value for given key.
 
 ```
-from integraty.xstring import String
->>> s1 = 'beta\nalpha beta\nbeta gamma\nalpha delta beta\nsigma epsilon\n'
->>> s = String(s1)
+>>> from integraty.xstring import String
+>>> s1 = String('beta\nalpha beta\nbeta gamma\nalpha delta beta\nsigma epsilon\n')
 >>> f1 = lambda l: zip([l.split()[0]], [l.split()[1]])
->>> s.to_dict_func(f1)
+>>> s1.to_dict_func(f1)
 [{'alpha': 'beta'}, {'beta': 'gamma'}, {'alpha': 'delta'}, {'sigma': 'epsilon'}]
 
 ```
@@ -901,7 +969,7 @@ was applied.
 
 ### String().trim_prefix
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1108)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1164)
 
 ```python
 def trim_prefix(
@@ -930,7 +998,7 @@ splitting, assuming substring is present.
 
 ### String().trim_suffix
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1138)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1194)
 
 ```python
 def trim_suffix(
@@ -959,7 +1027,7 @@ splitting, assuming substring is present.
 
 ### String().with_prefix
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1168)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1224)
 
 ```python
 def with_prefix(
@@ -1002,7 +1070,7 @@ parameters, not before.
 
 ### String().with_suffix
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1210)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1266)
 
 ```python
 def with_suffix(

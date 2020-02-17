@@ -18,6 +18,7 @@ class LibraryUsageEx1(IntegraTestCase):
         # When we run in Travis-CI, we basically mock output of `whois` because
         # the command is not available on at least some test platforms.
         cls.whois_cloudflare_com = 'whois -h whois.cloudflare.com cloudflare.com'
+        cls.whois_iana_org_azure = 'whois -h whois.iana.org .azure'
         cls.whois_iana_org_home_arpa = 'whois -h whois.iana.org home.arpa'
         cls.whois_iana_org_ip6_servers_arpa = 'whois -h whois.iana.org ip6-servers.arpa'
         cls.whois_iana_org_ip6_arpa = 'whois -h whois.iana.org ip6.arpa'
@@ -31,6 +32,7 @@ class LibraryUsageEx1(IntegraTestCase):
         if any([os.getenv('TRAVIS', 'false'), os.getenv('CIRCLECI', 'false')]):
             for elem in [
                     'whois_cloudflare_com',
+                    'whois_iana_org_azure',
                     'whois_iana_org_home_arpa',
                     'whois_iana_org_ip6_servers_arpa',
                     'whois_iana_org_ip6_arpa',
@@ -220,6 +222,21 @@ class LibraryUsageEx1(IntegraTestCase):
                     '10': 'alt1.gmail-smtp-in.l.google.com.',
                     '30': 'alt3.gmail-smtp-in.l.google.com.',
                 })
+        cmd = self.get_class_var('whois_iana_org_azure')
+        with ExternalProgram(cmd) as c:
+            c.exec()
+            self.assertCommandSucceeded(c)
+            results = c.out.line_tuples(sep=r':\s+',
+                                        maxsplit=1,
+                                        pattern='^org|^domain')
+            self.assertIn(('organisation', 'Microsoft Corporation'), results)
+            self.assertIn(('organisation', 'Verisign, Inc'), results)
+            self.assertIn(('domain', 'AZURE'), results)
+            results_dict = dict(results)
+            self.assertDictEqual(results_dict, {
+                'domain': 'AZURE',
+                'organisation': 'Verisign, Inc'
+            })
 
     def test_fields(self):
         self.log.info("Tests expected behaviour of the fields method")
@@ -365,6 +382,20 @@ class LibraryUsageEx1(IntegraTestCase):
                 " ".join(chain(*results[:5])),
                 'c/o IETF Administrative Support Activity, ISOC 1775 Wiehle Ave. Suite 102 Reston Virginia 20190-5108 United States'
             )
+
+    def test_map_func(self):
+        self.log.info("Tests expected behaviour of the map_func method")
+        cmd = self.get_class_var('whois_iana_org_home_arpa')
+        with ExternalProgram(cmd) as c:
+            c.exec()
+            self.assertCommandSucceeded(c)
+            results = c.out.map_func(func=lambda l: l.lower().split(),
+                                     pattern='^domain')
+            self.assertEqual(len(results), 1)
+            self.assertListEqual(results[0], ['domain:', 'home.arpa'])
+            results_dict = dict(zip(results[0], results[0][1:]))
+            self.assertDictEqual(results_dict, {'domain:': 'home.arpa'})
+            self.assertFalse(results_dict['domain:'] == 'HOME.ARPA')
 
     def test_filtered_map(self):
         self.log.info("Tests expected behaviour of the filtered_map method")

@@ -9,8 +9,8 @@ import stat
 import sys
 
 from collections import Counter
+from difflib import SequenceMatcher
 from unittest import TestCase
-
 from unittest import main as run_integra_tests
 
 from integraty.extprog import ExternalProgram
@@ -245,6 +245,21 @@ class IntegraTestCase(TestCase):
                 f"Expected distance between '{str1}' and '{str2}', to be less than {max_distance}, instead distance is {actual_distance}",
             )
             raise self.failureException(msg)
+        if is_equal(actual_ratio, ratio) or actual_ratio > ratio:
+            return
+        msg = self._formatMessage(
+            msg,
+            f"Expected '{str1}' to be at least {100*ratio:.4f}% similar to '{str2}', instead similarity is only {100*actual_ratio:.4f}%",
+        )
+        raise self.failureException(msg)
+
+    def assertStringsAlmostEqualDiffLib(self,
+                                 str1,
+                                 str2,
+                                 ratio: float = 0.8,
+                                 msg=None):
+        """Assert that two strings are similar enough; by default 80% in common using Difflib SequenceMatcher"""
+        actual_ratio = SequenceMatcher(None, str1, str2).quick_ratio()
         if is_equal(actual_ratio, ratio) or actual_ratio > ratio:
             return
         msg = self._formatMessage(

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import re
 import os
 import sys
@@ -11,7 +13,7 @@ from integraty.extprog import ExternalProgram, ExternalProgramException
 from integraty.productivity import TemporaryFile, ChecksumStream
 
 
-class LibraryUsageEx1(IntegraTestCase):
+class String1(IntegraTestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -52,24 +54,6 @@ class LibraryUsageEx1(IntegraTestCase):
     def tearDownClass(cls):
         print("This will run after all tests in the class or on CTRL-C",
               file=sys.stderr)
-
-    def test_domain_name_is_almost_equal(self):
-        self.log.info("Tests string near equality assertions")
-        cmd = self.get_class_var('dig_t_txt_microsoft_com')
-        with ExternalProgram(cmd) as c:
-            c.exec()
-            self.assertCommandSucceeded(c)
-            list_of_dicts = c.out.to_dict_func(lambda l: zip(
-                ('domain', '_', 'in', 'type', 'value'), l.split()),
-                                               pattern='[; ]',
-                                               exclude=True)
-            for d in list_of_dicts:
-                self.assertStringsAlmostEqual(d['domain'],
-                                              'microsoft.com',
-                                              ratio=0.75)
-                self.assertStringsAlmostEqualCosine(d['domain'],
-                                                    'MicroSoft.com',
-                                                    ratio=0.5)
 
     def test_to_dict_mapping(self):
         self.log.info("Tests mapping function to dict translation")

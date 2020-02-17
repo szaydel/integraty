@@ -5,10 +5,9 @@ from typing import Any, Callable, Dict, Iterable, Iterator, List, TypeVar, Seque
 
 
 def stripper(w, chars):
-    if chars:
-        return stripper(w.replace(chars[0], ""), chars[1:])
-    else:
+    if not chars:
         return w
+    return stripper(w.replace(chars[0], ""), chars[1:])
 
 
 def apply_filtered(map_func: Callable[[Any], Any],

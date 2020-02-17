@@ -11,7 +11,7 @@
 
 ## Map
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/utils.py#L50)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/utils.py#L49)
 
 ```python
 class Map():
@@ -28,7 +28,7 @@ by the `filter` function.
 
 ## Split
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/utils.py#L75)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/utils.py#L74)
 
 ```python
 class Split():
@@ -52,7 +52,7 @@ eliminate any empty strings.
 
 ## apply_filtered
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/utils.py#L14)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/utils.py#L13)
 
 ```python
 def apply_filtered(
@@ -64,7 +64,7 @@ def apply_filtered(
 
 ## map_if_possible
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/utils.py#L20)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/utils.py#L19)
 
 ```python
 def map_if_possible(func: Callable[[Any], Any], source: Iterable) -> Iterator:

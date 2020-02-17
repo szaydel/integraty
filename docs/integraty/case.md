@@ -22,6 +22,7 @@
         - [IntegraTestCase().assertStdoutIsJSONArray](#integratestcaseassertstdoutisjsonarray)
         - [IntegraTestCase().assertStringsAlmostEqual](#integratestcaseassertstringsalmostequal)
         - [IntegraTestCase().assertStringsAlmostEqualCosine](#integratestcaseassertstringsalmostequalcosine)
+        - [IntegraTestCase().assertStringsAlmostEqualDiffLib](#integratestcaseassertstringsalmostequaldifflib)
         - [IntegraTestCase().get_class_var](#integratestcaseget_class_var)
 
 ## IntegraTestCase
@@ -49,7 +50,7 @@ Assert that the executed command ran successfully.
 
 ### IntegraTestCase().assertDirExists
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L298)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L313)
 
 ```python
 def assertDirExists(path, msg=None):
@@ -59,7 +60,7 @@ Assert that given path is an existing directory.
 
 ### IntegraTestCase().assertDirModifiedAfter
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L329)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L344)
 
 ```python
 def assertDirModifiedAfter(path, timestamp: float, msg=None):
@@ -69,7 +70,7 @@ Assert that given directory path is more recent than timestamp.
 
 ### IntegraTestCase().assertFileMD5Equals
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L363)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L378)
 
 ```python
 def assertFileMD5Equals(path, checksum: str, msg=None):
@@ -79,7 +80,7 @@ Assert that MD5 checksum is correct.
 
 ### IntegraTestCase().assertFileModifiedAfter
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L315)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L330)
 
 ```python
 def assertFileModifiedAfter(path, timestamp: float, msg=None):
@@ -89,7 +90,7 @@ Assert that given file path is more recent than timestamp.
 
 ### IntegraTestCase().assertFileSHA1Equals
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L343)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L358)
 
 ```python
 def assertFileSHA1Equals(path, checksum: str, msg=None):
@@ -99,7 +100,7 @@ Assert that SHA1 checksum is correct.
 
 ### IntegraTestCase().assertFileSHA256Equals
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L353)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L368)
 
 ```python
 def assertFileSHA256Equals(path, checksum: str, msg=None):
@@ -137,7 +138,7 @@ Assert that the executed command produced nothing to stdout.
 
 ### IntegraTestCase().assertPathDoesNotExist
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L289)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L304)
 
 ```python
 def assertPathDoesNotExist(path, msg=None):
@@ -147,7 +148,7 @@ Assert that given path does not exist.
 
 ### IntegraTestCase().assertRegFileExists
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L272)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L287)
 
 ```python
 def assertRegFileExists(path, msg=None):
@@ -251,13 +252,23 @@ Assert that two strings are similar enough; by default 80% in common using Leven
 
 ### IntegraTestCase().assertStringsAlmostEqualCosine
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L256)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L271)
 
 ```python
 def assertStringsAlmostEqualCosine(str1, str2, ratio: float = 0.8, msg=None):
 ```
 
 Assert that two strings are similar enough; by default 80% in common using Cosine Similarity
+
+### IntegraTestCase().assertStringsAlmostEqualDiffLib
+
+[[find in source code]](https://github.com/szaydel/integratyintegraty/case.py#L256)
+
+```python
+def assertStringsAlmostEqualDiffLib(str1, str2, ratio: float = 0.8, msg=None):
+```
+
+Assert that two strings are similar enough; by default 80% in common using Difflib SequenceMatcher
 
 ### IntegraTestCase().get_class_var
 

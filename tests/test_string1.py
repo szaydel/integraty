@@ -4,7 +4,6 @@ import re
 import os
 import sys
 
-from collections import ChainMap
 from itertools import chain
 
 from integraty.case import IntegraTestCase
@@ -54,34 +53,6 @@ class String1(IntegraTestCase):
     def tearDownClass(cls):
         print("This will run after all tests in the class or on CTRL-C",
               file=sys.stderr)
-
-    def test_to_dict_mapping(self):
-        self.log.info("Tests mapping function to dict translation")
-
-        def func(line: str) -> zip:
-            if len(line.split()) < 2:
-                return (None, None)
-            tokens = line.split()
-            return zip([tokens[4]], [tokens[0]])
-
-        cmd = self.get_class_var('dig_x_t_ns_microsoft_com')
-        with ExternalProgram(cmd) as c:
-            c.exec()
-            self.assertCommandSucceeded(c)
-            records = c.out.to_dict_func(func, pattern='[; ]', exclude=True)
-            self.assertGreaterEqual(len(records), 5)
-
-            # Ordering does not matter here, but this will break if number of
-            # Nameservers changes. In other words, this could be an example of
-            # a fairly fragile test.
-            # This test will also break if any IP addresses change, but that's
-            # perhaps what we want in this case.
-            expected_keys = set([
-                '13.77.161.179', '40.76.4.15', '13.77.161.179',
-                '104.215.148.63', '40.113.200.201', '40.112.72.205'
-            ])
-            actual_keys = set([k for r in records for k, v in r.items()])
-            self.assertSetEqual(expected_keys, actual_keys)
 
     def test_with_prefix(self):
         self.log.info("Tests expected behaviour of with_prefix method")
@@ -312,45 +283,6 @@ class String1(IntegraTestCase):
                           ('cloudflare.com.', 'aspmx2.googlemail.com.'),
                           ('cloudflare.com.', 'aspmx3.googlemail.com.')])
 
-    def test_filter_func(self):
-        self.log.info("Tests expected behaviour of the filter method")
-        cmd = self.get_class_var('whois_iana_org_home_arpa')
-        with ExternalProgram(cmd) as c:
-            c.exec()
-            self.assertCommandSucceeded(c)
-            results = c.out.filter_func(lambda l: re.search(
-                r'\s(?:[0-9]{1,3}\.){3}[0-9]{1,3}\s', l))
-            results_tuples = [tuple(elem.split()[1:3]) for elem in results]
-            results_dict = {k.lower(): v for k, v in results_tuples}
-            self.assertDictEqual(
-                results_dict, {
-                    'blackhole-1.iana.org': '192.175.48.6',
-                    'blackhole-2.iana.org': '192.175.48.42'
-                })
-
-    def test_fold_funcs(self):
-        self.log.info("Tests expected behaviour of the fold_funcs method")
-        cmd = self.get_class_var('whois_iana_org_home_arpa')
-        with ExternalProgram(cmd) as c:
-            c.exec()
-            self.assertCommandSucceeded(c)
-            results = c.out.fold_funcs(
-                # This may seem silly, because it is possible to combine them
-                # into fewer expressions, but the goal here is to show how
-                # function composition could be used to transform from input to
-                # something we can make some sensible assertions about.
-                lambda l: re.split(r'^.*:\s{0,}?(?=B)', l),
-                lambda l: l[1].lower(),
-                lambda l: l.split(),
-                lambda l: {l[0]: l[2]},
-                pattern='^nserver')
-            self.assertListEqual(results,
-                                 [{
-                                     'blackhole-1.iana.org': '2620:4f:8000::6'
-                                 }, {
-                                     'blackhole-2.iana.org': '2620:4f:8000::42'
-                                 }])
-
     def test_take_range_fields(self):
         self.log.info(
             "Tests expected behaviour of the take_range_fields method")
@@ -366,95 +298,6 @@ class String1(IntegraTestCase):
                 " ".join(chain(*results[:5])),
                 'c/o IETF Administrative Support Activity, ISOC 1775 Wiehle Ave. Suite 102 Reston Virginia 20190-5108 United States'
             )
-
-    def test_map_func(self):
-        self.log.info("Tests expected behaviour of the map_func method")
-        cmd = self.get_class_var('whois_iana_org_home_arpa')
-        with ExternalProgram(cmd) as c:
-            c.exec()
-            self.assertCommandSucceeded(c)
-            results = c.out.map_func(func=lambda l: l.lower().split(),
-                                     pattern='^domain')
-            self.assertEqual(len(results), 1)
-            self.assertListEqual(results[0], ['domain:', 'home.arpa'])
-            results_dict = dict(zip(results[0], results[0][1:]))
-            self.assertDictEqual(results_dict, {'domain:': 'home.arpa'})
-            self.assertFalse(results_dict['domain:'] == 'HOME.ARPA')
-
-    def test_filtered_map(self):
-        self.log.info("Tests expected behaviour of the filtered_map method")
-        cmd = self.get_class_var('whois_iana_org_home_arpa')
-
-        def to_dict(l):
-            """ Builds a nested dictionary """
-            tokens = l.split()
-            return {
-                tokens[1].lower(): {
-                    'v4_addr': tokens[2],
-                    'v6_addr': tokens[3]
-                }
-            }
-
-        with ExternalProgram(cmd) as c:
-            c.exec()
-            self.assertCommandSucceeded(c)
-            results = c.out.filtered_map(
-                filter_func=lambda l: l.startswith('nserver'),
-                map_func=to_dict)
-            results_dict = dict(ChainMap(*results))
-            self.assertIn('blackhole-1.iana.org', results_dict)
-            self.assertIn('blackhole-2.iana.org', results_dict)
-            self.assertNotIn('blackhole-3.iana.org', results_dict)
-
-    def test_groupby(self):
-        self.log.info("Tests expected behaviour of the groupby method")
-        cmd = self.get_class_var('whois_iana_org_ip6_servers_arpa')
-
-        def key_func(l):
-            return 'group A' if l.split()[1][0] <= 'C' else 'group B'
-
-        with ExternalProgram(cmd) as c:
-            c.exec()
-            self.assertCommandSucceeded(c)
-            results_dict = c.out.groupby(key_func, pattern='nserver:')
-            self.assertGreaterEqual(len(results_dict['group A']), 3)
-            self.assertGreaterEqual(len(results_dict['group B']), 3)
-
-            results_dict = c.out.groupby(
-                lambda l: l.split(":", 1)[0],
-                sub_pattern=r':\s{0,}?(?=[a-zA-Z0-9])',
-                replacement=':',
-                pattern=r'^%',
-                exclude=True)
-            groups = {
-                k: [each.split(":", 1)[1] for each in v]
-                for k, v in results_dict.items()
-            }
-            self.assertListEqual(groups['nserver'], [
-                'A.IP6-SERVERS.ARPA 199.180.182.53 2620:37:e000::53',
-                'B.IP6-SERVERS.ARPA 199.253.182.182 2001:500:86::86',
-                'C.IP6-SERVERS.ARPA 196.216.169.11 2001:43f8:110::11',
-                'D.IP6-SERVERS.ARPA 200.7.86.53 2001:13c7:7012::53',
-                'E.IP6-SERVERS.ARPA 2001:dd8:6::101 203.119.86.101',
-                'F.IP6-SERVERS.ARPA 193.0.9.2 2001:67c:e0::2'
-            ])
-            self.assertIn('IP6-SERVERS.ARPA', groups['domain'])
-            self.assertIn('Los Angeles California 90094', groups['address'])
-            self.assertIn('Reston Virginia 20190-5108', groups['address'])
-
-    def test_groupby_count(self):
-        self.log.info("Tests expected behaviour of the groupby_count method")
-        cmd = self.get_class_var('whois_iana_org_ip6_servers_arpa')
-
-        def key_func(l):
-            return 'group A' if l.split()[1][0] <= 'C' else 'group B'
-
-        with ExternalProgram(cmd) as c:
-            c.exec()
-            self.assertCommandSucceeded(c)
-            results_dict = c.out.groupby_count(key_func, pattern='nserver:')
-            self.assertEqual(results_dict['group A'], 3)
-            self.assertEqual(results_dict['group B'], 3)
 
 
 if __name__ == "__main__":

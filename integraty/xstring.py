@@ -6,7 +6,7 @@ import re
 import sys
 
 from collections import Counter, defaultdict
-from functools import reduce
+from functools import partial, reduce
 from typing import Any, Callable, Dict, Iterable, Iterator, List, TypeVar, Sequence, Sequence
 
 from integraty.utils import Map, Split
@@ -566,6 +566,22 @@ class String(str):
             exclude=exclude,
         )
         return dict(Counter([key for key in map(key_func, lines)]))
+
+    def _partial(
+        self,
+        func,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
+        lines = self._lines_from_impl(
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
+        return [partial(func, line) for line in lines]
 
     ### End String Processing Private Methods ###
 
@@ -1594,6 +1610,51 @@ class String(str):
         """
         return self._groupby_count(
             key_func=key_func,
+            sub_pattern=sub_pattern,
+            replacement=replacement,
+            pattern=pattern,
+            exclude=exclude,
+        )
+
+    def partial(
+        self,
+        func,
+        sub_pattern=None,
+        replacement=None,
+        pattern=None,
+        exclude=False,
+    ):
+        """
+        A partial application method, which for each line from input partially
+        applies function in `func` supplying the line from input as first
+        positional argument to function effectively reducing the arity of
+        function in `func` by one argument. This method is useful for situations
+        where doing something more with the contents of line than
+        simple splitting and/or field extraction is necessary. A good example
+        is converting a line into a dictionary after selecting only certain
+        tokens in the line, and then having to supply keys in order to create
+        _key:value_ pairs and convert these _key:value_ pairs into a dict.
+        ```
+        from integraty.xstring import String
+        >>> s = String('alpha beta gamma\\nbeta gamma delta\\n')
+        >>> partially_applied = s.partial(lambda l, keys: dict(zip(keys, l.split())))
+        >>> keys = ['first', 'second', 'third']
+        >>> [f(keys) for f in partially_applied]
+        [{'first': 'alpha', 'second': 'beta', 'third': 'gamma'}, {'first': 'beta', 'second': 'gamma', 'third': 'delta'}]
+
+        ```
+        Args:
+            func (Callable[[Any,...], Any]): Partially apply `func` to each line in input.
+            sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
+            replacement (str, optional): Text with which to replace all matches of `sub_pattern`. Defaults to None.
+            pattern (str, optional): Select lines matching pattern. Defaults to None.
+            exclude (bool, optional): Invert pattern matching. Defaults to False.
+
+        Returns:
+            list: List of partially applied functions; one per line.
+        """
+        return self._partial(
+            func=func,
             sub_pattern=sub_pattern,
             replacement=replacement,
             pattern=pattern,

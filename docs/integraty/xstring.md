@@ -23,6 +23,7 @@
         - [String().lines](#stringlines)
         - [String().map_func](#stringmap_func)
         - [String().pairs](#stringpairs)
+        - [String().partial](#stringpartial)
         - [String().skip_lines](#stringskip_lines)
         - [String().tail](#stringtail)
         - [String().take_column](#stringtake_column)
@@ -45,7 +46,7 @@ class String(str):
 
 ### String().at_least_n_substr
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1329)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1345)
 
 ```python
 def at_least_n_substr(substr=None, n=0):
@@ -53,7 +54,7 @@ def at_least_n_substr(substr=None, n=0):
 
 ### String().at_most_n_substr
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1332)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1348)
 
 ```python
 def at_most_n_substr(substr=None, n=0):
@@ -61,7 +62,7 @@ def at_most_n_substr(substr=None, n=0):
 
 ### String().compress
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L981)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L997)
 
 ```python
 def compress(
@@ -115,7 +116,7 @@ substrings of interest.
 
 ### String().count
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L584)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L600)
 
 ```python
 def count(pattern=None, exclude=False):
@@ -134,7 +135,7 @@ Count number of lines in the supplied string.
 
 ### String().count_substrs
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1300)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1316)
 
 ```python
 def count_substrs(substr=None, pattern=None, exclude=False):
@@ -169,7 +170,7 @@ contains more than a single matching substring.
 
 ### String().fields
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L892)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L908)
 
 ```python
 def fields(
@@ -214,7 +215,7 @@ this produces: [('alpha', 'delta'), ('beta', 'epsilon'), ('gamma',
 
 ### String().filter_func
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1335)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1351)
 
 ```python
 def filter_func(
@@ -257,7 +258,7 @@ from integraty.xstring import String
 
 ### String().filtered_map
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1407)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1423)
 
 ```python
 def filtered_map(
@@ -294,7 +295,7 @@ filter_func (Callable[[Any], bool]): Function to select lines.
 
 ### String().firstn
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L735)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L751)
 
 ```python
 def firstn(
@@ -330,7 +331,7 @@ Select first n lines from input.
 
 ### String().fold_funcs
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1446)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1462)
 
 ```python
 def fold_funcs(
@@ -377,7 +378,7 @@ c(b(a(line)))
 
 ### String().groupby
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1535)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1551)
 
 ```python
 def groupby(
@@ -409,7 +410,7 @@ key_func (Callable[[str], Any]): For each line generate a key to establish a gro
 
 ### String().groupby_count
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1568)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1584)
 
 ```python
 def groupby_count(
@@ -443,7 +444,7 @@ key_func (Callable[[str], Any]): For each line generate a key to establish a gro
 
 ### String().head
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L798)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L814)
 
 ```python
 def head(
@@ -491,7 +492,7 @@ element, and _rest_ or _tail_, which is the remainder of the list.
 
 ### String().json_loads
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L574)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L590)
 
 ```python
 @property
@@ -506,7 +507,7 @@ bool, int, string, dict, list: Unmarshaled JSON data.
 
 ### String().lastn
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L766)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L782)
 
 ```python
 def lastn(
@@ -542,7 +543,7 @@ Select last n lines from input.
 
 ### String().line_tuples
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1070)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1086)
 
 ```python
 def line_tuples(
@@ -600,7 +601,7 @@ all (N) tokens after the split of that line.
 
 ### String().lines
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1125)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1141)
 
 ```python
 def lines(sub_pattern=None, replacement=None, pattern=None, exclude=False):
@@ -638,7 +639,7 @@ in `pattern`.
 
 ### String().map_func
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1376)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1392)
 
 ```python
 def map_func(
@@ -668,7 +669,7 @@ the resulting list. Result of calling 'func' should not be None.
 
 ### String().pairs
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1493)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1509)
 
 ```python
 def pairs(
@@ -706,9 +707,55 @@ in the split line will be discarded.
 
 - `list` - List of tuples of tuples or list of dicts.
 
+### String().partial
+
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1619)
+
+```python
+def partial(
+    func,
+    sub_pattern=None,
+    replacement=None,
+    pattern=None,
+    exclude=False,
+):
+```
+
+A partial application method, which for each line from input partially
+applies function in `func` supplying the line from input as first
+positional argument to function effectively reducing the arity of
+function in `func` by one argument. This method is useful for situations
+where doing something more with the contents of line than
+simple splitting and/or field extraction is necessary. A good example
+is converting a line into a dictionary after selecting only certain
+tokens in the line, and then having to supply keys in order to create
+_key:value_ pairs and convert these _key:value_ pairs into a dict.
+
+```
+from integraty.xstring import String
+>>> s = String('alpha beta gamma\nbeta gamma delta\n')
+>>> partially_applied = s.partial(lambda l, keys: dict(zip(keys, l.split())))
+>>> keys = ['first', 'second', 'third']
+>>> [f(keys) for f in partially_applied]
+[{'first': 'alpha', 'second': 'beta', 'third': 'gamma'}, {'first': 'beta', 'second': 'gamma', 'third': 'delta'}]
+
+```
+
+#### Arguments
+
+func (Callable[[Any,...], Any]): Partially apply `func` to each line in input.
+- `sub_pattern` *str, optional* - Substitution regex pattern. Defaults to None.
+- `replacement` *str, optional* - Text with which to replace all matches of `sub_pattern`. Defaults to None.
+- `pattern` *str, optional* - Select lines matching pattern. Defaults to None.
+- `exclude` *bool, optional* - Invert pattern matching. Defaults to False.
+
+#### Returns
+
+- `list` - List of partially applied functions; one per line.
+
 ### String().skip_lines
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L597)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L613)
 
 ```python
 def skip_lines(
@@ -759,7 +806,7 @@ terms of `grep` and [String().head](#stringhead) or [String().tail](#stringtail)
 
 ### String().tail
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L845)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L861)
 
 ```python
 def tail(
@@ -807,7 +854,7 @@ element, and _rest_ or _tail_, which is the remainder of the list.
 
 ### String().take_column
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L936)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L952)
 
 ```python
 def take_column(
@@ -852,7 +899,7 @@ line on `sep`.
 
 ### String().take_range_fields
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1035)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1051)
 
 ```python
 def take_range_fields(
@@ -885,7 +932,7 @@ from input, after splitting the line on `sep`.
 
 ### String().to_dict
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L692)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L708)
 
 ```python
 def to_dict(keys=None, sep=None, maxsplit=-1, pattern=None, exclude=False):
@@ -928,7 +975,7 @@ len(line) == 3, resulting dict is {0: line[0], 1: line[1], 2: line[2]}.
 
 ### String().to_dict_func
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L652)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L668)
 
 ```python
 def to_dict_func(
@@ -969,7 +1016,7 @@ was applied.
 
 ### String().trim_prefix
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1164)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1180)
 
 ```python
 def trim_prefix(
@@ -998,7 +1045,7 @@ splitting, assuming substring is present.
 
 ### String().trim_suffix
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1194)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1210)
 
 ```python
 def trim_suffix(
@@ -1027,7 +1074,7 @@ splitting, assuming substring is present.
 
 ### String().with_prefix
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1224)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1240)
 
 ```python
 def with_prefix(
@@ -1070,7 +1117,7 @@ parameters, not before.
 
 ### String().with_suffix
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1266)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1282)
 
 ```python
 def with_suffix(

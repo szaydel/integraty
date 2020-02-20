@@ -1218,7 +1218,13 @@ class String(str):
         """
         Trim substring in `suffix` from beginning of each line of input, after
         splitting, assuming substring is present.
+        ```
+        >>> from integraty.xstring import String
+        >>> s = String('Α alpha beta gamma ;;\\nΒ beta gamma delta ;;\\nΔ delta sigma lambda ;;\\nΕ epsilon tau ;;\\n')
+        >>> s.trim_suffix(' ;;')
+        ['Α alpha beta gamma', 'Β beta gamma delta', 'Δ delta sigma lambda', 'Ε epsilon tau']
 
+        ```
         Args:
             suffix (str): Suffix to trim from end of each line.
             sub_pattern (str, optional): Substitution regex pattern. Defaults to None.
@@ -1438,7 +1444,15 @@ class String(str):
         of lines matching a pattern. This method is meant to give user much
         more control over how to select lines and what to do with them, before
         having them returned as a list.
+        ```
+        >>> from integraty.xstring import String
+        >>> s = String('Α alpha beta gamma\\nΒ beta gamma delta\\nΔ delta sigma lambda\\nΕ epsilon tau\\n')
+        >>> s.filtered_map(lambda l: l.replace(' ', '_'), lambda l: l.find('sigma') >= 0)
+        ['Δ_delta_sigma_lambda']
+        >>> s.filtered_map(lambda l: l.replace(' ', '_'), lambda l: l.find('alpha') >= 0)
+        ['Α_alpha_beta_gamma']
 
+        ```
         Args:
             map_func (Callable[[Any], Any]): Function to apply over given lines.
             filter_func (Callable[[Any], bool]): Function to select lines.
@@ -1487,6 +1501,13 @@ class String(str):
         b(a(line))
         c(b(a(line)))
         ```
+        ```
+        >>> from integraty.xstring import String
+        >>> s = String('Α alpha beta gamma\\nΒ beta gamma delta\\nΔ delta sigma lambda\\nΕ epsilon tau\\n')
+        >>> s.fold_funcs(lambda l: l[2:], lambda l: tuple(l.title().split()), lambda l: sorted(l))
+        [['Alpha', 'Beta', 'Gamma'], ['Beta', 'Delta', 'Gamma'], ['Delta', 'Lambda', 'Sigma'], ['Epsilon', 'Tau']]
+
+        ```
 
         Args:
             *funcs (Sequence[Callable[(s: str) -> string]]): A sequence of functions, each with a single argument, returning a single value.
@@ -1526,7 +1547,13 @@ class String(str):
 
         If a line contains odd number of tokens after being split, last token
         in the split line will be discarded.
+        ```
+        >>> from integraty.xstring import String
+        >>> s = String('Α alpha beta gamma\\nΒ beta gamma delta\\nΔ delta sigma lambda\\nΕ epsilon tau\\n')
+        >>> s.pairs()
+        [(('Α', 'alpha'), ('beta', 'gamma')), (('Β', 'beta'), ('gamma', 'delta')), (('Δ', 'delta'), ('sigma', 'lambda')), (('Ε', 'epsilon'),)]
 
+        ```
         Args:
             as_dict (bool, optional): Should pairs be inserted into a dict. Defaults to False.
             maxsplit (int, optional): Split line at most this many times. Defaults to `-1`, no limit.
@@ -1562,6 +1589,13 @@ class String(str):
         adds it to a new group if the derived key is first seen. The final
         product is a dictionary where each key maps to a list of one or more
         lines.
+        ```
+        >>> from integraty.xstring import String
+        >>> s = String('Θ alpha beta\\nψ beta gamma\\nΘ delta sigma\\nψ epsilon tau\\n')
+        >>> s.groupby(lambda l: l[0])
+        defaultdict(<class 'list'>, {'Θ': ['Θ alpha beta', 'Θ delta sigma'], 'ψ': ['ψ beta gamma', 'ψ epsilon tau']})
+
+        ```
 
         Args:
             key_func (Callable[[str], Any]): For each line generate a key to establish a group to which the line will be added.
@@ -1597,7 +1631,13 @@ class String(str):
         lines, and instead just a histogram of the data. This is most useful
         when we know for example that we expect at least X number of items in
         a particular group.
+        ```
+        >>> from integraty.xstring import String
+        >>> s = String('Θ alpha beta\\nψ beta gamma\\nΘ delta sigma\\nψ epsilon tau\\n')
+        >>> s.groupby_count(lambda l: l[0])
+        {'Θ': 2, 'ψ': 2}
 
+        ```
         Args:
             key_func (Callable[[str], Any]): For each line generate a key to establish a group to which the line will be added.
             sub_pattern (str, optional): Substitution regex pattern. Defaults to None.

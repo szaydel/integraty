@@ -46,7 +46,7 @@ class String(str):
 
 ### String().at_least_n_substr
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1345)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1351)
 
 ```python
 def at_least_n_substr(substr=None, n=0):
@@ -54,7 +54,7 @@ def at_least_n_substr(substr=None, n=0):
 
 ### String().at_most_n_substr
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1348)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1354)
 
 ```python
 def at_most_n_substr(substr=None, n=0):
@@ -135,7 +135,7 @@ Count number of lines in the supplied string.
 
 ### String().count_substrs
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1316)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1322)
 
 ```python
 def count_substrs(substr=None, pattern=None, exclude=False):
@@ -215,7 +215,7 @@ this produces: [('alpha', 'delta'), ('beta', 'epsilon'), ('gamma',
 
 ### String().filter_func
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1351)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1357)
 
 ```python
 def filter_func(
@@ -258,7 +258,7 @@ from integraty.xstring import String
 
 ### String().filtered_map
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1423)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1429)
 
 ```python
 def filtered_map(
@@ -279,6 +279,16 @@ mapping occur after optional substitution and selection or excludion
 of lines matching a pattern. This method is meant to give user much
 more control over how to select lines and what to do with them, before
 having them returned as a list.
+
+```
+>>> from integraty.xstring import String
+>>> s = String('Α alpha beta gamma\nΒ beta gamma delta\nΔ delta sigma lambda\nΕ epsilon tau\n')
+>>> s.filtered_map(lambda l: l.replace(' ', '_'), lambda l: l.find('sigma') >= 0)
+['Δ_delta_sigma_lambda']
+>>> s.filtered_map(lambda l: l.replace(' ', '_'), lambda l: l.find('alpha') >= 0)
+['Α_alpha_beta_gamma']
+
+```
 
 #### Arguments
 
@@ -331,7 +341,7 @@ Select first n lines from input.
 
 ### String().fold_funcs
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1462)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1476)
 
 ```python
 def fold_funcs(
@@ -364,6 +374,14 @@ b(a(line))
 c(b(a(line)))
 ```
 
+```
+>>> from integraty.xstring import String
+>>> s = String('Α alpha beta gamma\nΒ beta gamma delta\nΔ delta sigma lambda\nΕ epsilon tau\n')
+>>> s.fold_funcs(lambda l: l[2:], lambda l: tuple(l.title().split()), lambda l: sorted(l))
+[['Alpha', 'Beta', 'Gamma'], ['Beta', 'Delta', 'Gamma'], ['Delta', 'Lambda', 'Sigma'], ['Epsilon', 'Tau']]
+
+```
+
 #### Arguments
 
 - `*funcs` *(Sequence[Callable[(s* - str) -> string]]): A sequence of functions, each with a single argument, returning a single value.
@@ -378,7 +396,7 @@ c(b(a(line)))
 
 ### String().groupby
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1551)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1578)
 
 ```python
 def groupby(
@@ -396,6 +414,14 @@ adds it to a new group if the derived key is first seen. The final
 product is a dictionary where each key maps to a list of one or more
 lines.
 
+```
+>>> from integraty.xstring import String
+>>> s = String('Θ alpha beta\nψ beta gamma\nΘ delta sigma\nψ epsilon tau\n')
+>>> s.groupby(lambda l: l[0])
+defaultdict(<class 'list'>, {'Θ': ['Θ alpha beta', 'Θ delta sigma'], 'ψ': ['ψ beta gamma', 'ψ epsilon tau']})
+
+```
+
 #### Arguments
 
 key_func (Callable[[str], Any]): For each line generate a key to establish a group to which the line will be added.
@@ -410,7 +436,7 @@ key_func (Callable[[str], Any]): For each line generate a key to establish a gro
 
 ### String().groupby_count
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1584)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1618)
 
 ```python
 def groupby_count(
@@ -429,6 +455,14 @@ give a flexible mechanism for group results without keeping all the
 lines, and instead just a histogram of the data. This is most useful
 when we know for example that we expect at least X number of items in
 a particular group.
+
+```
+>>> from integraty.xstring import String
+>>> s = String('Θ alpha beta\nψ beta gamma\nΘ delta sigma\nψ epsilon tau\n')
+>>> s.groupby_count(lambda l: l[0])
+{'Θ': 2, 'ψ': 2}
+
+```
 
 #### Arguments
 
@@ -639,7 +673,7 @@ in `pattern`.
 
 ### String().map_func
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1392)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1398)
 
 ```python
 def map_func(
@@ -669,7 +703,7 @@ the resulting list. Result of calling 'func' should not be None.
 
 ### String().pairs
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1509)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1530)
 
 ```python
 def pairs(
@@ -693,6 +727,14 @@ dict it becomes: {'name': 'abc', 'path': '/var/log/abc.log'}.
 If a line contains odd number of tokens after being split, last token
 in the split line will be discarded.
 
+```
+>>> from integraty.xstring import String
+>>> s = String('Α alpha beta gamma\nΒ beta gamma delta\nΔ delta sigma lambda\nΕ epsilon tau\n')
+>>> s.pairs()
+[(('Α', 'alpha'), ('beta', 'gamma')), (('Β', 'beta'), ('gamma', 'delta')), (('Δ', 'delta'), ('sigma', 'lambda')), (('Ε', 'epsilon'),)]
+
+```
+
 #### Arguments
 
 - `as_dict` *bool, optional* - Should pairs be inserted into a dict. Defaults to False.
@@ -709,7 +751,7 @@ in the split line will be discarded.
 
 ### String().partial
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1619)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1659)
 
 ```python
 def partial(
@@ -1060,6 +1102,14 @@ def trim_suffix(
 Trim substring in `suffix` from beginning of each line of input, after
 splitting, assuming substring is present.
 
+```
+>>> from integraty.xstring import String
+>>> s = String('Α alpha beta gamma ;;\nΒ beta gamma delta ;;\nΔ delta sigma lambda ;;\nΕ epsilon tau ;;\n')
+>>> s.trim_suffix(' ;;')
+['Α alpha beta gamma', 'Β beta gamma delta', 'Δ delta sigma lambda', 'Ε epsilon tau']
+
+```
+
 #### Arguments
 
 - `suffix` *str* - Suffix to trim from end of each line.
@@ -1074,7 +1124,7 @@ splitting, assuming substring is present.
 
 ### String().with_prefix
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1240)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1246)
 
 ```python
 def with_prefix(
@@ -1117,7 +1167,7 @@ parameters, not before.
 
 ### String().with_suffix
 
-[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1282)
+[[find in source code]](https://github.com/szaydel/integratyintegraty/xstring.py#L1288)
 
 ```python
 def with_suffix(

@@ -200,13 +200,12 @@ class Functional(IntegraTestCase):
         self.log.info("Tests expected behaviour of the groupby method")
         cmd = self.get_class_var('whois_iana_org_ip6_servers_arpa')
 
-        def key_func(l):
-            return 'group A' if l.split()[1][0] <= 'C' else 'group B'
-
         with ExternalProgram(cmd) as c:
             c.exec()
             self.assertCommandSucceeded(c)
-            results_dict = c.out.groupby(key_func, pattern='nserver:')
+            results_dict = c.out.groupby(
+                lambda l: 'group A' if l.split()[1][0] <= 'C' else 'group B',
+                pattern='nserver:')
             self.assertGreaterEqual(len(results_dict['group A']), 3)
             self.assertGreaterEqual(len(results_dict['group B']), 3)
 
@@ -236,15 +235,25 @@ class Functional(IntegraTestCase):
         self.log.info("Tests expected behaviour of the groupby_count method")
         cmd = self.get_class_var('whois_iana_org_ip6_servers_arpa')
 
-        def key_func(l):
-            return 'group A' if l.split()[1][0] <= 'C' else 'group B'
-
         with ExternalProgram(cmd) as c:
             c.exec()
             self.assertCommandSucceeded(c)
-            results_dict = c.out.groupby_count(key_func, pattern='nserver:')
+            results_dict = c.out.groupby_count(
+                lambda l: 'group A' if l.split()[1][0] \
+                    <= 'C' else 'group B',
+                pattern='nserver:')
             self.assertEqual(results_dict['group A'], 3)
             self.assertEqual(results_dict['group B'], 3)
+
+            results_dict = c.out.groupby_count(lambda l: l.split()[1],
+                                               pattern='nserver:')
+            self.assertEqual(results_dict['A.IP6-SERVERS.ARPA'], 1)
+            self.assertEqual(results_dict['E.IP6-SERVERS.ARPA'], 1)
+
+            results_dict = c.out.groupby_count(lambda l: l.split()[0][:-1],
+                                               pattern='organisation|address')
+            self.assertEqual(results_dict['organisation'], 3)
+            self.assertEqual(results_dict['address'], 14)
 
 
 if __name__ == "__main__":
